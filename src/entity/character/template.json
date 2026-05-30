@@ -1,0 +1,20 @@
+{
+  "characters": [
+    {
+      "templateId": 1001,
+      "name": "Meruru",
+      "bonds": [
+        "mage"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 80,
+        "maxMp": 4,
+        "attack": 12,
+        "defense": 3,
+        "shield": 0
+      },
+      "defaultSkills": ["ReverseFuture"]
+    }
+  ]
+}

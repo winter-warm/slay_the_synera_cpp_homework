@@ -1,0 +1,32 @@
+{
+  "effects": [
+    {
+      "effectid": 1,
+      "type": "heal",
+      "name": "Reverse"
+    },
+    {
+      "effectid": 2,
+      "type": "damage",
+      "name": "Witchification",
+      "params": {
+        "amount": 2
+      }
+    },
+    {
+      "effectid": 3,
+      "type": "damage",
+      "name": "burning_damage"
+    },
+    {
+      "effectid": 4,
+      "type": "heal",
+      "name": "regeneration_heal"
+    },
+    {
+      "effectid": 5,
+      "type": "attribute",
+      "name": "attack_up_attribute"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "buffs": [
+    {
+      "buffid": 1,
+      "name": "Reverse Future",
+      "priority": 10,
+      "effects": [
+        1,
+        2
+      ]
+    },
+    {
+      "buffid": 2,
+      "name": "Burning",
+      "priority": 5,
+      "cooldown": 1.0,
+      "effects": [
+        3
+      ]
+    },
+    {
+      "buffid": 3,
+      "name": "Regeneration",
+      "priority": 5,
+      "cooldown": 1.0,
+      "effects": [
+        4
+      ]
+    },
+    {
+      "buffid": 4,
+      "name": "Attack Up",
+      "priority": 1,
+      "effects": [
+        5
+      ]
+    }
+  ]
+}
