@@ -4,7 +4,7 @@
       "templateId": 1001,
       "name": "Meruru",
       "bonds": [
-        "mage"
+        "witch","pastor"
       ],
       "team": "pc",
       "baseStats": {
@@ -15,6 +15,22 @@
         "shield": 0
       },
       "defaultSkills": ["ReverseFuture"]
+    },
+    {
+      "templateId": 1002,
+      "name": "goblin",
+      "bonds": [
+        "beast"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 120,
+        "maxMp": 10,
+        "attack": 10,
+        "defense": 6,
+        "shield": 10
+      },
+      "defaultSkills": ["Savage"]
     }
   ]
 }

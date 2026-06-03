@@ -1,17 +1,19 @@
-#include "map_utility.h"
+#include "board_utility.h"
 #include "entity/obstacle/obstacle.h"
 
-#include <QQueue>
-#include <QSet>
-#include <QtMath>
+#include <cmath>
+#include <queue>
+#include <unordered_set>
 
 static Hex roundHex(const Hex& from, const Hex& to, double t) {
     const double x = from.x + (to.x - from.x) * t;
     const double y = from.y + (to.y - from.y) * t;
     const double z = from.z + (to.z - from.z) * t;
 
-    int rx = qRound(x), ry = qRound(y), rz = qRound(z);
-    const double dx = qAbs(rx - x), dy = qAbs(ry - y), dz = qAbs(rz - z);
+    int rx = static_cast<int>(std::round(x));
+    int ry = static_cast<int>(std::round(y));
+    int rz = static_cast<int>(std::round(z));
+    const double dx = std::abs(rx - x), dy = std::abs(ry - y), dz = std::abs(rz - z);
 
     if (dx > dy && dx > dz) {
         rx = -ry - rz;
@@ -24,8 +26,8 @@ static Hex roundHex(const Hex& from, const Hex& to, double t) {
     return Hex{rx, ry, rz};
 }
 
-QVector<Hex> line(const Board& board, const Hex& from, const Hex& to) {
-    QVector<Hex> out;
+std::vector<Hex> line(const Board& board, const Hex& from, const Hex& to) {
+    std::vector<Hex> out;
     const int n = board.dist(from, to);
     out.reserve(n + 1);
 
@@ -41,8 +43,8 @@ QVector<Hex> line(const Board& board, const Hex& from, const Hex& to) {
 }
 
 bool blockedBetween(const Board& board, const Hex& from, const Hex& to) {
-    const QVector<Hex> cells = line(board, from, to);
-    for (int i = 1; i + 1 < cells.size(); ++i) {
+    const std::vector<Hex> cells = line(board, from, to);
+    for (int i = 1; i + 1 < static_cast<int>(cells.size()); ++i) {
         Obstacle* obstacle = dynamic_cast<Obstacle*>(board.unitAt(cells[i]));
         if (obstacle && obstacle->getBlockAttack()) {
             return true;
@@ -59,15 +61,16 @@ bool pathExists(const Board& board, const Hex& from, const Hex& to) {
         return true;
     }
 
-    QQueue<Hex> queue;
-    QSet<Hex> seen;
-    queue.enqueue(from);
+    std::queue<Hex> queue;
+    std::unordered_set<Hex> seen;
+    queue.push(from);
     seen.insert(from);
 
-    while (!queue.isEmpty()) {
-        const Hex cur = queue.dequeue();
+    while (!queue.empty()) {
+        const Hex cur = queue.front();
+        queue.pop();
         for (const Hex& next : board.neighbors(cur)) {
-            if (seen.contains(next)) {
+            if (seen.find(next) != seen.end()) {
                 continue;
             }
             seen.insert(next);
@@ -77,7 +80,7 @@ bool pathExists(const Board& board, const Hex& from, const Hex& to) {
             if (!board.passable(next)) {
                 continue;
             }
-            queue.enqueue(next);
+            queue.push(next);
         }
     }
     return false;

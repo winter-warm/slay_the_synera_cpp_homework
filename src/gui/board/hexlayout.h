@@ -5,20 +5,22 @@
 
 #include <QPointF>
 #include <QPolygonF>
-#include <QVector>
 #include <optional>
+#include <vector>
 
 class HexLayout {
 public:
     HexLayout();
 
-    void setCells(const QVector<Hex>& cells);
+    void setCells(const std::vector<Hex>& cells);
+    void setOrigin(const QPointF& p);
+    void setSize(qreal r, qreal gap);
     QPointF toWorld(const Hex& h) const;
     std::optional<Hex> fromWorld(const QPointF& p) const;
     QPolygonF poly(const Hex& h) const;
 
 private:
-    QVector<Hex> cellList; qreal radius = 46.0, rowGap = 69.0;
+    std::vector<Hex> cellList; QPointF origin; qreal radius = 46.0, rowGap = 69.0;
 };
 
 #endif // GUI_HEXLAYOUT_H

@@ -1,14 +1,17 @@
-#include "game.h"
+#include "battlescene.h"
 #include "entity/character/character.h"
 #include "entity/unit.h"
-#include "gui/benchslotitem.h"
-#include "gui/griditem.h"
-#include "gui/hexlayout.h"
-#include "gui/unititem.h"
+#include "gui/board/benchslotitem.h"
+#include "gui/board/griditem.h"
+#include "gui/board/hexlayout.h"
+#include "gui/board/unititem.h"
+#include <QCoreApplication>
 #include <QGraphicsScene>
+#include <algorithm>
 
 
 static constexpr qreal zGrid = 0.0, zBench = 0.2, zUnit = 1.0, zDraggingUnit = 2.0;
+static constexpr qreal sceneW = 1280.0, sceneH = 720.0, scenePad = 40.0;
 
 static QColor colorForZone(Board::Zone zone) {
     switch (zone) {
@@ -27,7 +30,7 @@ static QColor colorForZone(Board::Zone zone) {
     }
 }
 
-Game::Game(QObject* parent)
+BattleScene::BattleScene(QObject* parent)
     : QObject(parent)
     , layout(std::make_unique<HexLayout>())
     , sceneObj(new QGraphicsScene(this))
@@ -37,19 +40,25 @@ Game::Game(QObject* parent)
     , benchCols(12)
     , benchSize(78.0)
     , benchGap(10.0)
-    , benchOrigin(0.0, 0.0) {}
+    , benchOrigin(0.0, 0.0)
+    , battlePhase(BattlePhase::Prep) {}
 
-Game::~Game() {
+BattleScene::~BattleScene() {
     units.clear();
 }
 
-void Game::initialize() {
-    board.load("maps/default_board.json");
+void BattleScene::initialize() {
+    const QString appBoard = QCoreApplication::applicationDirPath() + "/boards/default_board.json";
+    if (!board.load(appBoard.toStdString()) && !board.load("boards/default_board.json")) {
+        board.load("src/core/default_board.json");
+    }
     buildScene();
     reset();
 }
 
-void Game::reset() {
+void BattleScene::reset() {
+    battlePhase = BattlePhase::Prep;
+    clearBattleUnits();
     board.clearUnits();
     places.clear();
 
@@ -68,17 +77,83 @@ void Game::reset() {
             places[unit->id()] = place;
         }
     }
+    hideBench(false);
     syncFromState();
 }
 
-Unit* Game::addCharacter(Character* character, const std::string& displayName) {
+void BattleScene::startBattle() {
+    if (!isPreparationPhase()) {
+        return;
+    }
+
+    clearHighlights();
+    clearBattleUnits();
+
+    std::vector<std::pair<Character*, Hex>> list;
+    for (const auto& entry : places) {
+        const Placement& place = entry.second;
+        if (place.area != UnitArea::Board || !place.hasHex) {
+            continue;
+        }
+        Character* character = dynamic_cast<Character*>(findUnitById(entry.first));
+        if (character) {
+            list.push_back({character, place.hex});
+        }
+    }
+
+    for (const auto& entry : list) {
+        Character* source = entry.first;
+        const Hex h = entry.second;
+        board.remove(source);
+
+        auto copy = std::make_unique<Character>(*source);
+        Character* ptr = copy.get();
+        battleUnits.push_back(std::move(copy));
+        if (board.add(ptr, h)) {
+            createUnitItem(ptr);
+        }
+    }
+
+    battlePhase = BattlePhase::Battle;
+    phase = 1;
+    hideBench(true);
+    syncFromState();
+}
+
+void BattleScene::endBattle() {
+    clearBattleUnits();
+    battlePhase = BattlePhase::Prep;
+    phase = 0;
+    places.clear();
+
+    for (Unit* unit : units) {
+        if (!unit) {
+            continue;
+        }
+
+        const QPoint slot = firstFreeBenchSlot();
+        if (slot.x() < 0) {
+            places[unit->id()] = {};
+        } else {
+            Placement place;
+            place.area = UnitArea::Bench;
+            place.slot = slot;
+            places[unit->id()] = place;
+        }
+    }
+
+    hideBench(false);
+    syncFromState();
+}
+
+Unit* BattleScene::addCharacter(Character* character, const std::string& displayName) {
     if (!character) {
         return nullptr;
     }
 
     Unit* unit = character;
     unit->setName(displayName);
-    units.append(unit);
+    units.push_back(unit);
 
     const QPoint slot = firstFreeBenchSlot();
     if (slot.x() < 0) {
@@ -98,7 +173,7 @@ Unit* Game::addCharacter(Character* character, const std::string& displayName) {
     return unit;
 }
 
-void Game::handleDragStarted(int unitId, const QPointF&) {
+void BattleScene::handleDragStarted(int unitId, const QPointF&) {
     const auto placementIt = places.find(unitId);
     if (!canDragUnit(unitId) ||
         placementIt == places.end() ||
@@ -117,7 +192,7 @@ void Game::handleDragStarted(int unitId, const QPointF&) {
     }
 }
 
-void Game::handleDragMoved(int unitId, const QPointF& scenePos) {
+void BattleScene::handleDragMoved(int unitId, const QPointF& scenePos) {
     if (!dragActive || unitId != activeUnitId) {
         return;
     }
@@ -149,7 +224,7 @@ void Game::handleDragMoved(int unitId, const QPointF& scenePos) {
     }
 }
 
-void Game::handleDropCommand(int unitId, const QPointF& scenePos) {
+void BattleScene::handleDropCommand(int unitId, const QPointF& scenePos) {
     if (!dragActive || unitId != activeUnitId) {
         return;
     }
@@ -172,7 +247,7 @@ void Game::handleDropCommand(int unitId, const QPointF& scenePos) {
     syncFromState();
 }
 
-Unit* Game::findUnitById(int unitId) const {
+Unit* BattleScene::findUnitById(int unitId) const {
     for (Unit* unit : units) {
         if (unit && unit->id() == unitId) {
             return unit;
@@ -181,17 +256,16 @@ Unit* Game::findUnitById(int unitId) const {
     return nullptr;
 }
 
-bool Game::isPreparationPhase() const {
-    // TODO: Replace with battle phase timing once it exists.
-    return true;
+bool BattleScene::isPreparationPhase() const {
+    return battlePhase == BattlePhase::Prep;
 }
 
-bool Game::canDragUnit(int unitId) const {
+bool BattleScene::canDragUnit(int unitId) const {
     Unit* unit = findUnitById(unitId);
     return isPreparationPhase() && dynamic_cast<Character*>(unit);
 }
 
-GridItem* Game::findGridItem(const Hex& hex) const {
+GridItem* BattleScene::findGridItem(const Hex& hex) const {
     for (GridItem* item : gridItems) {
         if (item && item->hex() == hex) {
             return item;
@@ -200,7 +274,7 @@ GridItem* Game::findGridItem(const Hex& hex) const {
     return nullptr;
 }
 
-BenchSlotItem* Game::findBenchSlotItem(const QPoint& slotPos) const {
+BenchSlotItem* BattleScene::findBenchSlotItem(const QPoint& slotPos) const {
     for (BenchSlotItem* item : benchItems) {
         if (item && item->slotPos() == slotPos) {
             return item;
@@ -209,7 +283,7 @@ BenchSlotItem* Game::findBenchSlotItem(const QPoint& slotPos) const {
     return nullptr;
 }
 
-BenchSlotItem* Game::findBenchSlotItemAt(const QPointF& scenePos) const {
+BenchSlotItem* BattleScene::findBenchSlotItemAt(const QPointF& scenePos) const {
     for (BenchSlotItem* item : benchItems) {
         if (!item) {
             continue;
@@ -223,7 +297,7 @@ BenchSlotItem* Game::findBenchSlotItemAt(const QPointF& scenePos) const {
     return nullptr;
 }
 
-UnitItem* Game::findUnitItem(int unitId) const {
+UnitItem* BattleScene::findUnitItem(int unitId) const {
     auto it = unitItemMap.find(unitId);
     if (it == unitItemMap.end()) {
         return nullptr;
@@ -231,7 +305,54 @@ UnitItem* Game::findUnitItem(int unitId) const {
     return it->second;
 }
 
-void Game::clearHighlights() {
+bool BattleScene::isBattleUnit(Unit* unit) const {
+    for (const auto& battleUnit : battleUnits) {
+        if (battleUnit.get() == unit) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void BattleScene::clearBattleUnits() {
+    for (const auto& battleUnit : battleUnits) {
+        Unit* unit = battleUnit.get();
+        board.remove(unit);
+        auto itemIt = unitItemMap.find(unit->id());
+        if (itemIt != unitItemMap.end()) {
+            UnitItem* item = itemIt->second;
+            unitItemMap.erase(itemIt);
+            auto vecIt = std::find(unitItems.begin(), unitItems.end(), item);
+            if (vecIt != unitItems.end()) {
+                unitItems.erase(vecIt);
+            }
+            sceneObj->removeItem(item);
+            delete item;
+        }
+    }
+    battleUnits.clear();
+}
+
+void BattleScene::hideBench(bool hidden) {
+    for (BenchSlotItem* item : benchItems) {
+        if (item) {
+            item->setVisible(!hidden);
+        }
+    }
+}
+
+QRectF BattleScene::rawBoardBounds() const {
+    QRectF bounds;
+    bool first = true;
+    for (const Hex& hex : board.cells()) {
+        const QRectF rect = layout->poly(hex).boundingRect();
+        bounds = first ? rect : bounds.united(rect);
+        first = false;
+    }
+    return bounds;
+}
+
+void BattleScene::clearHighlights() {
     for (GridItem* item : gridItems) {
         if (item) {
             item->setHoverActive(false);
@@ -247,7 +368,7 @@ void Game::clearHighlights() {
     }
 }
 
-bool Game::canApplyDrop(int unitId, const DropTarget& target) const {
+bool BattleScene::canApplyDrop(int unitId, const DropTarget& target) const {
     Unit* unit = findUnitById(unitId);
     if (!unit || !canDragUnit(unitId) || !target.valid) {
         return false;
@@ -288,7 +409,7 @@ bool Game::canApplyDrop(int unitId, const DropTarget& target) const {
     return false;
 }
 
-void Game::applyDrop(int unitId, const DropTarget& target) {
+void BattleScene::applyDrop(int unitId, const DropTarget& target) {
     Unit* unit = findUnitById(unitId);
     if (!unit) {
         return;
@@ -315,16 +436,33 @@ void Game::applyDrop(int unitId, const DropTarget& target) {
     places[unitId] = place;
 }
 
-void Game::buildScene() {
+void BattleScene::buildScene() {
     sceneObj->clear();
     gridItems.clear();
     benchItems.clear();
     unitItems.clear();
     unitItemMap.clear();
     layout->setCells(board.cells());
+    layout->setOrigin(QPointF(0.0, 0.0));
+    layout->setSize(46.0, 69.0);
 
-    QRectF totalBounds;
-    bool first = true;
+    const qreal benchW = benchCols * benchSize + (benchCols - 1) * benchGap;
+    const qreal benchH = benchRows * benchSize + (benchRows - 1) * benchGap;
+    benchOrigin = QPointF((sceneW - benchW) * 0.5, sceneH - scenePad - benchH);
+
+    QRectF rawBounds = rawBoardBounds();
+    const qreal topW = sceneW - scenePad * 2.0;
+    const qreal topH = benchOrigin.y() - scenePad * 2.0;
+    if (!rawBounds.isEmpty()) {
+        const qreal scale = std::min<qreal>(1.0, std::min(topW / rawBounds.width(), topH / rawBounds.height()));
+        layout->setSize(46.0 * scale, 69.0 * scale);
+        rawBounds = rawBoardBounds();
+    }
+
+    const qreal boardX = scenePad + qMax<qreal>(0.0, (topW - rawBounds.width()) * 0.5) - rawBounds.left();
+    const qreal boardY = scenePad + qMax<qreal>(0.0, (topH - rawBounds.height()) * 0.5) - rawBounds.top();
+    layout->setOrigin(QPointF(boardX, boardY));
+
     for (const Hex& hex : board.cells()) {
         const QPolygonF poly = layout->poly(hex);
         GridItem* gridItem = new GridItem(hex, poly);
@@ -333,13 +471,8 @@ void Game::buildScene() {
 
         sceneObj->addItem(gridItem);
         gridItems.push_back(gridItem);
-
-        const QRectF bounds = gridItem->sceneBoundingRect();
-        totalBounds = first ? bounds : totalBounds.united(bounds);
-        first = false;
     }
 
-    benchOrigin = QPointF(totalBounds.left(), totalBounds.bottom() + 64.0);
     const QRectF slotRect(0.0, 0.0, benchSize, benchSize);
 
     for (int row = 0; row < benchRows; ++row) {
@@ -349,7 +482,6 @@ void Game::buildScene() {
             slotItem->setPos(benchSlotTopLeft(row, col));
             sceneObj->addItem(slotItem);
             benchItems.push_back(slotItem);
-            totalBounds = totalBounds.united(slotItem->sceneBoundingRect());
         }
     }
 
@@ -357,10 +489,11 @@ void Game::buildScene() {
         createUnitItem(unit);
     }
 
-    sceneObj->setSceneRect(totalBounds.adjusted(-40, -40, 40, 40));
+    sceneObj->setSceneRect(QRectF(0.0, 0.0, sceneW, sceneH));
+    hideBench(!isPreparationPhase());
 }
 
-void Game::createUnitItem(Unit* unit) {
+void BattleScene::createUnitItem(Unit* unit) {
     if (!unit || unitItemMap.find(unit->id()) != unitItemMap.end()) {
         return;
     }
@@ -372,14 +505,14 @@ void Game::createUnitItem(Unit* unit) {
     unitItemMap[unit->id()] = unitItem;
 
     connect(unitItem, &UnitItem::dragStarted,
-            this, &Game::handleDragStarted);
+            this, &BattleScene::handleDragStarted);
     connect(unitItem, &UnitItem::dragMoved,
-            this, &Game::handleDragMoved);
+            this, &BattleScene::handleDragMoved);
     connect(unitItem, &UnitItem::dragDropped,
-            this, &Game::handleDropCommand);
+            this, &BattleScene::handleDropCommand);
 }
 
-void Game::syncFromState() {
+void BattleScene::syncFromState() {
     clearHighlights();
 
     for (UnitItem* item : unitItems) {
@@ -388,6 +521,26 @@ void Game::syncFromState() {
         }
 
         const int unitId = item->unit()->id();
+        if (isBattleUnit(item->unit())) {
+            item->setVisible(battlePhase == BattlePhase::Battle);
+            item->setZValue(zUnit);
+
+            Hex h;
+            if (!board.posOf(item->unit(), &h)) {
+                item->setVisible(false);
+                continue;
+            }
+
+            item->setHex(h);
+            item->setPos(layout->toWorld(h));
+            continue;
+        }
+
+        if (battlePhase == BattlePhase::Battle) {
+            item->setVisible(false);
+            continue;
+        }
+
         const auto placementIt = places.find(unitId);
         if (placementIt == places.end() || placementIt->second.area == UnitArea::Hidden) {
             item->setVisible(false);
@@ -415,7 +568,7 @@ void Game::syncFromState() {
     }
 }
 
-bool Game::isBenchSlotFree(const QPoint& slotPos, int ignoredUnitId) const {
+bool BattleScene::isBenchSlotFree(const QPoint& slotPos, int ignoredUnitId) const {
     for (const auto& entry : places) {
         if (entry.first == ignoredUnitId) {
             continue;
@@ -427,7 +580,7 @@ bool Game::isBenchSlotFree(const QPoint& slotPos, int ignoredUnitId) const {
     return true;
 }
 
-QPoint Game::firstFreeBenchSlot() const {
+QPoint BattleScene::firstFreeBenchSlot() const {
     for (int row = 0; row < benchRows; ++row) {
         for (int col = 0; col < benchCols; ++col) {
             const QPoint slot(col, row);
@@ -439,7 +592,7 @@ QPoint Game::firstFreeBenchSlot() const {
     return QPoint(-1, -1);
 }
 
-Game::DropTarget Game::dropTargetAt(const QPointF& scenePos) const {
+BattleScene::DropTarget BattleScene::dropTargetAt(const QPointF& scenePos) const {
     if (BenchSlotItem* benchSlot = findBenchSlotItemAt(scenePos)) {
         DropTarget target;
         target.area = UnitArea::Bench;
@@ -467,12 +620,15 @@ Game::DropTarget Game::dropTargetAt(const QPointF& scenePos) const {
     return out;
 }
 
-QPointF Game::benchSlotTopLeft(int row, int col) const {
+QPointF BattleScene::benchSlotTopLeft(int row, int col) const {
     return QPointF(benchOrigin.x() + col * (benchSize + benchGap),
                    benchOrigin.y() + row * (benchSize + benchGap));
 }
 
-QPointF Game::benchSlotCenter(const QPoint& slotPos) const {
+QPointF BattleScene::benchSlotCenter(const QPoint& slotPos) const {
     return benchSlotTopLeft(slotPos.y(), slotPos.x()) +
            QPointF(benchSize * 0.5, benchSize * 0.5);
 }
+
+
+

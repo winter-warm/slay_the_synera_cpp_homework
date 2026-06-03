@@ -6,6 +6,7 @@
 #include <QString>
 
 void ReverseFuture(Character* caster, Character* target);
+void Savage(Character* caster,Character* target);
 Skill skillFromName(const QString& name);
 
 enum class SkillId {

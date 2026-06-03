@@ -1,5 +1,5 @@
 #include <QApplication>
-#include "gui/gamewindow.h"
+#include "app/appwindow.h"
 
 int main(int argc, char *argv[])
 {
@@ -8,9 +8,9 @@ int main(int argc, char *argv[])
     app.setApplicationName("Synera Starter");
     app.setApplicationVersion("1.0");
 
-    GameWindow window;
+    AppWindow window;
     window.setWindowTitle("Synera - Starter");
-    window.show();
+    window.showFullScreen();
 
     return app.exec();
 }

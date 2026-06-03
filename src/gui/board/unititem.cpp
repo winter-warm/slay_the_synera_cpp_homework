@@ -1,4 +1,4 @@
-#include "gui/unititem.h"
+#include "gui/board/unititem.h"
 #include "entity/unit.h"
 #include "entity/character/character.h"
 #include "gui/HUD/characterhud.h"

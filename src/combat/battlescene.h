@@ -1,15 +1,14 @@
-#ifndef CORE_GAME_H
-#define CORE_GAME_H
+#ifndef COMBAT_BATTLESCENE_H
+#define COMBAT_BATTLESCENE_H
 
 #include <QObject>
-#include <QList>
 #include <QPoint>
 #include <QPointF>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "board.h"
+#include "core/board.h"
 
 class BenchSlotItem;
 class Character;
@@ -19,15 +18,17 @@ class QGraphicsScene;
 class Unit;
 class UnitItem;
 
-class Game : public QObject {
+class BattleScene : public QObject {
     Q_OBJECT
 
 public:
-    explicit Game(QObject* parent = nullptr);
-    ~Game();
+    explicit BattleScene(QObject* parent = nullptr);
+    ~BattleScene();
 
     void initialize();
     void reset();
+    void startBattle();
+    void endBattle();
 
     Unit* addCharacter(Character* character, const std::string& displayName = "Character");
 
@@ -39,6 +40,7 @@ public:
 
     int phase = 0;
 private:
+    enum class BattlePhase { Prep, Battle };
     enum class UnitArea { Hidden, Board, Bench };
 
     struct Placement {
@@ -57,6 +59,10 @@ private:
     };
 
     Unit* findUnitById(int unitId) const;
+    bool isBattleUnit(Unit* unit) const;
+    void clearBattleUnits();
+    void hideBench(bool hidden);
+    QRectF rawBoardBounds() const;
     bool isPreparationPhase() const;
     bool canDragUnit(int unitId) const;
     GridItem* findGridItem(const Hex& hex) const;
@@ -78,7 +84,8 @@ private:
 
     Board board;
     std::unique_ptr<HexLayout> layout;
-    QList<Unit*> units;
+    std::vector<Unit*> units;
+    std::vector<std::unique_ptr<Character>> battleUnits;
 
     QGraphicsScene* sceneObj;
     std::vector<GridItem*> gridItems;
@@ -95,6 +102,9 @@ private:
     qreal benchSize;
     qreal benchGap;
     QPointF benchOrigin;
+    BattlePhase battlePhase;
 };
 
-#endif // CORE_GAME_H
+#endif // COMBAT_BATTLESCENE_H
+
+

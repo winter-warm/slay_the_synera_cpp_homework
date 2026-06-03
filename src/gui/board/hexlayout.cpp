@@ -4,15 +4,24 @@
 
 HexLayout::HexLayout() = default;
 
-void HexLayout::setCells(const QVector<Hex>& cells) {
+void HexLayout::setCells(const std::vector<Hex>& cells) {
     cellList = cells;
+}
+
+void HexLayout::setOrigin(const QPointF& p) {
+    origin = p;
+}
+
+void HexLayout::setSize(qreal r, qreal gap) {
+    radius = r;
+    rowGap = gap;
 }
 
 QPointF HexLayout::toWorld(const Hex& h) const {
     const qreal col = h.x, row = h.z;
     const qreal gap = radius * qSqrt(3.0);
     const qreal shift = (h.z % 2 == 0) ? gap * 0.5 : 0.0;
-    return QPointF(shift + col * gap, row * rowGap);
+    return origin + QPointF(shift + col * gap, row * rowGap);
 }
 
 std::optional<Hex> HexLayout::fromWorld(const QPointF& p) const {

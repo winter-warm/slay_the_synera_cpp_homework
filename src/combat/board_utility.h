@@ -1,12 +1,12 @@
-#ifndef MAP_UTILITY_H
-#define MAP_UTILITY_H
+#ifndef BOARD_UTILITY_H
+#define BOARD_UTILITY_H
 
 #include "core/board.h"
 
-#include <QVector>
+#include <vector>
 
-QVector<Hex> line(const Board& board, const Hex& from, const Hex& to);
+std::vector<Hex> line(const Board& board, const Hex& from, const Hex& to);
 bool blockedBetween(const Board& board, const Hex& from, const Hex& to);
 bool pathExists(const Board& board, const Hex& from, const Hex& to);
 
-#endif // MAP_UTILITY_H
+#endif // BOARD_UTILITY_H

@@ -14,7 +14,7 @@
 //buff已包含memory
 
 class Equipment;
-enum class Bond:char{none,soldier,mage,animal,building};
+enum class Bond:int{none,soldier,mage,animal,building,pastor,witch,beast,chess};
 class Character : public Unit
 {
 private:

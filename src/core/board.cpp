@@ -8,7 +8,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
-#include <QtMath>
+#include <cmath>
 #include <utility>
 
 static Board::Zone zoneFromChar(QChar ch) {
@@ -32,8 +32,8 @@ Board::Board() = default;
 
 Board::~Board() = default;
 
-bool Board::load(const QString& path) {
-    QFile file(path);
+bool Board::load(const std::string& path) {
+    QFile file(QString::fromStdString(path));
     if (!file.open(QIODevice::ReadOnly)) {
         qDebug() << "Failed to open board map:" << file.errorString();
         return false;
@@ -52,12 +52,12 @@ bool Board::load(const QString& path) {
     }
 
     const QJsonObject root = doc.object();
-    boardId = root.value("id").toString();
+    boardId = root.value("id").toString().toStdString();
     return build(root.value("map").toArray(), root.value("obstacles").toArray());
 }
 
 bool Board::build(const QJsonArray& rows, const QJsonArray& obstacleRows) {
-    QHash<Hex, Cell> next;
+    std::unordered_map<Hex, Cell> next;
     for (int row = 0; row < rows.size(); ++row) {
         const QString line = rows.at(row).toString();
         for (int col = 0; col < line.size(); ++col) {
@@ -67,22 +67,22 @@ bool Board::build(const QJsonArray& rows, const QJsonArray& obstacleRows) {
             }
 
             const Hex h{col, -col - row, row};
-            if (!isValidHex(h) || next.contains(h)) {
+            if (!isValidHex(h) || next.find(h) != next.end()) {
                 qDebug() << "invalid or duplicate board cell";
                 return false;
             }
 
             Cell cell; cell.pass = true; cell.zone = zoneFromChar(ch);
-            next.insert(h, cell);
+            next.emplace(h, cell);
         }
     }
 
-    for (auto it = cellMap.begin(); it != cellMap.end(); ++it) {
-        it.value().unit = nullptr;
+    for (auto& entry : cellMap) {
+        entry.second.unit = nullptr;
     }
-    for (auto it = unitPos.begin(); it != unitPos.end(); ++it) {
-        if (it.key()) {
-            it.key()->clearPosition();
+    for (auto& entry : unitPos) {
+        if (entry.first) {
+            entry.first->clearPosition();
         }
     }
     unitPos.clear();
@@ -129,75 +129,75 @@ void Board::addObstacle(const Hex& h, bool blockAttack, int image) {
     }
 }
 
-QVector<Hex> Board::cells() const {
-    QVector<Hex> out;
+std::vector<Hex> Board::cells() const {
+    std::vector<Hex> out;
     out.reserve(cellMap.size());
-    for (auto it = cellMap.cbegin(); it != cellMap.cend(); ++it) {
-        out.push_back(it.key());
+    for (const auto& entry : cellMap) {
+        out.push_back(entry.first);
     }
     return out;
 }
 
 bool Board::has(const Hex& h) const {
-    return cellMap.contains(h);
+    return cellMap.find(h) != cellMap.end();
 }
 
 bool Board::empty(const Hex& h) const {
-    auto it = cellMap.constFind(h);
-    return it != cellMap.cend() && it.value().unit == nullptr;
+    auto it = cellMap.find(h);
+    return it != cellMap.end() && it->second.unit == nullptr;
 }
 
 bool Board::passable(const Hex& h) const {
-    auto it = cellMap.constFind(h);
-    return it != cellMap.cend() && it.value().pass && it.value().unit == nullptr;
+    auto it = cellMap.find(h);
+    return it != cellMap.end() && it->second.pass && it->second.unit == nullptr;
 }
 
 Board::Zone Board::zone(const Hex& h) const {
-    auto it = cellMap.constFind(h);
-    return it == cellMap.cend() ? Zone::None : it.value().zone;
+    auto it = cellMap.find(h);
+    return it == cellMap.end() ? Zone::None : it->second.zone;
 }
 
 Unit* Board::unitAt(const Hex& h) const {
-    auto it = cellMap.constFind(h);
-    return it == cellMap.cend() ? nullptr : it.value().unit;
+    auto it = cellMap.find(h);
+    return it == cellMap.end() ? nullptr : it->second.unit;
 }
 
 bool Board::posOf(Unit* unit, Hex* out) const {
-    auto it = unitPos.constFind(unit);
-    if (it == unitPos.cend() || !out) {
+    auto it = unitPos.find(unit);
+    if (it == unitPos.end() || !out) {
         return false;
     }
-    *out = it.value();
+    *out = it->second;
     return true;
 }
 
 bool Board::add(Unit* unit, const Hex& h) {
     auto it = cellMap.find(h);
-    if (!unit || it == cellMap.end() || !it.value().pass || it.value().unit || unitPos.contains(unit)) {
+    if (!unit || it == cellMap.end() || !it->second.pass || it->second.unit || unitPos.find(unit) != unitPos.end()) {
         return false;
     }
 
-    it.value().unit = unit;
-    unitPos.insert(unit, h);
+    it->second.unit = unit;
+    unitPos.emplace(unit, h);
     unit->setPosition(h);
     return true;
 }
 
 bool Board::move(Unit* unit, const Hex& h) {
     auto from = unitPos.find(unit); auto to = cellMap.find(h);
-    if (!unit || from == unitPos.end() || to == cellMap.end() || !to.value().pass) {
+    if (!unit || from == unitPos.end() || to == cellMap.end() || !to->second.pass) {
         return false;
     }
-    if (to.value().unit && to.value().unit != unit) {
+    if (to->second.unit && to->second.unit != unit) {
         return false;
     }
-    if (from.value() == h) {
+    if (from->second == h) {
         return true;
     }
 
-    cellMap[from.value()].unit = nullptr;
-    to.value().unit = unit;
-    from.value() = h;
+    cellMap[from->second].unit = nullptr;
+    to->second.unit = unit;
+    from->second = h;
     unit->setPosition(h);
     return true;
 }
@@ -208,19 +208,19 @@ void Board::remove(Unit* unit) {
         return;
     }
 
-    auto cell = cellMap.find(it.value());
-    if (cell != cellMap.end() && cell.value().unit == unit) {
-        cell.value().unit = nullptr;
+    auto cell = cellMap.find(it->second);
+    if (cell != cellMap.end() && cell->second.unit == unit) {
+        cell->second.unit = nullptr;
     }
     unitPos.erase(it);
     unit->clearPosition();
 }
 
 void Board::clearUnits() {
-    QVector<Unit*> list;
-    for (auto it = unitPos.cbegin(); it != unitPos.cend(); ++it) {
-        if (!dynamic_cast<Obstacle*>(it.key())) {
-            list.push_back(it.key());
+    std::vector<Unit*> list;
+    for (const auto& entry : unitPos) {
+        if (!dynamic_cast<Obstacle*>(entry.first)) {
+            list.push_back(entry.first);
         }
     }
     for (Unit* unit : list) {
@@ -228,20 +228,20 @@ void Board::clearUnits() {
     }
 }
 
-QVector<Unit*> Board::units() const {
-    QVector<Unit*> out;
+std::vector<Unit*> Board::units() const {
+    std::vector<Unit*> out;
     out.reserve(unitPos.size());
-    for (auto it = unitPos.cbegin(); it != unitPos.cend(); ++it) {
-        out.push_back(it.key());
+    for (const auto& entry : unitPos) {
+        out.push_back(entry.first);
     }
     return out;
 }
 
 int Board::dist(const Hex& a, const Hex& b) const {
-    return (qAbs(a.x - b.x) + qAbs(a.y - b.y) + qAbs(a.z - b.z)) / 2;
+    return (std::abs(a.x - b.x) + std::abs(a.y - b.y) + std::abs(a.z - b.z)) / 2;
 }
 
-QVector<Hex> Board::neighbors(const Hex& h) const {
+std::vector<Hex> Board::neighbors(const Hex& h) const {
     static const Hex dirs[] = {
         {1, -1, 0},
         {1, 0, -1},
@@ -251,7 +251,7 @@ QVector<Hex> Board::neighbors(const Hex& h) const {
         {0, -1, 1}
     };
 
-    QVector<Hex> out;
+    std::vector<Hex> out;
     out.reserve(6);
     for (const Hex& d : dirs) {
         const Hex n{h.x + d.x, h.y + d.y, h.z + d.z};

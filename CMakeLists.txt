@@ -12,6 +12,7 @@ set(CMAKE_AUTOUIC ON)
 
 # QT6 dependency
 find_package(Qt6 COMPONENTS Core Widgets Gui REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 file(GLOB_RECURSE SOURCES 
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
@@ -38,9 +39,25 @@ target_link_libraries(Synera_Starter PRIVATE
 )
 
 add_custom_command(TARGET Synera_Starter POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+        "$<TARGET_FILE_DIR:Synera_Starter>/boards"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/core/default_board.json"
+        "$<TARGET_FILE_DIR:Synera_Starter>/boards/default_board.json"
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/core/maps"
-        "$<TARGET_FILE_DIR:Synera_Starter>/maps"
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets"
+        "$<TARGET_FILE_DIR:Synera_Starter>/assets"
+)
+
+add_custom_target(copy_runtime_assets ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+        "$<TARGET_FILE_DIR:Synera_Starter>/boards"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/core/default_board.json"
+        "$<TARGET_FILE_DIR:Synera_Starter>/boards/default_board.json"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets"
+        "$<TARGET_FILE_DIR:Synera_Starter>/assets"
 )
 
 if(WIN32)
@@ -49,6 +66,7 @@ endif()
 
 if(UNIX)
     target_link_libraries(Synera_Starter PRIVATE pthread)
+target_link_libraries(Synera_Starter PRIVATE Qt6::Widgets)
 endif()
 
 if(APPLE)
