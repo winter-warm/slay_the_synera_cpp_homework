@@ -1,16 +1,7 @@
 #include "buffcomponent.h"
 
 void BuffComponent::addBuff(std::unique_ptr<buff> buf){
-    if (!buf) {
-        return;
-    }
-
-    AddBuffContext context{owner, buf.get(), false};
-    beforeAddBuff(context);
-    if(!context.cancelled){
-        buf->apply(owner);
-        buffmanager.append(buf);
-    }
+    buffmanager.append(buf);
 }
 void BuffComponent::update(float deltaTime){
     TurnContext context{owner, deltaTime};

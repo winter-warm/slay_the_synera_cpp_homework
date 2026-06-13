@@ -1,9 +1,9 @@
 #include "gamehud.h"
+#include <QApplication>
 #include <QCoreApplication>
 #include <QDir>
 #include <QHBoxLayout>
 #include <QIcon>
-#include <QInputDialog>
 #include <QLabel>
 #include <QMessageBox>
 #include <QPixmap>
@@ -51,7 +51,7 @@ GameHud::GameHud(QWidget* parent)
     , hpLabel(new QLabel(this))
     , coinIconLabel(makeIconLabel(this, "ui_coin.png", QSize(42, 42)))
     , goldLabel(new QLabel(this))
-    , saveButton(makeHudButton(this, "bottom_save.png", QSize(92, 52), QSize(86, 44)))
+    , exitButton(makeHudButton(this, "bottom_exit.png", QSize(118, 58), QSize(112, 52)))
     , bagButton(makeHudButton(this, "bottom_bag.png", QSize(58, 58), QSize(48, 52)))
     , shopButton(makeHudButton(this, "bottom_shop.png", QSize(58, 58), QSize(48, 52))) {
     setFixedHeight(72);
@@ -71,23 +71,18 @@ GameHud::GameHud(QWidget* parent)
     layout->addWidget(coinIconLabel);
     layout->addWidget(goldLabel);
     layout->addStretch();
-    layout->addWidget(saveButton);
+    layout->addWidget(exitButton);
     layout->addWidget(bagButton);
     layout->addWidget(shopButton);
 
     connect(bagButton, &QToolButton::clicked, this, [this]() {
+        // TODO(hextech-bag): display selected HexTechCardRecord entries here; remove this comment after bag UI is implemented.
         QMessageBox::information(this, "Bag", "Bag panel placeholder.");
     });
     connect(shopButton, &QToolButton::clicked, this, [this]() {
         QMessageBox::information(this, "Shop", "Shop panel placeholder.");
     });
-    connect(saveButton, &QToolButton::clicked, this, [this]() {
-        bool ok = false;
-        const int slot = QInputDialog::getInt(this, "Save", "Slot:", 1, 1, 3, 1, &ok);
-        if (ok) {
-            emit saveRequested(slot);
-        }
-    });
+    connect(exitButton, &QToolButton::clicked, qApp, &QApplication::quit);
 
     setStyleSheet(R"(
         GameHud {

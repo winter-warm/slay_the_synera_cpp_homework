@@ -37,6 +37,10 @@ AppWindow::AppWindow(QWidget* parent)
 
     connect(eventPage, &EventPage::eventFinished,
             manager, &GameManager::finishEvent);
+    connect(eventPage, &EventPage::eventOptionSelected,
+            manager, &GameManager::chooseEventOption);
+    connect(eventPage, &EventPage::hexTechCardSelected,
+            manager, &GameManager::chooseHexTechCard);
     connect(eventPage, &EventPage::saveRequested,
             manager, &GameManager::saveToSlot);
 

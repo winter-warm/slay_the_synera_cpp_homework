@@ -1,0 +1,106 @@
+{
+  "battles": {
+    "1": {
+      "normal": [
+        { "kind": "normal", "boardId": "default_board", "enemyTemplateIds": [1002] },
+        { "kind": "normal", "boardId": "default_board", "enemyTemplateIds": [1002, 1002] },
+        { "kind": "normal", "boardId": "default_board", "enemyTemplateIds": [1101, 1101] },
+        { "kind": "normal", "boardId": "default_board", "enemyTemplateIds": [1101, 1104] }
+      ],
+      "elite": [
+        { "kind": "elite", "boardId": "default_board", "enemyTemplateIds": [1102, 1103, 1104] },
+        { "kind": "elite", "boardId": "default_board", "enemyTemplateIds": [1101, 1105] },
+        { "kind": "elite", "boardId": "default_board", "enemyTemplateIds": [1106, 1101, 1101] }
+      ],
+      "boss": [
+        { "kind": "boss", "boardId": "default_board", "enemyTemplateIds": [1002, 1002, 1002] }
+      ]
+    },
+    "2": {
+      "normal": [
+        { "kind": "normal", "boardId": "default_board", "enemyTemplateIds": [1002, 1002] }
+      ],
+      "elite": [
+        { "kind": "elite", "boardId": "default_board", "enemyTemplateIds": [1002, 1002, 1002] }
+      ],
+      "boss": [
+        { "kind": "boss", "boardId": "default_board", "enemyTemplateIds": [1002, 1002, 1002] }
+      ]
+    },
+    "3": {
+      "normal": [
+        { "kind": "normal", "boardId": "default_board", "enemyTemplateIds": [1002, 1002] }
+      ],
+      "elite": [
+        { "kind": "elite", "boardId": "default_board", "enemyTemplateIds": [1002, 1002, 1002] }
+      ],
+      "boss": [
+        { "kind": "boss", "boardId": "default_board", "enemyTemplateIds": [1002, 1002, 1002, 1002] }
+      ]
+    }
+  },
+  "events": {
+    "default": {
+      "steps": {
+        "start": {
+          "title": "Roadside Event",
+          "text": "A quiet event placeholder waits for real story content.",
+          "options": [
+            {
+              "label": "Leave",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "2": {
+      "steps": {
+        "start": {
+          "title": "Rest Site",
+          "text": "The party takes a brief rest before moving on.",
+          "options": [
+            {
+              "label": "Continue",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "15": {
+      "steps": {
+        "start": {
+          "title": "Ambush Test",
+          "text": "A suspicious path offers a future branch point.",
+          "options": [
+            {
+              "label": "Fight through",
+              "actions": [
+                {
+                  "type": "startBattle",
+                  "returnStepId": "afterBattle",
+                  "battle": { "kind": "normal", "boardId": "default_board", "enemyTemplateIds": [1002] }
+                }
+              ]
+            },
+            {
+              "label": "Avoid it",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        },
+        "afterBattle": {
+          "title": "Ambush Cleared",
+          "text": "The path is safe again.",
+          "options": [
+            {
+              "label": "Return to the map",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    }
+  }
+}

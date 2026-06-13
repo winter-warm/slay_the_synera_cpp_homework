@@ -14,6 +14,10 @@ static Bond bondFromString(const QString& value){
     if(value == "mage"){return Bond::mage;}
     if(value == "animal"){return Bond::animal;}
     if(value == "building"){return Bond::building;}
+    if(value == "pastor"){return Bond::pastor;}
+    if(value == "witch"){return Bond::witch;}
+    if(value == "beast"){return Bond::beast;}
+    if(value == "chess"){return Bond::chess;}
     return Bond::none;
 }
 

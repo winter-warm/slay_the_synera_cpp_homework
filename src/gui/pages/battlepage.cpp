@@ -50,11 +50,13 @@ BattlePage::BattlePage(QWidget* parent)
 BattlePage::~BattlePage() = default;
 
 void BattlePage::setState(const GameState& state) {
+    currentState = state;
     hud->setState(state);
 }
 
 void BattlePage::startNodeBattle(int) {
-    game->reset();
+    game->setActiveAuraIds(currentState.activeAuraIds);
+    game->loadBattle(currentState.currentBattle);
     QTimer::singleShot(0, this, &BattlePage::fitSceneInView);
 }
 

@@ -1,11 +1,16 @@
 #include "battlescene.h"
 #include "entity/character/character.h"
+#include "entity/character/characterfactory.h"
 #include "entity/unit.h"
 #include "gui/board/benchslotitem.h"
 #include "gui/board/griditem.h"
 #include "gui/board/hexlayout.h"
 #include "gui/board/unititem.h"
+#include "combat/buff/bufffactory.h"
+#include "world/hextech/hextechrepository.h"
 #include <QCoreApplication>
+#include <QDir>
+#include <QFile>
 #include <QGraphicsScene>
 #include <algorithm>
 
@@ -41,17 +46,15 @@ BattleScene::BattleScene(QObject* parent)
     , benchSize(78.0)
     , benchGap(10.0)
     , benchOrigin(0.0, 0.0)
-    , battlePhase(BattlePhase::Prep) {}
+    , battlePhase(BattlePhase::Prep)
+    , currentBattleKind(BattleKind::None) {}
 
 BattleScene::~BattleScene() {
     units.clear();
 }
 
 void BattleScene::initialize() {
-    const QString appBoard = QCoreApplication::applicationDirPath() + "/boards/default_board.json";
-    if (!board.load(appBoard.toStdString()) && !board.load("boards/default_board.json")) {
-        board.load("src/core/default_board.json");
-    }
+    board.load(boardPathForId("default_board"));
     buildScene();
     reset();
 }
@@ -59,6 +62,7 @@ void BattleScene::initialize() {
 void BattleScene::reset() {
     battlePhase = BattlePhase::Prep;
     clearBattleUnits();
+    clearEnemyUnits();
     board.clearUnits();
     places.clear();
 
@@ -79,6 +83,59 @@ void BattleScene::reset() {
     }
     hideBench(false);
     syncFromState();
+}
+
+void BattleScene::loadBattle(const BattleConfig& config) {
+    battlePhase = BattlePhase::Prep;
+    currentBattleKind = config.kind;
+    clearBattleUnits();
+    clearEnemyUnits();
+
+    if (!board.load(boardPathForId(config.boardId))) {
+        board.load(boardPathForId("default_board"));
+    }
+    buildScene();
+    reset();
+
+    std::vector<Hex> enemyCells = freeEnemyCells();
+    int cellIndex = 0;
+    for (int templateId : config.enemyTemplateIds) {
+        if (cellIndex >= static_cast<int>(enemyCells.size())) {
+            break;
+        }
+        std::unique_ptr<Character> enemy = characterfactory::create(templateId);
+        if (!enemy) {
+            continue;
+        }
+        Character* raw = enemy.get();
+        enemyUnits.push_back(std::move(enemy));
+        if (board.add(raw, enemyCells[static_cast<size_t>(cellIndex++)])) {
+            createUnitItem(raw);
+        }
+    }
+    syncFromState();
+}
+
+void BattleScene::setActiveAuraIds(const std::vector<std::string>& auraIds) {
+    activeAuras.clear();
+    HexTechRepository repository;
+    for (const std::string& auraId : auraIds) {
+        const auto definition = repository.findById(auraId);
+        if (!definition) {
+            continue;
+        }
+
+        ActiveAura aura;
+        aura.hexTechId = definition->id;
+        for (const HexTechEffect& effect : definition->effects) {
+            if (isLongTermHexTechEffect(effect)) {
+                aura.effects.push_back(effect);
+            }
+        }
+        if (!aura.effects.empty()) {
+            activeAuras.push_back(std::move(aura));
+        }
+    }
 }
 
 void BattleScene::startBattle() {
@@ -108,6 +165,8 @@ void BattleScene::startBattle() {
 
         auto copy = std::make_unique<Character>(*source);
         Character* ptr = copy.get();
+        applyActiveAuras(ptr);
+        ptr->onBattleStart();
         battleUnits.push_back(std::move(copy));
         if (board.add(ptr, h)) {
             createUnitItem(ptr);
@@ -262,7 +321,8 @@ bool BattleScene::isPreparationPhase() const {
 
 bool BattleScene::canDragUnit(int unitId) const {
     Unit* unit = findUnitById(unitId);
-    return isPreparationPhase() && dynamic_cast<Character*>(unit);
+    Character* character = dynamic_cast<Character*>(unit);
+    return isPreparationPhase() && character && character->getteam().getteam() == teams::pc;
 }
 
 GridItem* BattleScene::findGridItem(const Hex& hex) const {
@@ -331,6 +391,56 @@ void BattleScene::clearBattleUnits() {
         }
     }
     battleUnits.clear();
+}
+
+void BattleScene::clearEnemyUnits() {
+    for (const auto& enemy : enemyUnits) {
+        Unit* unit = enemy.get();
+        board.remove(unit);
+        auto itemIt = unitItemMap.find(unit->id());
+        if (itemIt != unitItemMap.end()) {
+            UnitItem* item = itemIt->second;
+            unitItemMap.erase(itemIt);
+            auto vecIt = std::find(unitItems.begin(), unitItems.end(), item);
+            if (vecIt != unitItems.end()) {
+                unitItems.erase(vecIt);
+            }
+            sceneObj->removeItem(item);
+            delete item;
+        }
+    }
+    enemyUnits.clear();
+}
+
+std::string BattleScene::boardPathForId(const std::string& boardId) const {
+    const QString fileName = QString::fromStdString(boardId) + ".json";
+    const QString appPath = QCoreApplication::applicationDirPath() + "/boards/" + fileName;
+    if (QFile::exists(appPath)) {
+        return appPath.toStdString();
+    }
+
+    const QString localPath = QDir("src/core/boards").filePath(fileName);
+    if (QFile::exists(localPath)) {
+        return localPath.toStdString();
+    }
+
+    return (QCoreApplication::applicationDirPath() + "/boards/default_board.json").toStdString();
+}
+
+std::vector<Hex> BattleScene::freeEnemyCells() const {
+    std::vector<Hex> out;
+    for (const Hex& hex : board.cells()) {
+        if (board.zone(hex) == Board::Zone::Enemy && board.empty(hex)) {
+            out.push_back(hex);
+        }
+    }
+    std::sort(out.begin(), out.end(), [](const Hex& left, const Hex& right) {
+        if (left.z != right.z) {
+            return left.z < right.z;
+        }
+        return left.x < right.x;
+    });
+    return out;
 }
 
 void BattleScene::hideBench(bool hidden) {
@@ -512,6 +622,33 @@ void BattleScene::createUnitItem(Unit* unit) {
             this, &BattleScene::handleDropCommand);
 }
 
+void BattleScene::applyActiveAuras(Character* character) {
+    if (!character) {
+        return;
+    }
+
+    for (const ActiveAura& aura : activeAuras) {
+        for (const HexTechEffect& effect : aura.effects) {
+            if (effect.type != "apply_buff" || effect.buffId <= 0) {
+                continue;
+            }
+            if (effect.modifierKey == "boss_only" && currentBattleKind != BattleKind::Boss) {
+                continue;
+            }
+            if (effect.modifierKey == "boss_elite_only" &&
+                currentBattleKind != BattleKind::Boss &&
+                currentBattleKind != BattleKind::Elite) {
+                continue;
+            }
+
+            std::unique_ptr<buff> created = bufffactory::create(effect.buffId, effect.duration);
+            if (created) {
+                character->getbuff().addBuff(std::move(created));
+            }
+        }
+    }
+}
+
 void BattleScene::syncFromState() {
     clearHighlights();
 
@@ -521,6 +658,18 @@ void BattleScene::syncFromState() {
         }
 
         const int unitId = item->unit()->id();
+        Character* character = dynamic_cast<Character*>(item->unit());
+        if (character && character->getteam().getteam() == teams::enemy) {
+            item->setVisible(true);
+            item->setZValue(zUnit);
+            Hex h;
+            if (board.posOf(item->unit(), &h)) {
+                item->setHex(h);
+                item->setPos(layout->toWorld(h));
+            }
+            continue;
+        }
+
         if (isBattleUnit(item->unit())) {
             item->setVisible(battlePhase == BattlePhase::Battle);
             item->setZValue(zUnit);

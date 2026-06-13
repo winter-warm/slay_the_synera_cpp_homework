@@ -2,6 +2,7 @@
 #define CHARACTERHUD_H
 
 #include <QColor>
+#include <QPixmap>
 #include <QRectF>
 #include <string>
 
@@ -20,8 +21,11 @@ public:
     void paint(QPainter* painter, const QRectF& bounds) const;
 
 private:
+    void loadPawnImage();
+
     std::string displayNameValue;
     QColor fillColor;
+    QPixmap pawnImage;
     bool visible;
 };
 

@@ -24,7 +24,7 @@ private:
     QLabel* hpLabel;
     QLabel* coinIconLabel;
     QLabel* goldLabel;
-    QToolButton* saveButton;
+    QToolButton* exitButton;
     QToolButton* bagButton;
     QToolButton* shopButton;
 };

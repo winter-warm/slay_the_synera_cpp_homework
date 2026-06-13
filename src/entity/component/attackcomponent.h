@@ -10,7 +10,8 @@ class AttackComponent:public component
 {
 private:
     std::vector<Skill> skill;
-    int cooldown = 0;//1s一攻击
+    float cooldown = 0.0f;
+    float attackInterval = 1.0f;
 
 public:
     AttackComponent(Character* owner,Skill skill);
@@ -19,6 +20,7 @@ public:
     void update(float deltaTime,bool ismoving);
     void attack(Character* target);
     void useskill(Character* target);
+    void modifyAttackIntervalPercent(int percent);
 };
 
 #endif // ATTACKCOMPONENT_H

@@ -2,8 +2,23 @@
 #define APP_GAMESTATE_H
 
 #include "world/map/mapgraph.h"
+#include "world/event/eventtypes.h"
+#include "world/bag/bag.h"
+#include "world/hextech/hextech.h"
 #include <QJsonObject>
+#include <string>
 #include <vector>
+
+struct CurrentEventState {
+    bool active = false;
+    int eventId = -1;
+    std::string stepId = "start";
+    std::string title;
+    std::string backgroundPath;
+    std::string text;
+    std::vector<EventOption> options;
+    bool hexTechSelection = false;
+};
 
 struct GameState {
     int seed = 0;
@@ -16,6 +31,12 @@ struct GameState {
     MapGraph map;
     std::vector<int> completedNodeIds;
     std::vector<int> availableNodeIds;
+    CurrentEventState currentEvent;
+    BattleConfig currentBattle;
+    std::string pendingEventStepAfterBattle;
+    std::vector<HexTechCardRecord> selectedHexTechCards;
+    std::vector<std::string> activeAuraIds;
+    std::vector<HexTechDefinition> currentHexTechChoices;
 
     QJsonObject toJson() const;
     static GameState fromJson(const QJsonObject& object);

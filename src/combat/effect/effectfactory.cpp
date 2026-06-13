@@ -20,6 +20,15 @@ effect::AttackHandler witchification();
 effect::TurnHandler burningDamage();
 }
 
+namespace attribute_effect {
+effect::BattleHandler statModifier();
+effect::AttackHandler damageMultiplier();
+effect::BeAttackedHandler damageReductionPercent();
+effect::BeAttackedHandler damageImmunity();
+effect::BeAttackedHandler lowHealthGuard();
+effect::DeathHandler deathProtection();
+}
+
 QJsonObject effectfactory::loadEffectList()
 {
     const QString path = QFileInfo(QString::fromUtf8(__FILE__)).dir().filePath("effectlist.json");
@@ -77,6 +86,39 @@ std::unique_ptr<effect> effectfactory::create(int effectid)
             break;
         case 4:
             created->setOnTurnStart(heal_effect::regenerationHeal());
+            break;
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+        case 12:
+        case 19:
+        case 20:
+        case 21:
+        case 25:
+            created->setOnBattleStart(attribute_effect::statModifier());
+            break;
+        case 13:
+        case 17:
+            created->setBeforeBeAttacked(attribute_effect::damageReductionPercent());
+            break;
+        case 14:
+        case 18:
+            created->setBeforeBeAttacked(attribute_effect::damageImmunity());
+            break;
+        case 15:
+            created->setBeforeBeAttacked(attribute_effect::lowHealthGuard());
+            break;
+        case 16:
+        case 22:
+        case 24:
+            created->setBeforeAttack(attribute_effect::damageMultiplier());
+            break;
+        case 23:
+            created->setBeforeDeath(attribute_effect::deathProtection());
             break;
         default:
             break;

@@ -8,6 +8,7 @@
 #include <QGraphicsProxyWidget>
 #include <QGraphicsRectItem>
 #include <QGraphicsScene>
+#include <QGraphicsTextItem>
 #include <QGraphicsView>
 #include <QIcon>
 #include <QPainter>
@@ -49,6 +50,7 @@ void MapPage::setState(const GameState& state) {
     const bool playEntryScroll = state.currentLayerId != lastAnimatedLayerId;
     if (playEntryScroll) {
         lastAnimatedLayerId = state.currentLayerId;
+        entryAnimationLayerId = state.currentLayerId;
     }
     drawLayer(state, playEntryScroll);
 }
@@ -77,6 +79,8 @@ void MapPage::drawLayer(const GameState& state, bool playEntryAnimation) {
         scrollAnimation->deleteLater();
         scrollAnimation = nullptr;
     }
+    entryBannerRect = nullptr;
+    entryBannerText = nullptr;
 
     scene->clear();
     const MapLayer* layer = state.map.layerById(state.currentLayerId);
@@ -145,7 +149,7 @@ void MapPage::drawLayer(const GameState& state, bool playEntryAnimation) {
             auto* iconItem = scene->addPixmap(icon.scaled(size, size, Qt::KeepAspectRatio,
                                                           Qt::SmoothTransformation));
             iconItem->setPos(nodePoint - QPointF(size * 0.5, size * 0.5));
-            iconItem->setOpacity(fullOpacity ? 1.0 : 0.5);
+            iconItem->setOpacity(fullOpacity ? 1.0 : 0.75);
             iconItem->setZValue(10);
         }
 
@@ -159,7 +163,9 @@ void MapPage::drawLayer(const GameState& state, bool playEntryAnimation) {
             "QToolButton:hover:enabled { background-color: rgba(255,255,255,20); }"
             "QToolButton:disabled { background: transparent; border: 0; }");
         connect(button, &QToolButton::clicked, this, [this, node]() {
-            emit nodeSelected(node.id);
+            QTimer::singleShot(0, this, [this, nodeId = node.id]() {
+                emit nodeSelected(nodeId);
+            });
         });
 
         QGraphicsProxyWidget* proxy = scene->addWidget(button);
@@ -204,12 +210,52 @@ void MapPage::playEntryScroll() {
 
     scrollBar->setValue(scrollBar->minimum());
 
+    QString bannerText;
+    if (entryAnimationLayerId == 1) {
+        bannerText = QString::fromUtf8("启航");
+    } else if (entryAnimationLayerId == 2) {
+        bannerText = QString::fromUtf8("探索");
+    } else if (entryAnimationLayerId == 3) {
+        bannerText = QString::fromUtf8("决战");
+    }
+
+    if (!bannerText.isEmpty()) {
+        const qreal bannerWidth = mapSceneWidth * mapContentRatio;
+        const qreal bannerHeight = 150.0;
+        const qreal bannerX = (mapSceneWidth - bannerWidth) * 0.5;
+        const qreal bannerY = mapSceneHeight * 0.4 - bannerHeight * 0.5;
+        entryBannerRect = scene->addRect(QRectF(bannerX, bannerY, bannerWidth, bannerHeight),
+                                         QPen(Qt::NoPen), QColor(70, 70, 70, 179));
+        entryBannerRect->setZValue(30);
+
+        entryBannerText = scene->addText(bannerText);
+        QFont bannerFont = entryBannerText->font();
+        bannerFont.setPointSize(52);
+        bannerFont.setBold(true);
+        entryBannerText->setFont(bannerFont);
+        entryBannerText->setDefaultTextColor(QColor(245, 245, 245));
+        const QRectF textBounds = entryBannerText->boundingRect();
+        entryBannerText->setPos(bannerX + (bannerWidth - textBounds.width()) * 0.5,
+                                bannerY + (bannerHeight - textBounds.height()) * 0.5);
+        entryBannerText->setZValue(31);
+    }
+
     scrollAnimation = new QPropertyAnimation(scrollBar, "value", this);
     scrollAnimation->setDuration(1800);
     scrollAnimation->setStartValue(scrollBar->minimum());
     scrollAnimation->setEndValue(scrollBar->maximum());
     scrollAnimation->setEasingCurve(QEasingCurve::InOutCubic);
     connect(scrollAnimation, &QPropertyAnimation::finished, this, [this]() {
+        if (entryBannerRect) {
+            scene->removeItem(entryBannerRect);
+            delete entryBannerRect;
+            entryBannerRect = nullptr;
+        }
+        if (entryBannerText) {
+            scene->removeItem(entryBannerText);
+            delete entryBannerText;
+            entryBannerText = nullptr;
+        }
         if (scrollAnimation) {
             scrollAnimation->deleteLater();
             scrollAnimation = nullptr;

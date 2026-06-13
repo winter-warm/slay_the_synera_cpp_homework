@@ -31,6 +31,7 @@ private:
     void fitSceneInView();
     void ensureStarterRoster();
 
+    GameState currentState;
     GameHud* hud;
     QGraphicsView* view;
     QPushButton* startButton;

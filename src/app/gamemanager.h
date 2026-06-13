@@ -28,6 +28,8 @@ public slots:
     void loadFromSlot(int slot);
     void saveToSlot(int slot);
     void enterMapNode(int nodeId);
+    void chooseEventOption(int optionIndex);
+    void chooseHexTechCard(int choiceIndex);
     void finishEvent(const EventResult& result = {});
     void finishBattle(const BattleResult& result = {});
 
@@ -43,6 +45,9 @@ private:
     void setState(const GameState& state);
     void unlockLayerStart(int layerId);
     void completeCurrentNode();
+    void loadEventStep(int eventId, const std::string& stepId);
+    void loadHexTechEvent(int layerId, int nodeId);
+    void startBattle(const BattleConfig& config);
 
     GameState currentState;
     SaveManager saves;

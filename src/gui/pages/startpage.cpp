@@ -3,7 +3,6 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QIcon>
-#include <QInputDialog>
 #include <QLabel>
 #include <QMessageBox>
 #include <QPainter>
@@ -113,11 +112,7 @@ StartPage::StartPage(QWidget* parent)
         emit newGameRequested(static_cast<int>(QRandomGenerator::global()->generate()));
     });
     connect(continueButton, &QToolButton::clicked, this, [this]() {
-        bool ok = false;
-        const int slot = QInputDialog::getInt(this, "Continue Game", "Save slot:", 1, 1, 3, 1, &ok);
-        if (ok) {
-            emit loadGameRequested(slot);
-        }
+        emit loadGameRequested(1);
     });
     connect(settingsButton, &QToolButton::clicked, this, [this]() {
         QMessageBox::information(this, "Settings", "Settings placeholder.");

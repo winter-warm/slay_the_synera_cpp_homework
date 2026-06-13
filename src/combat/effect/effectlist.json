@@ -1,32 +1,30 @@
 {
   "effects": [
-    {
-      "effectid": 1,
-      "type": "heal",
-      "name": "Reverse"
-    },
-    {
-      "effectid": 2,
-      "type": "damage",
-      "name": "Witchification",
-      "params": {
-        "amount": 2
-      }
-    },
-    {
-      "effectid": 3,
-      "type": "damage",
-      "name": "burning_damage"
-    },
-    {
-      "effectid": 4,
-      "type": "heal",
-      "name": "regeneration_heal"
-    },
-    {
-      "effectid": 5,
-      "type": "attribute",
-      "name": "attack_up_attribute"
-    }
+    { "effectid": 1, "type": "heal", "name": "Reverse" },
+    { "effectid": 2, "type": "damage", "name": "Witchification", "params": { "amount": 2 } },
+    { "effectid": 3, "type": "damage", "name": "burning_damage", "params": { "amount": 2 } },
+    { "effectid": 4, "type": "heal", "name": "regeneration_heal", "params": { "amount": 2 } },
+    { "effectid": 5, "type": "attribute", "name": "attack_up_attribute", "params": { "stat": "attack", "value": 2 } },
+
+    { "effectid": 6, "type": "attribute", "name": "hextech_shield_8", "params": { "stat": "shield", "value": 8 } },
+    { "effectid": 7, "type": "attribute", "name": "hextech_start_mp_2", "params": { "stat": "mp", "value": 2 } },
+    { "effectid": 8, "type": "attribute", "name": "hextech_max_mp_down_1", "params": { "stat": "max_mp", "value": -1 } },
+    { "effectid": 9, "type": "attribute", "name": "hextech_attack_4", "params": { "stat": "attack", "value": 4 } },
+    { "effectid": 10, "type": "attribute", "name": "hextech_attack_7", "params": { "stat": "attack", "value": 7 } },
+    { "effectid": 11, "type": "attribute", "name": "hextech_attack_double", "params": { "stat": "attack_percent", "value": 100 } },
+    { "effectid": 12, "type": "heal", "name": "hextech_regeneration_5", "params": { "amount": 5 } },
+    { "effectid": 13, "type": "attribute", "name": "hextech_damage_reduction_70", "params": { "percent": 70 } },
+    { "effectid": 14, "type": "attribute", "name": "hextech_damage_immunity" },
+    { "effectid": 15, "type": "attribute", "name": "hextech_low_health_guard", "params": { "thresholdPercent": 50, "shield": 12, "defense": 8 } },
+    { "effectid": 16, "type": "attribute", "name": "hextech_damage_double", "params": { "percent": 200 } },
+    { "effectid": 17, "type": "attribute", "name": "hextech_incoming_damage_risk", "params": { "percent": -5 } },
+    { "effectid": 18, "type": "attribute", "name": "hextech_damage_immunity_four" },
+    { "effectid": 19, "type": "attribute", "name": "hextech_attack_20", "params": { "stat": "attack", "value": 20 } },
+    { "effectid": 20, "type": "attribute", "name": "hextech_defense_half", "params": { "stat": "defense_percent", "value": -50 } },
+    { "effectid": 21, "type": "attribute", "name": "hextech_boss_attack_double", "params": { "stat": "attack_percent", "value": 100 } },
+    { "effectid": 22, "type": "attribute", "name": "hextech_damage_bonus_20", "params": { "percent": 120 } },
+    { "effectid": 23, "type": "attribute", "name": "hextech_death_protection_half_hp", "params": { "healPercent": 50 } },
+    { "effectid": 24, "type": "attribute", "name": "hextech_damage_bonus_25", "params": { "percent": 125 } },
+    { "effectid": 25, "type": "attribute", "name": "hextech_attack_speed_up", "params": { "stat": "attack_interval_percent", "value": 70 } }
   ]
 }

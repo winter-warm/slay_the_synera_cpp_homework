@@ -1,0 +1,255 @@
+﻿{
+  "cards": [
+    {
+      "id": "ember_edge",
+      "layerId": 1,
+      "name": "Ember Edge",
+      "title": "余烬锋刃",
+      "description": "附魔武器，全队战斗开始时攻击小幅提升。",
+      "cardImagePath": "assets/hextech/cards/ember_edge.png",
+      "effects": [{ "type": "apply_buff", "buffId": 101, "duration": -1 }]
+    },
+    {
+      "id": "steady_guard",
+      "layerId": 1,
+      "name": "Steady Guard",
+      "title": "钢铁雄心",
+      "description": "全队战斗开始时获得护盾。",
+      "cardImagePath": "assets/hextech/cards/steady_guard.png",
+      "effects": [{ "type": "apply_buff", "buffId": 102, "duration": -1 }]
+    },
+    {
+      "id": "camp_spoils",
+      "layerId": 1,
+      "name": "Camp Spoils",
+      "title": "顺手牵羊",
+      "description": "战斗胜利后对敌方营地地毯式搜索，获得更多金币。",
+      "cardImagePath": "assets/hextech/cards/camp_spoils.png",
+      "effects": [{ "type": "reward_modifier", "value": 10, "modifierKey": "gold_drop_percent" }]
+    },
+    {
+      "id": "first_wind",
+      "layerId": 1,
+      "name": "First Wind",
+      "title": "只打顺风局",
+      "description": "全队战斗开始时获得两点mp。",
+      "cardImagePath": "assets/hextech/cards/first_wind.png",
+      "effects": [{ "type": "apply_buff", "buffId": 103, "duration": -1 }]
+    },
+    {
+      "id": "quick_preparation",
+      "layerId": 1,
+      "name": "Quick Preparation",
+      "title": "快速整备",
+      "description": "全队初始法力值阈值下降1点，更快释放技能",
+      "cardImagePath": "assets/hextech/cards/quick_preparation.png",
+      "effects": [{ "type": "apply_buff", "buffId": 104, "duration": -1 }]
+    },
+    {
+      "id": "lucky_pouch",
+      "layerId": 1,
+      "name": "Lucky Pouch",
+      "title": "幸运钱袋",
+      "description": "立即获得 35 金币。",
+      "cardImagePath": "assets/hextech/cards/lucky_pouch.png",
+      "effects": [{ "type": "grant_gold", "value": 35 }]
+    },
+    {
+      "id": "soft_landing",
+      "layerId": 1,
+      "name": "Soft Landing",
+      "title": "平稳着陆",
+      "description": "每场战斗首次受到伤害时减免70%伤害。",
+      "cardImagePath": "assets/hextech/cards/soft_landing.png",
+      "effects": [{ "type": "apply_buff", "buffId": 105, "duration": -1 }]
+    },
+    {
+      "id": "training_mark",
+      "layerId": 1,
+      "name": "Training Mark",
+      "title": "训练刻印",
+      "description": "攻击速度提升。",
+      "cardImagePath": "assets/hextech/cards/training_mark.png",
+      "effects": [{ "type": "apply_buff", "buffId": 106, "duration": -1 }]
+    },
+    {
+      "id": "borrowed_blade",
+      "layerId": 1,
+      "name": "Borrowed Blade",
+      "title": "借来的破剑",
+      "description": "立即选择一次基础装备。",
+      "cardImagePath": "assets/hextech/cards/borrowed_blade.png",
+      "effects": [{ "type": "choose_basic_equipment" }]
+    },
+    {
+      "id": "storm_oath",
+      "layerId": 2,
+      "name": "Storm Oath",
+      "title": "风暴誓约",
+      "description": "生命较低时获得额外护盾和防御。",
+      "cardImagePath": "assets/hextech/cards/storm_oath.png",
+      "effects": [
+        { "type": "apply_buff", "buffId": 107, "duration": -1 }
+      ]
+    },
+    {
+      "id": "iron_circle",
+      "layerId": 2,
+      "name": "Iron Circle",
+      "title": "铁锁连环",
+      "description": "与友军相邻时获得每秒5点生命恢复。",
+      "cardImagePath": "assets/hextech/cards/iron_circle.png",
+      "effects": [{ "type": "apply_buff", "buffId": 108, "duration": -1 }]
+    },
+    {
+      "id": "treasure_sense",
+      "layerId": 2,
+      "name": "Treasure Sense",
+      "title": "寻宝感知",
+      "description": "战斗胜利后更容易获得稀有奖励。",
+      "cardImagePath": "assets/hextech/cards/treasure_sense.png",
+      "effects": [{ "type": "reward_modifier", "value": 15, "modifierKey": "rare_drop_percent" }]
+    },
+    {
+      "id": "arcane_pressure",
+      "layerId": 2,
+      "name": "Arcane Pressure",
+      "title": "奥术压迫",
+      "description": "施加的debuff持续更久。",
+      "cardImagePath": "assets/hextech/cards/arcane_pressure.png",
+      "effects": [{ "type": "combat_modifier", "value": 1, "modifierKey": "debuff_duration" }]
+    },
+    {
+      "id": "mist_veil",
+      "layerId": 2,
+      "name": "Mist Veil",
+      "title": "雾纱",
+      "description": "每场战斗前四次受到伤害时免伤。",
+      "cardImagePath": "assets/hextech/cards/mist_veil.png",
+      "effects": [{ "type": "apply_buff", "buffId": 109, "duration": -1 }]
+    },
+    {
+      "id": "golden_route",
+      "layerId": 2,
+      "name": "Golden Route",
+      "title": "黄金罗盘",
+      "description": "二阶段的地图将变为一条直道，但不会遭遇精英怪。普通敌人掉落装备的概率提升25%，掉落金币提升50%。",
+      "cardImagePath": "assets/hextech/cards/golden_route.png",
+      "effects": [
+        { "type": "map_modifier", "modifierKey": "straight_no_elite_layer2" },
+        { "type": "reward_modifier", "value": 25, "modifierKey": "equipment_drop_percent" },
+        { "type": "reward_modifier", "value": 50, "modifierKey": "gold_drop_percent" }
+      ]
+    },
+    {
+      "id": "elite_hunter",
+      "layerId": 2,
+      "name": "Elite Hunter",
+      "title": "精英猎手",
+      "description": "精英战胜利后获得更丰厚奖励。",
+      "cardImagePath": "assets/hextech/cards/elite_hunter.png",
+      "effects": [{ "type": "reward_modifier", "value": 20, "modifierKey": "elite_reward_percent" }]
+    },
+    {
+      "id": "arcane_reserve",
+      "layerId": 2,
+      "name": "Arcane Reserve",
+      "title": "奥术储备",
+      "description": "全队初始 MP 上限下降，MP 提高。",
+      "cardImagePath": "assets/hextech/cards/arcane_reserve.png",
+      "effects": [
+        { "type": "apply_buff", "buffId": 110, "duration": -1 }
+      ]
+    },
+    {
+      "id": "supply_cache",
+      "layerId": 2,
+      "name": "Supply Cache",
+      "title": "补给密匣",
+      "description": "立即获得一次装备选择机会。",
+      "cardImagePath": "assets/hextech/cards/supply_cache.png",
+      "effects": [{ "type": "choose_supply" }]
+    },
+    {
+      "id": "war_banner",
+      "layerId": 3,
+      "name": "War Banner",
+      "title": "战争旌旗",
+      "description": "全队战斗开始时攻击大幅提升。",
+      "cardImagePath": "assets/hextech/cards/war_banner.png",
+      "effects": [{ "type": "apply_buff", "buffId": 111, "duration": -1 }]
+    },
+    {
+      "id": "last_stand",
+      "layerId": 3,
+      "name": "Last Stand",
+      "title": "背水一战",
+      "description": "攻击翻倍，防御减半。",
+      "cardImagePath": "assets/hextech/cards/last_stand.png",
+      "effects": [{ "type": "apply_buff", "buffId": 112, "duration": -1 }]
+    },
+    {
+      "id": "dragon_hoard",
+      "layerId": 3,
+      "name": "Dragon Hoard",
+      "title": "龙藏",
+      "description": "在boss战中获得100%力量提升。",
+      "cardImagePath": "assets/hextech/cards/dragon_hoard.png",
+      "effects": [{ "type": "apply_buff", "buffId": 113, "duration": -1, "modifierKey": "boss_only" }]
+    },
+    {
+      "id": "decisive_focus",
+      "layerId": 3,
+      "name": "Decisive Focus",
+      "title": "决断凝视",
+      "description": "每场战斗前三次造成伤害翻倍。",
+      "cardImagePath": "assets/hextech/cards/decisive_focus.png",
+      "effects": [{ "type": "apply_buff", "buffId": 114, "duration": -1 }]
+    },
+    {
+      "id": "divine_aegis",
+      "layerId": 3,
+      "name": "Divine Aegis",
+      "title": "神圣圆盾",
+      "description": "每场战斗开始后首次受到伤害时免疫该伤害。",
+      "cardImagePath": "assets/hextech/cards/divine_aegis.png",
+      "effects": [{ "type": "apply_buff", "buffId": 115, "duration": -1 }]
+    },
+    {
+      "id": "final_fortune",
+      "layerId": 3,
+      "name": "Final Fortune",
+      "title": "终局财富",
+      "description": "立即获得 999 金币，享受零元购吧。",
+      "cardImagePath": "assets/hextech/cards/final_fortune.png",
+      "effects": [{ "type": "grant_gold", "value": 999 }]
+    },
+    {
+      "id": "execution_mark",
+      "layerId": 3,
+      "name": "Execution Mark",
+      "title": "处决印记",
+      "description": "对 Boss 和精英敌人造成更高伤害。",
+      "cardImagePath": "assets/hextech/cards/execution_mark.png",
+      "effects": [{ "type": "apply_buff", "buffId": 116, "duration": -1, "modifierKey": "boss_elite_only" }]
+    },
+    {
+      "id": "phoenix_clause",
+      "layerId": 3,
+      "name": "Phoenix Clause",
+      "title": "涅槃",
+      "description": "所有角色每场战斗首次濒死时，取消死亡并恢复最大生命值的一半。",
+      "cardImagePath": "assets/hextech/cards/phoenix_clause.png",
+      "effects": [{ "type": "apply_buff", "buffId": 117, "duration": -1 }]
+    },
+    {
+      "id": "chosen_armory",
+      "layerId": 3,
+      "name": "Chosen Armory",
+      "title": "军械库",
+      "description": "立即获得一次高级装备选择机会。",
+      "cardImagePath": "assets/hextech/cards/chosen_armory.png",
+      "effects": [{ "type": "choose_advanced_equipment" }]
+    }
+  ]
+}

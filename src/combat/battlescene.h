@@ -9,6 +9,8 @@
 #include <unordered_map>
 #include <vector>
 #include "core/board.h"
+#include "world/event/eventtypes.h"
+#include "world/aura/aura.h"
 
 class BenchSlotItem;
 class Character;
@@ -27,6 +29,8 @@ public:
 
     void initialize();
     void reset();
+    void loadBattle(const BattleConfig& config);
+    void setActiveAuraIds(const std::vector<std::string>& auraIds);
     void startBattle();
     void endBattle();
 
@@ -61,7 +65,10 @@ private:
     Unit* findUnitById(int unitId) const;
     bool isBattleUnit(Unit* unit) const;
     void clearBattleUnits();
+    void clearEnemyUnits();
     void hideBench(bool hidden);
+    std::string boardPathForId(const std::string& boardId) const;
+    std::vector<Hex> freeEnemyCells() const;
     QRectF rawBoardBounds() const;
     bool isPreparationPhase() const;
     bool canDragUnit(int unitId) const;
@@ -74,6 +81,7 @@ private:
     void applyDrop(int unitId, const DropTarget& target);
     void buildScene();
     void createUnitItem(Unit* unit);
+    void applyActiveAuras(Character* character);
     void syncFromState();
     bool isBenchSlotFree(const QPoint& slotPos, int ignoredUnitId = -1) const;
     QPoint firstFreeBenchSlot() const;
@@ -86,6 +94,8 @@ private:
     std::unique_ptr<HexLayout> layout;
     std::vector<Unit*> units;
     std::vector<std::unique_ptr<Character>> battleUnits;
+    std::vector<std::unique_ptr<Character>> enemyUnits;
+    std::vector<ActiveAura> activeAuras;
 
     QGraphicsScene* sceneObj;
     std::vector<GridItem*> gridItems;
@@ -103,6 +113,7 @@ private:
     qreal benchGap;
     QPointF benchOrigin;
     BattlePhase battlePhase;
+    BattleKind currentBattleKind;
 };
 
 #endif // COMBAT_BATTLESCENE_H

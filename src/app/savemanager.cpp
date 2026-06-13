@@ -5,14 +5,15 @@
 #include <QJsonDocument>
 
 std::string SaveManager::savePath(int slot) const {
+    (void)slot;
     const QString dirPath = QCoreApplication::applicationDirPath() + "/saves";
-    return QDir(dirPath).filePath(QString("save%1.json").arg(slot)).toStdString();
+    return QDir(dirPath).filePath("save.json").toStdString();
 }
 
 bool SaveManager::saveGame(const GameState& state, int slot, std::string* error) const {
-    if (slot < 1 || slot > 3) {
+    if (slot != 1) {
         if (error) {
-            *error = "Save slot must be 1, 2, or 3.";
+            *error = "Only one save file is supported.";
         }
         return false;
     }
@@ -38,9 +39,9 @@ bool SaveManager::saveGame(const GameState& state, int slot, std::string* error)
 }
 
 bool SaveManager::loadGame(GameState* state, int slot, std::string* error) const {
-    if (!state || slot < 1 || slot > 3) {
+    if (!state || slot != 1) {
         if (error) {
-            *error = "Invalid save slot.";
+            *error = "Invalid save file.";
         }
         return false;
     }
@@ -68,10 +69,8 @@ bool SaveManager::loadGame(GameState* state, int slot, std::string* error) const
 
 std::vector<int> SaveManager::existingSlots() const {
     std::vector<int> saveSlots;
-    for (int slot = 1; slot <= 3; ++slot) {
-        if (QFile::exists(QString::fromStdString(savePath(slot)))) {
-            saveSlots.push_back(slot);
-        }
+    if (QFile::exists(QString::fromStdString(savePath(1)))) {
+        saveSlots.push_back(1);
     }
     return saveSlots;
 }

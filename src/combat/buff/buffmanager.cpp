@@ -4,7 +4,17 @@ BuffManager::BuffManager(Character* owner):owner(owner) {buffs.clear();}
 BuffManager::~BuffManager() = default;
 
 void BuffManager::append(std::unique_ptr<buff>& buf){
-    //buffs.push_back(buf);扫雷：错误，unique_ptr不能拷贝
+    if (!buf) {
+        return;
+    }
+
+    AddBuffContext context{owner, buf.get(), false};
+    beforeAddBuff(context);
+    if (context.cancelled) {
+        return;
+    }
+
+    buf->apply(owner);
     buffs.push_back(std::move(buf));
 }
 

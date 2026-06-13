@@ -1,39 +1,26 @@
 {
   "buffs": [
-    {
-      "buffid": 1,
-      "name": "Reverse Future",
-      "priority": 10,
-      "effects": [
-        1,
-        2
-      ]
-    },
-    {
-      "buffid": 2,
-      "name": "Burning",
-      "priority": 5,
-      "cooldown": 1.0,
-      "effects": [
-        3
-      ]
-    },
-    {
-      "buffid": 3,
-      "name": "Regeneration",
-      "priority": 5,
-      "cooldown": 1.0,
-      "effects": [
-        4
-      ]
-    },
-    {
-      "buffid": 4,
-      "name": "Attack Up",
-      "priority": 1,
-      "effects": [
-        5
-      ]
-    }
+    { "buffid": 1, "name": "Reverse Future", "priority": 10, "effects": [1, 2] },
+    { "buffid": 2, "name": "Burning", "priority": 5, "cooldown": 1.0, "effects": [3] },
+    { "buffid": 3, "name": "Regeneration", "priority": 5, "cooldown": 1.0, "effects": [4] },
+    { "buffid": 4, "name": "Attack Up", "priority": 1, "trigger": "onBattleStart", "effects": [5] },
+
+    { "buffid": 101, "name": "HexTech Ember Edge", "priority": 1, "trigger": "onBattleStart", "effects": [5] },
+    { "buffid": 102, "name": "HexTech Steady Guard", "priority": 1, "trigger": "onBattleStart", "effects": [6] },
+    { "buffid": 103, "name": "HexTech First Wind", "priority": 1, "trigger": "onBattleStart", "effects": [7] },
+    { "buffid": 104, "name": "HexTech Quick Preparation", "priority": 1, "trigger": "onBattleStart", "effects": [8] },
+    { "buffid": 105, "name": "HexTech Soft Landing", "priority": 10, "trigger": "beforeBeAttacked", "maxTriggers": 1, "effects": [13] },
+    { "buffid": 106, "name": "HexTech Training Mark", "priority": 1, "trigger": "onBattleStart", "effects": [25] },
+    { "buffid": 107, "name": "HexTech Storm Oath", "priority": 1, "trigger": "beforeBeAttacked", "effects": [15] },
+    { "buffid": 108, "name": "HexTech Iron Circle", "priority": 1, "cooldown": 1.0, "effects": [12] },
+    { "buffid": 109, "name": "HexTech Mist Veil", "priority": 10, "trigger": "beforeBeAttacked", "maxTriggers": 4, "effects": [18] },
+    { "buffid": 110, "name": "HexTech Arcane Reserve", "priority": 1, "trigger": "onBattleStart", "effects": [8, 7] },
+    { "buffid": 111, "name": "HexTech War Banner", "priority": 1, "trigger": "onBattleStart", "effects": [10] },
+    { "buffid": 112, "name": "HexTech Last Stand", "priority": 1, "trigger": "onBattleStart", "effects": [11, 20] },
+    { "buffid": 113, "name": "HexTech Dragon Hoard", "priority": 1, "trigger": "onBattleStart", "effects": [21] },
+    { "buffid": 114, "name": "HexTech Decisive Focus", "priority": 2, "trigger": "beforeAttack", "maxTriggers": 3, "effects": [16] },
+    { "buffid": 115, "name": "HexTech Divine Aegis", "priority": 10, "trigger": "beforeBeAttacked", "maxTriggers": 1, "effects": [14] },
+    { "buffid": 116, "name": "HexTech Execution Mark", "priority": 2, "trigger": "beforeAttack", "effects": [22] },
+    { "buffid": 117, "name": "HexTech Phoenix Clause", "priority": 20, "trigger": "beforeDeath", "maxTriggers": 1, "effects": [23] }
   ]
 }

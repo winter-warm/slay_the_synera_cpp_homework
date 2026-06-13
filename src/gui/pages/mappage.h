@@ -6,6 +6,8 @@
 
 class GameHud;
 class QGraphicsScene;
+class QGraphicsRectItem;
+class QGraphicsTextItem;
 class QGraphicsView;
 class QPropertyAnimation;
 
@@ -31,7 +33,10 @@ private:
     QGraphicsView* view;
     QGraphicsScene* scene;
     QPropertyAnimation* scrollAnimation = nullptr;
+    QGraphicsRectItem* entryBannerRect = nullptr;
+    QGraphicsTextItem* entryBannerText = nullptr;
     int lastAnimatedLayerId = -1;
+    int entryAnimationLayerId = -1;
 };
 
 #endif // GUI_PAGES_MAPPAGE_H

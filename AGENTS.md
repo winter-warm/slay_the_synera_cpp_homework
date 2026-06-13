@@ -20,5 +20,11 @@
 - Tactical board data lives with the board model at `src/core/default_board.json` and is copied to `boards/default_board.json` at runtime.
 - Do not place macro map images in `src/core`.
 
+## Qt Graphics Scene Lifecycle
+
+- Do not mutate or clear a `QGraphicsScene` synchronously from a click handler owned by a `QGraphicsProxyWidget` inside that same scene.
+- If clicking an embedded scene widget changes pages, emits state that redraws the map, or calls `scene->clear()`, defer the action with `QTimer::singleShot(0, ...)` so Qt finishes the current widget event before the proxy widget is destroyed.
+- Treat delayed exits or crashes after clicking map nodes as a likely scene/proxy lifetime issue before chasing unrelated game-state logic.
+
 ## Recompile
 - If it's a minor change, there's no need to recompile and verify with CMake

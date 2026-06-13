@@ -31,6 +31,102 @@
         "shield": 10
       },
       "defaultSkills": ["Savage"]
+    },
+    {
+      "templateId": 1101,
+      "name": "chess_pawn",
+      "bonds": [
+        "chess"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 95,
+        "maxMp": 3,
+        "attack": 9,
+        "defense": 4,
+        "shield": 8
+      },
+      "defaultSkills": ["PawnAdvance"]
+    },
+    {
+      "templateId": 1102,
+      "name": "chess_rook",
+      "bonds": [
+        "chess"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 150,
+        "maxMp": 4,
+        "attack": 13,
+        "defense": 9,
+        "shield": 18
+      },
+      "defaultSkills": ["CastleWall"]
+    },
+    {
+      "templateId": 1103,
+      "name": "chess_knight",
+      "bonds": [
+        "chess"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 115,
+        "maxMp": 3,
+        "attack": 15,
+        "defense": 5,
+        "shield": 8
+      },
+      "defaultSkills": ["KnightFork"]
+    },
+    {
+      "templateId": 1104,
+      "name": "chess_bishop",
+      "bonds": [
+        "chess"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 105,
+        "maxMp": 3,
+        "attack": 12,
+        "defense": 4,
+        "shield": 6
+      },
+      "defaultSkills": ["DiagonalSmite"]
+    },
+    {
+      "templateId": 1105,
+      "name": "chess_queen",
+      "bonds": [
+        "chess"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 135,
+        "maxMp": 5,
+        "attack": 17,
+        "defense": 6,
+        "shield": 10
+      },
+      "defaultSkills": ["RoyalSweep"]
+    },
+    {
+      "templateId": 1106,
+      "name": "chess_king",
+      "bonds": [
+        "chess"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 170,
+        "maxMp": 5,
+        "attack": 12,
+        "defense": 8,
+        "shield": 20
+      },
+      "defaultSkills": ["KingCommand"]
     }
   ]
 }
