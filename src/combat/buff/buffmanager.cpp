@@ -48,6 +48,12 @@ void BuffManager::afterBeAttacked(BeAttackedContext& context){
     }
 }
 
+void BuffManager::beforeHeal(HealContext& context){
+    for(auto& ele:buffs){
+        ele->beforeHeal(context);
+    }
+}
+
 void BuffManager::beforeAddBuff(AddBuffContext& context){
     for(auto& ele:buffs){
         ele->beforeAddBuff(context);
@@ -86,5 +92,10 @@ void BuffManager::requestRemoveByTemplateId(int buffid){
 }
 
 void BuffManager::clear(){
+    for(auto& ele:buffs){
+        if(ele){
+            ele->remove(owner);
+        }
+    }
     buffs.clear();
 }

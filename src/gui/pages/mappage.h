@@ -23,6 +23,8 @@ public slots:
 signals:
     void nodeSelected(int nodeId);
     void saveRequested(int slot);
+    void bagRequested();
+    void shopRequested();
 
 private:
     QString nodeIconPath(const MapNode& node) const;

@@ -51,6 +51,13 @@ void buff::afterBeAttacked(BeAttackedContext& context){
     recordTrigger(BuffTrigger::AfterBeAttacked);
 }
 
+void buff::beforeHeal(HealContext& context){
+    for(auto& ele:effects){
+        ele->beforeHeal(context);
+    }
+    recordTrigger(BuffTrigger::BeforeHeal);
+}
+
 void buff::beforeAddBuff(AddBuffContext& context){
     for(auto& ele:effects){
         ele->beforeAddBuff(context);

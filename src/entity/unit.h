@@ -27,7 +27,7 @@ public:
     void setPosition(const Hex& h) { unitPos = h; hasPos = true; }
     void clearPosition() { hasPos = false; }
 
-    virtual void update(float deltatime,const Board& board) = 0;
+    virtual void update(float deltatime, Board& board) = 0;
 };
 
 #endif // UNIT_H

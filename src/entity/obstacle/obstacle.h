@@ -12,7 +12,7 @@ public:
     void setBlockAttack(bool blockAttack) { blockAttackValue = blockAttack; }
     void setImage(int image) { imageValue = image; }
 
-    void update(float deltatime,const Board& board) override;
+    void update(float deltatime, Board& board) override;
 
 private:
     bool blockAttackValue;

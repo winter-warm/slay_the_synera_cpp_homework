@@ -31,6 +31,10 @@ void BuffComponent::afterBeAttacked(BeAttackedContext& context){
     buffmanager.afterBeAttacked(context);
 }
 
+void BuffComponent::beforeHeal(HealContext& context){
+    buffmanager.beforeHeal(context);
+}
+
 void BuffComponent::beforeAddBuff(AddBuffContext& context){
     buffmanager.beforeAddBuff(context);
 }

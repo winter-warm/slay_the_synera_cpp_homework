@@ -3,17 +3,48 @@
 #include <QSet>
 #include "../character/character.h"
 #include "teamcomponent.h"
+#include <algorithm>
+#include <unordered_map>
+
+static bool canAttackFrom(Character* self, const Board& board, const Hex& from, const Hex& targetHex){
+    return self && board.dist(from, targetHex) <= self->getstats().getRANGE();
+}
 
 MoveComponent::MoveComponent(const MoveComponent& other, Character* owner):component(other, owner) {
     path = other.path; targetSelector = other.targetSelector;
     pathFinder = other.pathFinder; target = other.target;
 }
 
-bool MoveComponent::update(const Board& board) {
-    if(target == nullptr) {
-        target = targetSelector(owner, board);
+bool MoveComponent::update(Board& board) {
+    Hex selfHex;
+    if(!board.posOf(owner, &selfHex)) {
+        target = nullptr;
+        path.clear();
+        return false;
     }
-    if(target == nullptr)return false;
+
+    Hex targetHex;
+    if(target == nullptr ||
+       !target->isTargetable() ||
+       target->getteam().getteam() == owner->getteam().getteam() ||
+       !board.posOf(target, &targetHex) ||
+       target->isdead()) {
+        target = targetSelector(owner, board);
+        path.clear();
+    }
+    if(target == nullptr || !board.posOf(target, &targetHex))return false;
+    if(canAttackFrom(owner, board, selfHex, targetHex))return false;
+
+    path = pathFinder(owner, target, board);
+    if(path.empty())return false;
+
+    const Hex next = path.front();
+    if(board.move(owner, next)) {
+        path.erase(path.begin());
+        return true;
+    }
+
+    path.clear();
     return false;
 }
 
@@ -32,7 +63,7 @@ Character* nearestEnemy(Character* self, const Board& board) {
         Hex cur = queue.dequeue();
         Unit* unit = board.unitAt(cur);
         Character* tar = dynamic_cast<Character*>(unit);
-        if(tar && tar != self && tar->getteam().getteam() != self->getteam().getteam()) {
+        if(tar && tar != self && tar->isTargetable() && tar->getteam().getteam() != self->getteam().getteam()) {
             return tar;
         }
 
@@ -42,7 +73,7 @@ Character* nearestEnemy(Character* self, const Board& board) {
 
             Unit* nextUnit = board.unitAt(next);
             Character* nextTar = dynamic_cast<Character*>(nextUnit);
-            if(nextTar && nextTar != self && nextTar->getteam().getteam() != self->getteam().getteam()) {
+            if(nextTar && nextTar != self && nextTar->isTargetable() && nextTar->getteam().getteam() != self->getteam().getteam()) {
                 return nextTar;
             }
             if(nextUnit)continue;
@@ -53,6 +84,122 @@ Character* nearestEnemy(Character* self, const Board& board) {
     return nullptr;
 }
 
+Character* highestAttackEnemy(Character* self, const Board& board) {
+    Character* best = nullptr;
+    for(Unit* unit : board.units()) {
+        Character* candidate = dynamic_cast<Character*>(unit);
+        if(!candidate ||
+           candidate == self ||
+           !candidate->isTargetable() ||
+           candidate->isdead() ||
+           candidate->getteam().getteam() == self->getteam().getteam()) {
+            continue;
+        }
+        if(best == nullptr || candidate->getstats().getATTACK() > best->getstats().getATTACK()) {
+            best = candidate;
+        }
+    }
+    return best;
+}
+
 std::vector<Hex> Astar(Character* self, Character* target, const Board& board) {
-    return {};
+    Hex start;
+    Hex targetHex;
+    if(!self || !target || !board.posOf(self, &start) || !board.posOf(target, &targetHex)) {
+        return {};
+    }
+    if(canAttackFrom(self, board, start, targetHex)) {
+        return {};
+    }
+
+    QSet<Hex> seen;
+    QQueue<Hex> queue;
+    std::unordered_map<Hex, Hex> parent;
+    Hex goal;
+    bool found = false;
+
+    queue.enqueue(start);
+    seen.insert(start);
+
+    while(!queue.isEmpty() && !found) {
+        const Hex cur = queue.dequeue();
+        for(const Hex& next : board.neighbors(cur)) {
+            if(seen.contains(next))continue;
+            if(!board.passable(next))continue;
+
+            seen.insert(next);
+            parent.emplace(next, cur);
+
+            if(canAttackFrom(self, board, next, targetHex)) {
+                goal = next;
+                found = true;
+                break;
+            }
+
+            queue.enqueue(next);
+        }
+    }
+
+    if(!found) {
+        return {};
+    }
+
+    std::vector<Hex> out;
+    Hex cur = goal;
+    while(!(cur == start)) {
+        out.push_back(cur);
+        const auto it = parent.find(cur);
+        if(it == parent.end()) {
+            return {};
+        }
+        cur = it->second;
+    }
+    std::reverse(out.begin(), out.end());
+    return out;
+}
+
+std::vector<Hex> flyToAttackPosition(Character* self, Character* target, const Board& board) {
+    Hex start;
+    Hex targetHex;
+    if(!self || !target || !board.posOf(self, &start) || !board.posOf(target, &targetHex)) {
+        return {};
+    }
+    if(canAttackFrom(self, board, start, targetHex)) {
+        return {};
+    }
+
+    bool found = false;
+    Hex best;
+    int bestDist = 0;
+    for(const Hex& cell : board.neighbors(targetHex)) {
+        if(!board.passable(cell)) {
+            continue;
+        }
+        const int dist = board.dist(start, cell);
+        if(!found || dist < bestDist) {
+            found = true;
+            best = cell;
+            bestDist = dist;
+        }
+    }
+    if(!found) {
+        for(const Hex& cell : board.cells()) {
+            if(!board.passable(cell)) {
+                continue;
+            }
+            if(!canAttackFrom(self, board, cell, targetHex)) {
+                continue;
+            }
+            const int dist = board.dist(start, cell);
+            if(!found || dist < bestDist) {
+                found = true;
+                best = cell;
+                bestDist = dist;
+            }
+        }
+    }
+    if(!found) {
+        return {};
+    }
+    return {best};
 }

@@ -74,6 +74,8 @@ std::unique_ptr<buff> bufffactory::create(int buffid, int duration){
             trigger = BuffTrigger::BeforeBeAttacked;
         }else if(triggerName == "afterBeAttacked"){
             trigger = BuffTrigger::AfterBeAttacked;
+        }else if(triggerName == "beforeHeal"){
+            trigger = BuffTrigger::BeforeHeal;
         }else if(triggerName == "beforeAddBuff"){
             trigger = BuffTrigger::BeforeAddBuff;
         }else if(triggerName == "beforeDeath"){

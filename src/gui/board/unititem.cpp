@@ -20,9 +20,7 @@ UnitItem::UnitItem(Unit* unit, QGraphicsItem* parent)
 }
 
 UnitItem::~UnitItem() {
-    if (Character* character = dynamic_cast<Character*>(unitPtr)) {
-        character->getrender().bindHUD(nullptr);
-    }
+    unitPtr = nullptr;
 }
 
 QRectF UnitItem::boundingRect() const {

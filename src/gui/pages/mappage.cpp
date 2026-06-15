@@ -43,6 +43,8 @@ MapPage::MapPage(QWidget* parent)
     scene->setSceneRect(0, 0, mapSceneWidth, mapSceneHeight);
 
     connect(hud, &GameHud::saveRequested, this, &MapPage::saveRequested);
+    connect(hud, &GameHud::bagRequested, this, &MapPage::bagRequested);
+    connect(hud, &GameHud::shopRequested, this, &MapPage::shopRequested);
 }
 
 void MapPage::setState(const GameState& state) {

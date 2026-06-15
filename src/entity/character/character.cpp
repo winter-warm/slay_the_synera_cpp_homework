@@ -1,5 +1,7 @@
 #include "character.h"
 
+#include <utility>
+
 static int normalizeBondCount(int count){
     if (count < 1) {
         return 1;
@@ -10,11 +12,11 @@ static int normalizeBondCount(int count){
     return count;
 }
 
-Character::Character(std::string name,const std::array<Bond, 2>& characterBonds,int characterBondCount,std::vector<Skill> skills,int maxhp,int maxmp,int attackValue,int defense,int range,int shield,teams characterTeam)
-    : Unit(name), bonds(characterBonds), bondCount(normalizeBondCount(characterBondCount)), stats(this, maxhp, maxmp, attackValue, defense,range, shield), combat(this, std::move(skills))
+Character::Character(std::string name,const std::array<Bond, 2>& characterBonds,int characterBondCount,std::vector<Skill> skills,int maxhp,int maxmp,int attackValue,int defense,int range,int shield,teams characterTeam,int templateId,int rarity,std::string displayName,std::string magicName,std::string skillDescription)
+    : Unit(name), templateIdValue(templateId), rarityValue(rarity), displayNameValue(std::move(displayName)), magicNameValue(std::move(magicName)), skillDescriptionValue(std::move(skillDescription)), bonds(characterBonds), bondCount(normalizeBondCount(characterBondCount)), stats(this, maxhp, maxmp, attackValue, defense,range, shield), combat(this, std::move(skills))
     , team(this, characterTeam), render(this), move(this), buff(this),equip(nullptr){}
 
-Character::Character(const Character& other):Unit(other.name()), bonds(other.bonds), bondCount(other.bondCount),stats(other.stats,this)
+Character::Character(const Character& other):Unit(other.name()), templateIdValue(other.templateIdValue), rarityValue(other.rarityValue), displayNameValue(other.displayNameValue), magicNameValue(other.magicNameValue), skillDescriptionValue(other.skillDescriptionValue), bonds(other.bonds), bondCount(other.bondCount),stats(other.stats,this)
     , combat(other.combat,this), team(this, other.team), render(this), move(other.move,this), buff(this),equip(nullptr)
 {
     if (other.hasPosition()) {
@@ -33,7 +35,8 @@ void Character::onBattleStart(){
 }
 
 
-void Character::update(float deltaTime,const Board& board){
+void Character::update(float deltaTime, Board& board){
+    currentBoard = &board;
     if(buff.isable())buff.update(deltaTime);
     bool ismoving = false;
     if(move.isable())ismoving = move.update(board);

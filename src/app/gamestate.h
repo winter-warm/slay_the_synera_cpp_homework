@@ -37,6 +37,8 @@ struct GameState {
     std::vector<HexTechCardRecord> selectedHexTechCards;
     std::vector<std::string> activeAuraIds;
     std::vector<HexTechDefinition> currentHexTechChoices;
+    std::vector<OwnedCharacterCard> ownedCharacterCards;
+    ShopState shop;
 
     QJsonObject toJson() const;
     static GameState fromJson(const QJsonObject& object);

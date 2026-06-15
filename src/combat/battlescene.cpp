@@ -1,16 +1,10 @@
 #include "battlescene.h"
 #include "entity/character/character.h"
-#include "entity/character/characterfactory.h"
 #include "entity/unit.h"
 #include "gui/board/benchslotitem.h"
 #include "gui/board/griditem.h"
 #include "gui/board/hexlayout.h"
 #include "gui/board/unititem.h"
-#include "combat/buff/bufffactory.h"
-#include "world/hextech/hextechrepository.h"
-#include <QCoreApplication>
-#include <QDir>
-#include <QFile>
 #include <QGraphicsScene>
 #include <algorithm>
 
@@ -37,6 +31,7 @@ static QColor colorForZone(Board::Zone zone) {
 
 BattleScene::BattleScene(QObject* parent)
     : QObject(parent)
+    , boardRef(nullptr)
     , layout(std::make_unique<HexLayout>())
     , sceneObj(new QGraphicsScene(this))
     , dragActive(false)
@@ -46,24 +41,26 @@ BattleScene::BattleScene(QObject* parent)
     , benchSize(78.0)
     , benchGap(10.0)
     , benchOrigin(0.0, 0.0)
-    , battlePhase(BattlePhase::Prep)
-    , currentBattleKind(BattleKind::None) {}
+    , battlePhase(BattlePhase::Prep) {}
 
 BattleScene::~BattleScene() {
     units.clear();
 }
 
 void BattleScene::initialize() {
-    board.load(boardPathForId("default_board"));
     buildScene();
-    reset();
 }
 
-void BattleScene::reset() {
+void BattleScene::setBoard(Board* board) {
+    boardRef = board;
     battlePhase = BattlePhase::Prep;
-    clearBattleUnits();
-    clearEnemyUnits();
-    board.clearUnits();
+    battleDisplayUnits.clear();
+    buildScene();
+    resetPreparation();
+}
+
+void BattleScene::resetPreparation() {
+    battlePhase = BattlePhase::Prep;
     places.clear();
 
     for (Unit* unit : units) {
@@ -85,124 +82,81 @@ void BattleScene::reset() {
     syncFromState();
 }
 
-void BattleScene::loadBattle(const BattleConfig& config) {
-    battlePhase = BattlePhase::Prep;
-    currentBattleKind = config.kind;
-    clearBattleUnits();
-    clearEnemyUnits();
-
-    if (!board.load(boardPathForId(config.boardId))) {
-        board.load(boardPathForId("default_board"));
+void BattleScene::clearRoster() {
+    Board* board = activeBoard();
+    for (Unit* unit : units) {
+        if (unit && board) {
+            board->remove(unit);
+        }
+        if (unit) {
+            removeCharacterItem(unit->id());
+        }
     }
-    buildScene();
-    reset();
+    units.clear();
+    places.clear();
+    syncFromState();
+}
 
-    std::vector<Hex> enemyCells = freeEnemyCells();
-    int cellIndex = 0;
-    for (int templateId : config.enemyTemplateIds) {
-        if (cellIndex >= static_cast<int>(enemyCells.size())) {
-            break;
-        }
-        std::unique_ptr<Character> enemy = characterfactory::create(templateId);
-        if (!enemy) {
-            continue;
-        }
-        Character* raw = enemy.get();
-        enemyUnits.push_back(std::move(enemy));
-        if (board.add(raw, enemyCells[static_cast<size_t>(cellIndex++)])) {
-            createUnitItem(raw);
-        }
+void BattleScene::setBattleCharacters(const std::vector<Character*>& characters) {
+    battleDisplayUnits = characters;
+    battlePhase = BattlePhase::Battle;
+    phase = 1;
+    hideBench(true);
+    clearTransientUnitItems();
+
+    for (Character* character : battleDisplayUnits) {
+        createUnitItem(character);
     }
     syncFromState();
 }
 
-void BattleScene::setActiveAuraIds(const std::vector<std::string>& auraIds) {
-    activeAuras.clear();
-    HexTechRepository repository;
-    for (const std::string& auraId : auraIds) {
-        const auto definition = repository.findById(auraId);
-        if (!definition) {
-            continue;
-        }
-
-        ActiveAura aura;
-        aura.hexTechId = definition->id;
-        for (const HexTechEffect& effect : definition->effects) {
-            if (isLongTermHexTechEffect(effect)) {
-                aura.effects.push_back(effect);
-            }
-        }
-        if (!aura.effects.empty()) {
-            activeAuras.push_back(std::move(aura));
-        }
-    }
-}
-
-void BattleScene::startBattle() {
-    if (!isPreparationPhase()) {
+void BattleScene::removeCharacterItem(int id) {
+    auto itemIt = unitItemMap.find(id);
+    if (itemIt == unitItemMap.end()) {
         return;
     }
 
-    clearHighlights();
-    clearBattleUnits();
+    UnitItem* item = itemIt->second;
+    unitItemMap.erase(itemIt);
+    auto vecIt = std::find(unitItems.begin(), unitItems.end(), item);
+    if (vecIt != unitItems.end()) {
+        unitItems.erase(vecIt);
+    }
+    sceneObj->removeItem(item);
+    delete item;
+}
 
-    std::vector<std::pair<Character*, Hex>> list;
+void BattleScene::syncFromBattleSystem(const battlesystem& battleSystem) {
+    if (battleSystem.isRunning()) {
+        setBattleCharacters(battleSystem.liveCharacters());
+        return;
+    }
+
+    battleDisplayUnits.clear();
+    battlePhase = BattlePhase::Prep;
+    phase = 0;
+    clearTransientUnitItems();
+    hideBench(false);
+    syncFromState();
+}
+
+std::vector<CharacterPlacement> BattleScene::preparedPlacements() const {
+    std::vector<CharacterPlacement> out;
     for (const auto& entry : places) {
         const Placement& place = entry.second;
         if (place.area != UnitArea::Board || !place.hasHex) {
             continue;
         }
+
         Character* character = dynamic_cast<Character*>(findUnitById(entry.first));
         if (character) {
-            list.push_back({character, place.hex});
+            CharacterPlacement placement;
+            placement.source = character;
+            placement.hex = place.hex;
+            out.push_back(placement);
         }
     }
-
-    for (const auto& entry : list) {
-        Character* source = entry.first;
-        const Hex h = entry.second;
-        board.remove(source);
-
-        auto copy = std::make_unique<Character>(*source);
-        Character* ptr = copy.get();
-        applyActiveAuras(ptr);
-        ptr->onBattleStart();
-        battleUnits.push_back(std::move(copy));
-        if (board.add(ptr, h)) {
-            createUnitItem(ptr);
-        }
-    }
-
-    battlePhase = BattlePhase::Battle;
-    phase = 1;
-    hideBench(true);
-    syncFromState();
-}
-
-void BattleScene::endBattle() {
-    clearBattleUnits();
-    battlePhase = BattlePhase::Prep;
-    phase = 0;
-    places.clear();
-
-    for (Unit* unit : units) {
-        if (!unit) {
-            continue;
-        }
-
-        const QPoint slot = firstFreeBenchSlot();
-        if (slot.x() < 0) {
-            places[unit->id()] = {};
-        } else {
-            Placement place;
-            place.area = UnitArea::Bench;
-            place.slot = slot;
-            places[unit->id()] = place;
-        }
-    }
-
-    hideBench(false);
-    syncFromState();
+    return out;
 }
 
 Unit* BattleScene::addCharacter(Character* character, const std::string& displayName) {
@@ -365,82 +319,42 @@ UnitItem* BattleScene::findUnitItem(int unitId) const {
     return it->second;
 }
 
-bool BattleScene::isBattleUnit(Unit* unit) const {
-    for (const auto& battleUnit : battleUnits) {
-        if (battleUnit.get() == unit) {
+bool BattleScene::isRosterUnit(Unit* unit) const {
+    return std::find(units.begin(), units.end(), unit) != units.end();
+}
+
+bool BattleScene::isBattleDisplayUnit(Unit* unit) const {
+    for (Character* battleUnit : battleDisplayUnits) {
+        if (battleUnit == unit) {
             return true;
         }
     }
     return false;
 }
 
-void BattleScene::clearBattleUnits() {
-    for (const auto& battleUnit : battleUnits) {
-        Unit* unit = battleUnit.get();
-        board.remove(unit);
-        auto itemIt = unitItemMap.find(unit->id());
-        if (itemIt != unitItemMap.end()) {
-            UnitItem* item = itemIt->second;
-            unitItemMap.erase(itemIt);
-            auto vecIt = std::find(unitItems.begin(), unitItems.end(), item);
-            if (vecIt != unitItems.end()) {
-                unitItems.erase(vecIt);
-            }
-            sceneObj->removeItem(item);
-            delete item;
+bool BattleScene::isRenderedBattleId(int unitId) const {
+    for (Character* character : battleDisplayUnits) {
+        if (character && character->id() == unitId) {
+            return true;
         }
     }
-    battleUnits.clear();
+    return false;
 }
 
-void BattleScene::clearEnemyUnits() {
-    for (const auto& enemy : enemyUnits) {
-        Unit* unit = enemy.get();
-        board.remove(unit);
-        auto itemIt = unitItemMap.find(unit->id());
-        if (itemIt != unitItemMap.end()) {
-            UnitItem* item = itemIt->second;
-            unitItemMap.erase(itemIt);
-            auto vecIt = std::find(unitItems.begin(), unitItems.end(), item);
-            if (vecIt != unitItems.end()) {
-                unitItems.erase(vecIt);
-            }
-            sceneObj->removeItem(item);
-            delete item;
+void BattleScene::clearTransientUnitItems() {
+    Board* board = activeBoard();
+    std::vector<int> removeIds;
+    for (const auto& entry : unitItemMap) {
+        UnitItem* item = entry.second;
+        Hex ignored;
+        const bool onBoard = board && item && board->posOf(item->unit(), &ignored);
+        if (!item || (!isRosterUnit(item->unit()) && !onBoard)) {
+            removeIds.push_back(entry.first);
         }
     }
-    enemyUnits.clear();
-}
-
-std::string BattleScene::boardPathForId(const std::string& boardId) const {
-    const QString fileName = QString::fromStdString(boardId) + ".json";
-    const QString appPath = QCoreApplication::applicationDirPath() + "/boards/" + fileName;
-    if (QFile::exists(appPath)) {
-        return appPath.toStdString();
+    for (int id : removeIds) {
+        removeCharacterItem(id);
     }
-
-    const QString localPath = QDir("src/core/boards").filePath(fileName);
-    if (QFile::exists(localPath)) {
-        return localPath.toStdString();
-    }
-
-    return (QCoreApplication::applicationDirPath() + "/boards/default_board.json").toStdString();
-}
-
-std::vector<Hex> BattleScene::freeEnemyCells() const {
-    std::vector<Hex> out;
-    for (const Hex& hex : board.cells()) {
-        if (board.zone(hex) == Board::Zone::Enemy && board.empty(hex)) {
-            out.push_back(hex);
-        }
-    }
-    std::sort(out.begin(), out.end(), [](const Hex& left, const Hex& right) {
-        if (left.z != right.z) {
-            return left.z < right.z;
-        }
-        return left.x < right.x;
-    });
-    return out;
 }
 
 void BattleScene::hideBench(bool hidden) {
@@ -451,10 +365,19 @@ void BattleScene::hideBench(bool hidden) {
     }
 }
 
+Board* BattleScene::activeBoard() const {
+    return boardRef;
+}
+
 QRectF BattleScene::rawBoardBounds() const {
     QRectF bounds;
     bool first = true;
-    for (const Hex& hex : board.cells()) {
+    Board* board = activeBoard();
+    if (!board) {
+        return bounds;
+    }
+
+    for (const Hex& hex : board->cells()) {
         const QRectF rect = layout->poly(hex).boundingRect();
         bounds = first ? rect : bounds.united(rect);
         first = false;
@@ -479,8 +402,9 @@ void BattleScene::clearHighlights() {
 }
 
 bool BattleScene::canApplyDrop(int unitId, const DropTarget& target) const {
+    Board* board = activeBoard();
     Unit* unit = findUnitById(unitId);
-    if (!unit || !canDragUnit(unitId) || !target.valid) {
+    if (!board || !unit || !canDragUnit(unitId) || !target.valid) {
         return false;
     }
 
@@ -492,15 +416,15 @@ bool BattleScene::canApplyDrop(int unitId, const DropTarget& target) const {
     const Placement& source = placementIt->second;
 
     if (target.area == UnitArea::Board) {
-        const Board::Zone z = target.hasHex ? board.zone(target.hex) : Board::Zone::None;
+        const Board::Zone z = target.hasHex ? board->zone(target.hex) : Board::Zone::None;
         if (!target.hasHex ||
-            !board.has(target.hex) ||
-            !board.empty(target.hex) ||
+            !board->has(target.hex) ||
+            !board->empty(target.hex) ||
             (z != Board::Zone::Player && z != Board::Zone::Neutral)) {
             return false;
         }
         if (source.area == UnitArea::Board) {
-            return source.hasHex && board.unitAt(source.hex) == unit && source.hex != target.hex;
+            return source.hasHex && board->unitAt(source.hex) == unit && source.hex != target.hex;
         }
         return source.area == UnitArea::Bench;
     }
@@ -520,19 +444,20 @@ bool BattleScene::canApplyDrop(int unitId, const DropTarget& target) const {
 }
 
 void BattleScene::applyDrop(int unitId, const DropTarget& target) {
+    Board* board = activeBoard();
     Unit* unit = findUnitById(unitId);
-    if (!unit) {
+    if (!board || !unit) {
         return;
     }
 
     const auto placementIt = places.find(unitId);
     if (placementIt != places.end() && placementIt->second.area == UnitArea::Board) {
-        board.remove(unit);
+        board->remove(unit);
     }
 
     if (target.area == UnitArea::Board) {
         if (target.hasHex) {
-            board.add(unit, target.hex);
+            board->add(unit, target.hex);
         }
     } else {
         unit->clearPosition();
@@ -552,7 +477,8 @@ void BattleScene::buildScene() {
     benchItems.clear();
     unitItems.clear();
     unitItemMap.clear();
-    layout->setCells(board.cells());
+    Board* board = activeBoard();
+    layout->setCells(board ? board->cells() : std::vector<Hex>{});
     layout->setOrigin(QPointF(0.0, 0.0));
     layout->setSize(46.0, 69.0);
 
@@ -573,11 +499,16 @@ void BattleScene::buildScene() {
     const qreal boardY = scenePad + qMax<qreal>(0.0, (topH - rawBounds.height()) * 0.5) - rawBounds.top();
     layout->setOrigin(QPointF(boardX, boardY));
 
-    for (const Hex& hex : board.cells()) {
+    if (!board) {
+        sceneObj->setSceneRect(QRectF(0.0, 0.0, sceneW, sceneH));
+        return;
+    }
+
+    for (const Hex& hex : board->cells()) {
         const QPolygonF poly = layout->poly(hex);
         GridItem* gridItem = new GridItem(hex, poly);
         gridItem->setZValue(zGrid);
-        gridItem->setBaseColor(colorForZone(board.zone(hex)));
+        gridItem->setBaseColor(colorForZone(board->zone(hex)));
 
         sceneObj->addItem(gridItem);
         gridItems.push_back(gridItem);
@@ -597,6 +528,11 @@ void BattleScene::buildScene() {
 
     for (Unit* unit : units) {
         createUnitItem(unit);
+    }
+    for (Unit* unit : board->units()) {
+        if (unit && !isRosterUnit(unit)) {
+            createUnitItem(unit);
+        }
     }
 
     sceneObj->setSceneRect(QRectF(0.0, 0.0, sceneW, sceneH));
@@ -622,35 +558,9 @@ void BattleScene::createUnitItem(Unit* unit) {
             this, &BattleScene::handleDropCommand);
 }
 
-void BattleScene::applyActiveAuras(Character* character) {
-    if (!character) {
-        return;
-    }
-
-    for (const ActiveAura& aura : activeAuras) {
-        for (const HexTechEffect& effect : aura.effects) {
-            if (effect.type != "apply_buff" || effect.buffId <= 0) {
-                continue;
-            }
-            if (effect.modifierKey == "boss_only" && currentBattleKind != BattleKind::Boss) {
-                continue;
-            }
-            if (effect.modifierKey == "boss_elite_only" &&
-                currentBattleKind != BattleKind::Boss &&
-                currentBattleKind != BattleKind::Elite) {
-                continue;
-            }
-
-            std::unique_ptr<buff> created = bufffactory::create(effect.buffId, effect.duration);
-            if (created) {
-                character->getbuff().addBuff(std::move(created));
-            }
-        }
-    }
-}
-
 void BattleScene::syncFromState() {
     clearHighlights();
+    Board* board = activeBoard();
 
     for (UnitItem* item : unitItems) {
         if (!item || !item->unit()) {
@@ -663,19 +573,19 @@ void BattleScene::syncFromState() {
             item->setVisible(true);
             item->setZValue(zUnit);
             Hex h;
-            if (board.posOf(item->unit(), &h)) {
+            if (board && board->posOf(item->unit(), &h)) {
                 item->setHex(h);
                 item->setPos(layout->toWorld(h));
             }
             continue;
         }
 
-        if (isBattleUnit(item->unit())) {
+        if (isBattleDisplayUnit(item->unit())) {
             item->setVisible(battlePhase == BattlePhase::Battle);
             item->setZValue(zUnit);
 
             Hex h;
-            if (!board.posOf(item->unit(), &h)) {
+            if (!board || !board->posOf(item->unit(), &h)) {
                 item->setVisible(false);
                 continue;
             }
@@ -702,8 +612,9 @@ void BattleScene::syncFromState() {
 
         if (placement.area == UnitArea::Board) {
             if (!placement.hasHex ||
-                !board.has(placement.hex) ||
-                board.unitAt(placement.hex) != item->unit()) {
+                !board ||
+                !board->has(placement.hex) ||
+                board->unitAt(placement.hex) != item->unit()) {
                 item->setVisible(false);
                 continue;
             }

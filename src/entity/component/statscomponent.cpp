@@ -25,6 +25,13 @@ bool StatsComponent::modifyMP(int delta){
     return false;
 }
 
+void StatsComponent::setHP(int value){
+    hp = value;
+    if(hp > maxhp){
+        hp = maxhp;
+    }
+}
+
 void StatsComponent::beattacked(int damage, Character* attacker){
     BeAttackedContext context{attacker, owner, damage, false};
     owner->getbuff().beforeBeAttacked(context);
@@ -42,6 +49,23 @@ void StatsComponent::beattacked(int damage, Character* attacker){
         modifySHIELF(-1*dhp);
     }
     owner->getbuff().afterBeAttacked(context);
+}
+
+void StatsComponent::heal(int amount, Character* source){
+    if(amount <= 0){
+        return;
+    }
+
+    HealContext context{source, owner, amount, false};
+    owner->getbuff().beforeHeal(context);
+    if(context.cancelled || context.amount <= 0){
+        return;
+    }
+
+    modifyHP(context.amount);
+    if(hp > maxhp){
+        hp = maxhp;
+    }
 }
 
 bool StatsComponent::update(){

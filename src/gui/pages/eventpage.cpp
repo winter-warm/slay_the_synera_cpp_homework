@@ -110,6 +110,8 @@ EventPage::EventPage(QWidget* parent)
     layout->addWidget(content, 1);
 
     connect(hud, &GameHud::saveRequested, this, &EventPage::saveRequested);
+    connect(hud, &GameHud::bagRequested, this, &EventPage::bagRequested);
+    connect(hud, &GameHud::shopRequested, this, &EventPage::shopRequested);
     connect(confirmHexTechButton, &QPushButton::clicked, this, [this]() {
         if (selectedHexTechChoice >= 0) {
             emit hexTechCardSelected(selectedHexTechChoice);

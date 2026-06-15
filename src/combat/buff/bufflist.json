@@ -9,9 +9,9 @@
     { "buffid": 102, "name": "HexTech Steady Guard", "priority": 1, "trigger": "onBattleStart", "effects": [6] },
     { "buffid": 103, "name": "HexTech First Wind", "priority": 1, "trigger": "onBattleStart", "effects": [7] },
     { "buffid": 104, "name": "HexTech Quick Preparation", "priority": 1, "trigger": "onBattleStart", "effects": [8] },
-    { "buffid": 105, "name": "HexTech Soft Landing", "priority": 10, "trigger": "beforeBeAttacked", "maxTriggers": 1, "effects": [13] },
+    { "buffid": 105, "name": "HexTech Soft Landing", "priority": 10, "trigger": "beforeBeAttacked", "maxTriggers": 3, "effects": [13] },
     { "buffid": 106, "name": "HexTech Training Mark", "priority": 1, "trigger": "onBattleStart", "effects": [25] },
-    { "buffid": 107, "name": "HexTech Storm Oath", "priority": 1, "trigger": "beforeBeAttacked", "effects": [15] },
+    { "buffid": 107, "name": "HexTech Storm Oath", "priority": 1, "trigger": "beforeBeAttacked", "effects": [27] },
     { "buffid": 108, "name": "HexTech Iron Circle", "priority": 1, "cooldown": 1.0, "effects": [12] },
     { "buffid": 109, "name": "HexTech Mist Veil", "priority": 10, "trigger": "beforeBeAttacked", "maxTriggers": 4, "effects": [18] },
     { "buffid": 110, "name": "HexTech Arcane Reserve", "priority": 1, "trigger": "onBattleStart", "effects": [8, 7] },
@@ -21,6 +21,21 @@
     { "buffid": 114, "name": "HexTech Decisive Focus", "priority": 2, "trigger": "beforeAttack", "maxTriggers": 3, "effects": [16] },
     { "buffid": 115, "name": "HexTech Divine Aegis", "priority": 10, "trigger": "beforeBeAttacked", "maxTriggers": 1, "effects": [14] },
     { "buffid": 116, "name": "HexTech Execution Mark", "priority": 2, "trigger": "beforeAttack", "effects": [22] },
-    { "buffid": 117, "name": "HexTech Phoenix Clause", "priority": 20, "trigger": "beforeDeath", "maxTriggers": 1, "effects": [23] }
+    { "buffid": 117, "name": "HexTech Phoenix Clause", "priority": 20, "trigger": "beforeDeath", "maxTriggers": 1, "effects": [23] },
+
+    { "buffid": 201, "name": "Temporary Alliance", "priority": 20, "effects": [201] },
+    { "buffid": 202, "name": "Temporary Betrayal", "priority": 20, "effects": [202] },
+    { "buffid": 203, "name": "Untargetable", "priority": 20, "effects": [203] },
+
+    { "buffid": 301, "name": "Killing Intent Sense", "priority": 20, "trigger": "onBattleStart", "effects": [301, 302] },
+    { "buffid": 305, "name": "Levitation", "priority": 20, "trigger": "onBattleStart", "effects": [305] },
+    { "buffid": 306, "name": "Sight Induction", "priority": 25, "trigger": "onBattleStart", "effects": [306] },
+    { "buffid": 308, "name": "Simple Spear Targeting", "priority": 20, "trigger": "onBattleStart", "effects": [308] },
+    { "buffid": 309, "name": "Simple Spear First Strike", "priority": 20, "trigger": "beforeAttack", "maxTriggers": 1, "effects": [309] },
+    { "buffid": 310, "name": "Burning Percent", "priority": 5, "cooldown": 1.0, "effects": [310] },
+    { "buffid": 312, "name": "Liquid Damage Reduction", "priority": 20, "trigger": "beforeBeAttacked", "effects": [312] },
+    { "buffid": 313, "name": "Liquid Regeneration", "priority": 20, "cooldown": 1.0, "effects": [313] },
+    { "buffid": 314, "name": "Death Rewind", "priority": 30, "trigger": "beforeDeath", "maxTriggers": 3, "effects": [314] },
+    { "buffid": 315, "name": "Mimicry", "priority": 20, "trigger": "afterBeAttacked", "effects": [315] }
   ]
 }

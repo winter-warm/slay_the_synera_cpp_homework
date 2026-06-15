@@ -20,6 +20,7 @@ public:
     void afterAttack(AttackContext& context);
     void beforeBeAttacked(BeAttackedContext& context);
     void afterBeAttacked(BeAttackedContext& context);
+    void beforeHeal(HealContext& context);
     void beforeAddBuff(AddBuffContext& context);
     void beforeDeath(DeathContext& context);
     void onTurnStart(TurnContext& context);

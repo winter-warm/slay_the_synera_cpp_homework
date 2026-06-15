@@ -13,8 +13,8 @@
       "id": "steady_guard",
       "layerId": 1,
       "name": "Steady Guard",
-      "title": "钢铁雄心",
-      "description": "全队战斗开始时获得护盾。",
+      "title": "便携护盾",
+      "description": "全队战斗开始时获得生命值25%的护盾。",
       "cardImagePath": "assets/hextech/cards/steady_guard.png",
       "effects": [{ "type": "apply_buff", "buffId": 102, "duration": -1 }]
     },
@@ -31,7 +31,7 @@
       "id": "first_wind",
       "layerId": 1,
       "name": "First Wind",
-      "title": "只打顺风局",
+      "title": "顺风局",
       "description": "全队战斗开始时获得两点mp。",
       "cardImagePath": "assets/hextech/cards/first_wind.png",
       "effects": [{ "type": "apply_buff", "buffId": 103, "duration": -1 }]
@@ -40,7 +40,7 @@
       "id": "quick_preparation",
       "layerId": 1,
       "name": "Quick Preparation",
-      "title": "快速整备",
+      "title": "热启动",
       "description": "全队初始法力值阈值下降1点，更快释放技能",
       "cardImagePath": "assets/hextech/cards/quick_preparation.png",
       "effects": [{ "type": "apply_buff", "buffId": 104, "duration": -1 }]
@@ -50,16 +50,16 @@
       "layerId": 1,
       "name": "Lucky Pouch",
       "title": "幸运钱袋",
-      "description": "立即获得 35 金币。",
+      "description": "立即获得 15 金币。",
       "cardImagePath": "assets/hextech/cards/lucky_pouch.png",
-      "effects": [{ "type": "grant_gold", "value": 35 }]
+      "effects": [{ "type": "grant_gold", "value": 15 }]
     },
     {
       "id": "soft_landing",
       "layerId": 1,
       "name": "Soft Landing",
       "title": "平稳着陆",
-      "description": "每场战斗首次受到伤害时减免70%伤害。",
+      "description": "每场战斗前三次受到伤害时减免 70% 伤害。",
       "cardImagePath": "assets/hextech/cards/soft_landing.png",
       "effects": [{ "type": "apply_buff", "buffId": 105, "duration": -1 }]
     },
@@ -76,7 +76,7 @@
       "id": "borrowed_blade",
       "layerId": 1,
       "name": "Borrowed Blade",
-      "title": "借来的破剑",
+      "title": "简易长矛",
       "description": "立即选择一次基础装备。",
       "cardImagePath": "assets/hextech/cards/borrowed_blade.png",
       "effects": [{ "type": "choose_basic_equipment" }]
@@ -86,7 +86,7 @@
       "layerId": 2,
       "name": "Storm Oath",
       "title": "风暴誓约",
-      "description": "生命较低时获得额外护盾和防御。",
+      "description": "每收到一次伤害，攻击提升5%。",
       "cardImagePath": "assets/hextech/cards/storm_oath.png",
       "effects": [
         { "type": "apply_buff", "buffId": 107, "duration": -1 }
@@ -155,7 +155,7 @@
       "layerId": 2,
       "name": "Arcane Reserve",
       "title": "奥术储备",
-      "description": "全队初始 MP 上限下降，MP 提高。",
+      "description": "全队 MP 阈值下降，初始MP 提高。",
       "cardImagePath": "assets/hextech/cards/arcane_reserve.png",
       "effects": [
         { "type": "apply_buff", "buffId": 110, "duration": -1 }
@@ -219,8 +219,8 @@
       "id": "final_fortune",
       "layerId": 3,
       "name": "Final Fortune",
-      "title": "终局财富",
-      "description": "立即获得 999 金币，享受零元购吧。",
+      "title": "零元购",
+      "description": "立即获得 999 金币。",
       "cardImagePath": "assets/hextech/cards/final_fortune.png",
       "effects": [{ "type": "grant_gold", "value": 999 }]
     },

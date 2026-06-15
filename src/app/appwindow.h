@@ -4,8 +4,10 @@
 #include <QMainWindow>
 
 class BattlePage;
+class CardPanel;
 class EventPage;
 class GameManager;
+class QResizeEvent;
 class MapPage;
 class QStackedWidget;
 class StartPage;
@@ -16,6 +18,9 @@ class AppWindow : public QMainWindow {
 public:
     explicit AppWindow(QWidget* parent = nullptr);
 
+protected:
+    void resizeEvent(QResizeEvent* event) override;
+
 private:
     GameManager* manager;
     QStackedWidget* stack;
@@ -23,6 +28,7 @@ private:
     MapPage* mapPage;
     EventPage* eventPage;
     BattlePage* battlePage;
+    CardPanel* cardPanel;
 };
 
 #endif // APP_APPWINDOW_H

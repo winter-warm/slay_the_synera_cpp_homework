@@ -1,4 +1,6 @@
 #include "gamemanager.h"
+#include "combat/battlerepository.h"
+#include "entity/character/characterfactory.h"
 #include "world/event/eventrepository.h"
 #include "world/hextech/hextechrepository.h"
 #include "world/map/mapgenerator.h"
@@ -7,6 +9,64 @@
 
 static bool containsInt(const std::vector<int>& values, int value) {
     return std::find(values.begin(), values.end(), value) != values.end();
+}
+
+static int shopExpThresholdForLevel(int level) {
+    if (level == 1) {
+        return 10;
+    }
+    if (level == 2) {
+        return 15;
+    }
+    if (level == 3) {
+        return 20;
+    }
+    return 0;
+}
+
+static int shopCostForRarity(int rarity) {
+    switch (rarity) {
+    case 1:
+        return 1;
+    case 2:
+        return 3;
+    case 3:
+        return 5;
+    case 4:
+        return 10;
+    default:
+        return 1;
+    }
+}
+
+static int rollRarityForShopLevel(int level, std::mt19937& rng) {
+    static const int probabilities[4][4] = {
+        {75, 25, 0, 0},
+        {50, 30, 20, 0},
+        {50, 20, 20, 10},
+        {20, 20, 30, 30},
+    };
+    const int row = std::max(0, std::min(3, level - 1));
+    std::uniform_int_distribution<int> distribution(1, 100);
+    int roll = distribution(rng);
+    int cumulative = 0;
+    for (int i = 0; i < 4; ++i) {
+        cumulative += probabilities[row][i];
+        if (roll <= cumulative) {
+            return i + 1;
+        }
+    }
+    return 1;
+}
+
+static BattleNodeContext battleContextFor(const GameState& state, const MapNode& node, BattleKind kind) {
+    BattleNodeContext context;
+    context.layerId = state.currentLayerId;
+    context.nodeId = node.id;
+    context.nodeRow = node.row;
+    context.seed = state.seed;
+    context.kind = kind;
+    return context;
 }
 
 static std::string hexTechIntroTitleForLayer(int layerId) {
@@ -36,7 +96,8 @@ static std::string hexTechIntroTextForLayer(int layerId) {
 }
 
 GameManager::GameManager(QObject* parent)
-    : QObject(parent) {}
+    : QObject(parent)
+    , battleSystem(this) {}
 
 std::vector<int> GameManager::existingSaveSlots() const {
     return saves.existingSlots();
@@ -52,10 +113,13 @@ void GameManager::newGame(int seed) {
     state.seed = seed;
     state.map = MapGenerator().generate(seed);
     state.currentLayerId = 1;
+    state.ownedCharacterCards = {{1209, 1}};
+    state.shop = {};
     currentState = state;
     for (MapLayer& layer : currentState.map.layers) {
         layer.rebuildNextPointers();
     }
+    refreshShopOffers();
     unlockLayerStart(1);
     emit stateChanged(currentState);
     emit showMapRequested();
@@ -68,7 +132,9 @@ void GameManager::loadFromSlot(int slot) {
         emit messageRequested("Load failed", QString::fromStdString(error));
         return;
     }
-    setState(state);
+    currentState = state;
+    ensureCardEconomyInitialized();
+    setState(currentState);
     emit showMapRequested();
 }
 
@@ -106,6 +172,7 @@ void GameManager::enterMapNode(int nodeId) {
     context.seed = currentState.seed;
 
     EventRepository repository;
+    BattleRepository battleRepository;
     if (node->event_id == MapEventId::Start) {
         loadHexTechEvent(currentState.currentLayerId, nodeId);
         emit stateChanged(currentState);
@@ -114,19 +181,19 @@ void GameManager::enterMapNode(int nodeId) {
     }
 
     if (node->event_id == MapEventId::NormalBattle) {
-        if (const auto battle = repository.battleFor(context, BattleKind::Normal)) {
+        if (const auto battle = battleRepository.battleFor(battleContextFor(currentState, *node, BattleKind::Normal))) {
             startBattle(*battle);
             return;
         }
     }
     if (node->event_id == MapEventId::EliteBattle) {
-        if (const auto battle = repository.battleFor(context, BattleKind::Elite)) {
+        if (const auto battle = battleRepository.battleFor(battleContextFor(currentState, *node, BattleKind::Elite))) {
             startBattle(*battle);
             return;
         }
     }
     if (node->event_id == MapEventId::Boss) {
-        if (const auto battle = repository.battleFor(context, BattleKind::Boss)) {
+        if (const auto battle = battleRepository.battleFor(battleContextFor(currentState, *node, BattleKind::Boss))) {
             startBattle(*battle);
             return;
         }
@@ -220,7 +287,21 @@ void GameManager::chooseEventOption(int optionIndex) {
             return;
         case EventActionType::StartBattle:
             currentState.pendingEventStepAfterBattle = action.battle.returnStepId;
-            startBattle(action.battle);
+            if (!action.battle.enemies.empty()) {
+                startBattle(action.battle);
+                return;
+            }
+            if (const MapLayer* layer = currentState.map.layerById(currentState.currentLayerId)) {
+                if (const MapNode* node = layer->nodeById(currentState.currentNodeId)) {
+                    BattleRepository battleRepository;
+                    BattleKind kind = action.battle.kind == BattleKind::None ? BattleKind::Normal : action.battle.kind;
+                    if (const auto battle = battleRepository.battleFor(battleContextFor(currentState, *node, kind))) {
+                        BattleConfig config = *battle;
+                        config.returnStepId = action.battle.returnStepId;
+                        startBattle(config);
+                    }
+                }
+            }
             return;
         }
     }
@@ -237,23 +318,90 @@ void GameManager::finishEvent(const EventResult& result) {
 }
 
 void GameManager::finishBattle(const BattleResult& result) {
+    const int completedBattleNodeId =
+        activeBattleNodeId >= 0 ? activeBattleNodeId : currentState.currentNodeId;
+    battleSystem.clear();
     if (result.victory) {
-        if (!currentState.pendingEventStepAfterBattle.empty()) {
-            const std::string nextStep = currentState.pendingEventStepAfterBattle;
-            currentState.pendingEventStepAfterBattle.clear();
-            loadEventStep(currentState.currentEvent.eventId, nextStep);
-            emit stateChanged(currentState);
-            emit showEventRequested(currentState.currentNodeId);
-            return;
-        }
-        completeCurrentNode();
-        emit stateChanged(currentState);
+        grantShopExperience(1);
+        refreshShopOffers();
     }
+    if (!currentState.pendingEventStepAfterBattle.empty()) {
+        const std::string nextStep = currentState.pendingEventStepAfterBattle;
+        currentState.pendingEventStepAfterBattle.clear();
+        loadEventStep(currentState.currentEvent.eventId, nextStep);
+        emit stateChanged(currentState);
+        emit showEventRequested(currentState.currentNodeId);
+        activeBattleNodeId = -1;
+        return;
+    }
+    completeNode(completedBattleNodeId);
+    emit stateChanged(currentState);
+    activeBattleNodeId = -1;
     emit showMapRequested();
+}
+
+void GameManager::startPreparedBattle(const std::vector<CharacterPlacement>& placements) {
+    battleSystem.startFromPreparedUnits(placements);
+}
+
+void GameManager::buyShopOffer(int offerIndex) {
+    ensureCardEconomyInitialized();
+    if (offerIndex < 0 || offerIndex >= static_cast<int>(currentState.shop.offers.size())) {
+        return;
+    }
+
+    ShopOffer& offer = currentState.shop.offers[static_cast<size_t>(offerIndex)];
+    if (offer.sold || offer.templateId <= 0) {
+        return;
+    }
+
+    const auto info = characterfactory::infoFor(offer.templateId);
+    if (!info) {
+        return;
+    }
+    const int cost = shopCostForRarity(info->rarity);
+    if (currentState.gold < cost) {
+        emit messageRequested(QString::fromUtf8("金币不足"),
+                              QString::fromUtf8("这张卡需要 %1 金币。").arg(cost));
+        return;
+    }
+
+    currentState.gold -= cost;
+    currentState.ownedCharacterCards.push_back({offer.templateId, 1});
+    offer.sold = true;
+    grantShopExperience(1);
+    emit stateChanged(currentState);
+}
+
+void GameManager::mergeOwnedCharacterCards(int firstIndex, int secondIndex) {
+    ensureCardEconomyInitialized();
+    if (firstIndex == secondIndex ||
+        firstIndex < 0 ||
+        secondIndex < 0 ||
+        firstIndex >= static_cast<int>(currentState.ownedCharacterCards.size()) ||
+        secondIndex >= static_cast<int>(currentState.ownedCharacterCards.size())) {
+        return;
+    }
+
+    if (firstIndex > secondIndex) {
+        std::swap(firstIndex, secondIndex);
+    }
+
+    const OwnedCharacterCard first = currentState.ownedCharacterCards[static_cast<size_t>(firstIndex)];
+    const OwnedCharacterCard second = currentState.ownedCharacterCards[static_cast<size_t>(secondIndex)];
+    if (first.templateId != second.templateId || first.starLevel != second.starLevel || first.starLevel >= 3) {
+        return;
+    }
+
+    currentState.ownedCharacterCards.erase(currentState.ownedCharacterCards.begin() + secondIndex);
+    currentState.ownedCharacterCards.erase(currentState.ownedCharacterCards.begin() + firstIndex);
+    currentState.ownedCharacterCards.push_back({first.templateId, first.starLevel + 1});
+    emit stateChanged(currentState);
 }
 
 void GameManager::setState(const GameState& state) {
     currentState = state;
+    ensureCardEconomyInitialized();
     for (MapLayer& layer : currentState.map.layers) {
         layer.rebuildNextPointers();
     }
@@ -278,11 +426,15 @@ void GameManager::unlockLayerStart(int layerId) {
 }
 
 void GameManager::completeCurrentNode() {
-    const int nodeId = currentState.currentNodeId;
+    completeNode(currentState.currentNodeId);
+}
+
+void GameManager::completeNode(int nodeId) {
     if (nodeId < 0) {
         return;
     }
 
+    currentState.currentNodeId = nodeId;
     if (!containsInt(currentState.completedNodeIds, nodeId)) {
         currentState.completedNodeIds.push_back(nodeId);
     }
@@ -349,6 +501,75 @@ void GameManager::loadHexTechEvent(int layerId, int nodeId) {
 
 void GameManager::startBattle(const BattleConfig& config) {
     currentState.currentBattle = config;
+    activeBattleNodeId = currentState.currentNodeId;
+    battleSystem.setActiveAuraIds(currentState.activeAuraIds);
+    battleSystem.loadBattle(config);
     emit stateChanged(currentState);
     emit showBattleRequested(currentState.currentNodeId);
+}
+
+void GameManager::ensureCardEconomyInitialized() {
+    if (currentState.ownedCharacterCards.empty()) {
+        currentState.ownedCharacterCards.push_back({1209, 1});
+    }
+    if (currentState.shop.level < 1) {
+        currentState.shop.level = 1;
+    }
+    if (currentState.shop.level > 4) {
+        currentState.shop.level = 4;
+    }
+    if (currentState.shop.exp < 0) {
+        currentState.shop.exp = 0;
+    }
+    if (currentState.shop.offers.size() != 4) {
+        refreshShopOffers();
+    }
+}
+
+void GameManager::refreshShopOffers() {
+    currentState.shop.offers.clear();
+    const std::vector<characterfactory::CharacterTemplateInfo> templates = characterfactory::playerTemplates();
+    if (templates.empty()) {
+        return;
+    }
+
+    std::mt19937 rng(static_cast<unsigned int>(currentState.seed * 1103515245u +
+                                               currentState.shop.rollCounter * 2654435761u +
+                                               currentState.shop.level * 97u));
+    for (int slot = 0; slot < 4; ++slot) {
+        const int rarity = rollRarityForShopLevel(currentState.shop.level, rng);
+        std::vector<int> candidates;
+        for (const auto& info : templates) {
+            if (info.rarity == rarity) {
+                candidates.push_back(info.templateId);
+            }
+        }
+        if (candidates.empty()) {
+            for (const auto& info : templates) {
+                candidates.push_back(info.templateId);
+            }
+        }
+        std::uniform_int_distribution<int> pick(0, static_cast<int>(candidates.size()) - 1);
+        currentState.shop.offers.push_back({candidates[static_cast<size_t>(pick(rng))], false});
+    }
+    ++currentState.shop.rollCounter;
+}
+
+void GameManager::grantShopExperience(int amount) {
+    if (amount <= 0) {
+        return;
+    }
+    currentState.shop.exp += amount;
+    while (currentState.shop.level < 4) {
+        const int threshold = shopExpThresholdForLevel(currentState.shop.level);
+        if (threshold <= 0 || currentState.shop.exp < threshold) {
+            break;
+        }
+        currentState.shop.exp -= threshold;
+        ++currentState.shop.level;
+    }
+    if (currentState.shop.level >= 4) {
+        currentState.shop.level = 4;
+        currentState.shop.exp = std::max(0, currentState.shop.exp);
+    }
 }

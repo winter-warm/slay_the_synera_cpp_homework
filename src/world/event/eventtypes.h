@@ -1,6 +1,7 @@
 #ifndef WORLD_EVENT_EVENTTYPES_H
 #define WORLD_EVENT_EVENTTYPES_H
 
+#include "core/hex.h"
 #include <string>
 #include <vector>
 
@@ -17,10 +18,16 @@ enum class EventActionType {
     GoToStep
 };
 
+struct EnemyPlacement {
+    int templateId = 0;
+    Hex hex;
+};
+
 struct BattleConfig {
     BattleKind kind = BattleKind::None;
     std::string boardId = "default_board";
-    std::vector<int> enemyTemplateIds;
+    std::vector<EnemyPlacement> enemies;
+    float statMultiplier = 1.0f;
     std::string returnStepId;
 };
 

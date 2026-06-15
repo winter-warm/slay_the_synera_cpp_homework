@@ -8,6 +8,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
+#include "entity/component/teamcomponent.h"
+
 //namespace前向声明，可以在其他cpp中找到这个空间；这种方式不应该再include .cpp，只是把这个函数交给其他文件写了而已，编译器会自动连接
 //写的时候只要有声明就好了，调用会自己去找这个函数
 namespace heal_effect{
@@ -26,7 +28,31 @@ effect::AttackHandler damageMultiplier();
 effect::BeAttackedHandler damageReductionPercent();
 effect::BeAttackedHandler damageImmunity();
 effect::BeAttackedHandler lowHealthGuard();
+effect::BeAttackedHandler attackUpAfterDamage();
 effect::DeathHandler deathProtection();
+}
+
+namespace control_effect {
+effect::ApplyHandler temporaryTeam(teams team);
+effect::RemoveHandler clearTemporaryTeam();
+effect::ApplyHandler untargetable();
+effect::RemoveHandler clearUntargetable();
+}
+
+namespace character_effect {
+effect::BattleHandler cocoStart();
+effect::BeAttackedHandler cocoRetreat();
+effect::BattleHandler levitation();
+effect::BattleHandler sightInduction();
+effect::RemoveHandler clearSightInduction();
+effect::AttackHandler removeSightInduction();
+effect::BattleHandler simpleSpearTargeting();
+effect::AttackHandler firstAttackDouble();
+effect::TurnHandler burningPercent();
+effect::BeAttackedHandler noahDamageReduction();
+effect::TurnHandler noahRegeneration();
+effect::DeathHandler deathRewind();
+effect::BeAttackedHandler mimicry();
 }
 
 QJsonObject effectfactory::loadEffectList()
@@ -112,6 +138,9 @@ std::unique_ptr<effect> effectfactory::create(int effectid)
         case 15:
             created->setBeforeBeAttacked(attribute_effect::lowHealthGuard());
             break;
+        case 27:
+            created->setBeforeBeAttacked(attribute_effect::attackUpAfterDamage());
+            break;
         case 16:
         case 22:
         case 24:
@@ -119,6 +148,53 @@ std::unique_ptr<effect> effectfactory::create(int effectid)
             break;
         case 23:
             created->setBeforeDeath(attribute_effect::deathProtection());
+            break;
+        case 201:
+            created->setApply(control_effect::temporaryTeam(teams::pc));
+            created->setRemove(control_effect::clearTemporaryTeam());
+            break;
+        case 202:
+            created->setApply(control_effect::temporaryTeam(teams::enemy));
+            created->setRemove(control_effect::clearTemporaryTeam());
+            break;
+        case 203:
+            created->setApply(control_effect::untargetable());
+            created->setRemove(control_effect::clearUntargetable());
+            break;
+        case 301:
+            created->setOnBattleStart(character_effect::cocoStart());
+            break;
+        case 302:
+            created->setAfterBeAttacked(character_effect::cocoRetreat());
+            break;
+        case 305:
+            created->setOnBattleStart(character_effect::levitation());
+            break;
+        case 306:
+            created->setOnBattleStart(character_effect::sightInduction());
+            created->setRemove(character_effect::clearSightInduction());
+            created->setAfterAttack(character_effect::removeSightInduction());
+            break;
+        case 308:
+            created->setOnBattleStart(character_effect::simpleSpearTargeting());
+            break;
+        case 309:
+            created->setBeforeAttack(character_effect::firstAttackDouble());
+            break;
+        case 310:
+            created->setOnTurnStart(character_effect::burningPercent());
+            break;
+        case 312:
+            created->setBeforeBeAttacked(character_effect::noahDamageReduction());
+            break;
+        case 313:
+            created->setOnTurnStart(character_effect::noahRegeneration());
+            break;
+        case 314:
+            created->setBeforeDeath(character_effect::deathRewind());
+            break;
+        case 315:
+            created->setAfterBeAttacked(character_effect::mimicry());
             break;
         default:
             break;

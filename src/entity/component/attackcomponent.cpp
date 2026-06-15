@@ -1,4 +1,5 @@
 #include "attackcomponent.h"
+#include "core/board.h"
 #include "entity/character/character.h"
 #include <utility>
 
@@ -13,7 +14,7 @@ AttackComponent::AttackComponent(Character* owner, std::vector<Skill> skills)
     : component(owner), skill(std::move(skills))
 {
     if(skill.empty()){
-        skill.push_back([](Character*, Character*){});
+        skill.push_back(Skill{});
     }
 }
 
@@ -30,7 +31,7 @@ void AttackComponent::update(float deltaTime, bool ismoving){
         return;
     }
     Character* target = owner->gettarget();
-    if(target == nullptr){
+    if(target == nullptr || !target->isTargetable()){
         return;
     }
     attack(target);
@@ -41,6 +42,19 @@ void AttackComponent::update(float deltaTime, bool ismoving){
 }
 
 void AttackComponent::attack(Character* target){
+    if(target == nullptr || !target->isTargetable()){
+        return;
+    }
+    Board* board = owner->getCurrentBoard();
+    Hex selfHex;
+    Hex targetHex;
+    if(board &&
+       (!board->posOf(owner, &selfHex) ||
+        !board->posOf(target, &targetHex) ||
+        board->dist(selfHex, targetHex) > owner->getstats().getRANGE())) {
+        return;
+    }
+
     AttackContext context{owner, target, owner->getstats().getATTACK(), false};
     owner->getbuff().beforeAttack(context);
     if(context.cancelled || context.target == nullptr){
@@ -54,7 +68,18 @@ void AttackComponent::attack(Character* target){
 
 void AttackComponent::useskill(Character* target){
     for(auto& ele : skill){
-        ele(owner, target);
+        ele.execute(owner, target);
+    }
+}
+
+void AttackComponent::activateAndRemoveBuffSkills(){
+    for(auto it = skill.begin(); it != skill.end();){
+        if(it->is_buff){
+            it->execute(owner, owner);
+            it = skill.erase(it);
+        }else{
+            ++it;
+        }
     }
 }
 

@@ -5,7 +5,6 @@
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QLabel>
-#include <QMessageBox>
 #include <QPixmap>
 #include <QToolButton>
 
@@ -76,11 +75,10 @@ GameHud::GameHud(QWidget* parent)
     layout->addWidget(shopButton);
 
     connect(bagButton, &QToolButton::clicked, this, [this]() {
-        // TODO(hextech-bag): display selected HexTechCardRecord entries here; remove this comment after bag UI is implemented.
-        QMessageBox::information(this, "Bag", "Bag panel placeholder.");
+        emit bagRequested();
     });
     connect(shopButton, &QToolButton::clicked, this, [this]() {
-        QMessageBox::information(this, "Shop", "Shop panel placeholder.");
+        emit shopRequested();
     });
     connect(exitButton, &QToolButton::clicked, qApp, &QApplication::quit);
 

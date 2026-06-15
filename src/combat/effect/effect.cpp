@@ -5,10 +5,16 @@ effect::effect(int id, std::string na, QJsonObject params):
 
 bool effect::apply(Character* other){
     owner = other;
+    if(applyFunc){
+        return applyFunc(*this, other);
+    }
     return true;
 }
 
 bool effect::remove(){
+    if(removeFunc){
+        return removeFunc(*this);
+    }
     return true;
 }
 
@@ -30,6 +36,10 @@ void effect::beforeBeAttacked(BeAttackedContext& context){
 
 void effect::afterBeAttacked(BeAttackedContext& context){
     if(afterBeAttackedFunc){afterBeAttackedFunc(*this, context);}
+}
+
+void effect::beforeHeal(HealContext& context){
+    if(beforeHealFunc){beforeHealFunc(*this, context);}
 }
 
 void effect::beforeAddBuff(AddBuffContext& context){

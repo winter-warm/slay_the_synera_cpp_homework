@@ -13,7 +13,19 @@ void KnightFork(Character* caster, Character* target);
 void DiagonalSmite(Character* caster, Character* target);
 void RoyalSweep(Character* caster, Character* target);
 void KingCommand(Character* caster, Character* target);
-Skill skillFromName(const QString& name);
+void KillingIntentSense(Character* caster, Character* target);
+void EhEhOh(Character* caster, Character* target);
+void Levitation(Character* caster, Character* target);
+void SightInduction(Character* caster, Character* target);
+void SimpleSpear(Character* caster, Character* target);
+void Fireball(Character* caster, Character* target);
+void Kotodama(Character* caster, Character* target);
+void LiquidManipulation(Character* caster, Character* target);
+void Gunshot(Character* caster, Character* target);
+void DeathRewind(Character* caster, Character* target);
+void Mimicry(Character* caster, Character* target);
+void WitchKiller(Character* caster, Character* target);
+Skill skillFromName(const QString& name, bool isBuff);
 
 enum class SkillId {
     None,

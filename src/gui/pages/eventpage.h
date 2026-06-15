@@ -26,6 +26,8 @@ signals:
     void eventOptionSelected(int optionIndex);
     void hexTechCardSelected(int choiceIndex);
     void saveRequested(int slot);
+    void bagRequested();
+    void shopRequested();
 
 private:
     void paintEvent(QPaintEvent* event) override;

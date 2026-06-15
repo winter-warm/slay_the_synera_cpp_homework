@@ -6,8 +6,6 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonValue>
-#include <algorithm>
-#include <random>
 
 static QJsonObject loadRoot() {
     const QString runtimePath = QCoreApplication::applicationDirPath() + "/events/events.json";
@@ -40,33 +38,10 @@ static BattleKind battleKindFromString(const QString& value) {
     return BattleKind::None;
 }
 
-static QString battleKindKey(BattleKind kind) {
-    switch (kind) {
-    case BattleKind::Normal:
-        return "normal";
-    case BattleKind::Elite:
-        return "elite";
-    case BattleKind::Boss:
-        return "boss";
-    case BattleKind::None:
-        return "";
-    }
-    return "";
-}
-
-static std::vector<int> intsFromJson(const QJsonArray& array) {
-    std::vector<int> values;
-    for (const QJsonValue& value : array) {
-        values.push_back(value.toInt());
-    }
-    return values;
-}
-
 static BattleConfig battleFromJson(const QJsonObject& object) {
     BattleConfig config;
     config.kind = battleKindFromString(object.value("kind").toString());
     config.boardId = object.value("boardId").toString("default_board").toStdString();
-    config.enemyTemplateIds = intsFromJson(object.value("enemyTemplateIds").toArray());
     config.returnStepId = object.value("returnStepId").toString().toStdString();
     return config;
 }
@@ -122,25 +97,6 @@ static EventDefinition eventFromJson(int eventId, const std::string& stepId, con
 
 EventRepository::EventRepository()
     : root(loadRoot()) {}
-
-std::optional<BattleConfig> EventRepository::battleFor(const EventContext& context, BattleKind kind) const {
-    const QJsonObject battles = root.value("battles").toObject();
-    const QJsonObject layer = battles.value(QString::number(context.layerId)).toObject();
-    const QJsonArray pool = layer.value(battleKindKey(kind)).toArray();
-    if (pool.isEmpty()) {
-        return std::nullopt;
-    }
-
-    std::mt19937 rng(static_cast<unsigned int>(context.seed * 1103515245u +
-                                               context.layerId * 1009u +
-                                               context.nodeId * 9176u));
-    std::uniform_int_distribution<int> dist(0, pool.size() - 1);
-    BattleConfig config = battleFromJson(pool.at(dist(rng)).toObject());
-    if (config.kind == BattleKind::None) {
-        config.kind = kind;
-    }
-    return config;
-}
 
 std::optional<EventDefinition> EventRepository::eventFor(const EventContext& context,
                                                          const std::string& stepId) const {

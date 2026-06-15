@@ -22,6 +22,13 @@ struct BeAttackedContext {
     bool cancelled = false;
 };
 
+struct HealContext {
+    Character* source = nullptr;
+    Character* target = nullptr;
+    int amount = 0;
+    bool cancelled = false;
+};
+
 struct AddBuffContext {
     Character* target = nullptr;
     buff* incomingBuff = nullptr;

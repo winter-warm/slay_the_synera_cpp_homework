@@ -19,6 +19,22 @@
 - Macro route map visuals live under `assets/maps`.
 - Tactical board data lives with the board model at `src/core/default_board.json` and is copied to `boards/default_board.json` at runtime.
 - Do not place macro map images in `src/core`.
+- Data-driven battle node pools live in `src/combat/battle.json` and are copied to `battle/battle.json` at runtime.
+- Do not put map battle pools back into `src/world/event/events.json`; that file is for event text, options, and event flow.
+- In battle data, `map_id` names the tactical Board JSON. Macro route Map and tactical Board naming must stay separate.
+
+## Battle Node Data
+
+- `src/combat/battle.json` describes map battle encounters by layer, elite flag, tactical board id, and enemy placements.
+- Battle layers `1`, `2`, and `3` are regular layer pools. Layers `10`, `20`, and `30` are boss pools for macro layers 1, 2, and 3.
+- Enemy placement uses tactical hex `position.x` and `position.y`; compute `z` as `-x-y`.
+- Map battle selection must go through `BattleRepository`, not `EventRepository`.
+- Enemy scaling uses the macro `MapNode::row`: first battle row has no bonus, and each higher row adds 5% to enemy `maxhp`, `attack`, and `defense`.
+
+## Combat And Skills
+
+- Implement skills with trigger timing through buffs/effects. If a skill needs to happen on battle start, before/after attack, before/after being attacked, before death, or on a timed tick, model it as a buff-backed skill instead of adding timing branches to active skill execution.
+- Keep helper functions scarce. Prefer direct, local code unless a helper removes meaningful duplication or clarifies genuinely complex logic.
 
 ## Qt Graphics Scene Lifecycle
 

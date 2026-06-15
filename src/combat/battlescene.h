@@ -8,9 +8,8 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include "combat/battlesystem.h"
 #include "core/board.h"
-#include "world/event/eventtypes.h"
-#include "world/aura/aura.h"
 
 class BenchSlotItem;
 class Character;
@@ -28,11 +27,13 @@ public:
     ~BattleScene();
 
     void initialize();
-    void reset();
-    void loadBattle(const BattleConfig& config);
-    void setActiveAuraIds(const std::vector<std::string>& auraIds);
-    void startBattle();
-    void endBattle();
+    void setBoard(Board* board);
+    void resetPreparation();
+    void clearRoster();
+    void setBattleCharacters(const std::vector<Character*>& characters);
+    void removeCharacterItem(int id);
+    void syncFromBattleSystem(const battlesystem& battleSystem);
+    std::vector<CharacterPlacement> preparedPlacements() const;
 
     Unit* addCharacter(Character* character, const std::string& displayName = "Character");
 
@@ -63,12 +64,12 @@ private:
     };
 
     Unit* findUnitById(int unitId) const;
-    bool isBattleUnit(Unit* unit) const;
-    void clearBattleUnits();
-    void clearEnemyUnits();
+    bool isRosterUnit(Unit* unit) const;
+    bool isBattleDisplayUnit(Unit* unit) const;
+    bool isRenderedBattleId(int unitId) const;
+    void clearTransientUnitItems();
     void hideBench(bool hidden);
-    std::string boardPathForId(const std::string& boardId) const;
-    std::vector<Hex> freeEnemyCells() const;
+    Board* activeBoard() const;
     QRectF rawBoardBounds() const;
     bool isPreparationPhase() const;
     bool canDragUnit(int unitId) const;
@@ -81,7 +82,6 @@ private:
     void applyDrop(int unitId, const DropTarget& target);
     void buildScene();
     void createUnitItem(Unit* unit);
-    void applyActiveAuras(Character* character);
     void syncFromState();
     bool isBenchSlotFree(const QPoint& slotPos, int ignoredUnitId = -1) const;
     QPoint firstFreeBenchSlot() const;
@@ -90,12 +90,10 @@ private:
     QPointF benchSlotTopLeft(int row, int col) const;
     QPointF benchSlotCenter(const QPoint& slotPos) const;
 
-    Board board;
+    Board* boardRef;
     std::unique_ptr<HexLayout> layout;
     std::vector<Unit*> units;
-    std::vector<std::unique_ptr<Character>> battleUnits;
-    std::vector<std::unique_ptr<Character>> enemyUnits;
-    std::vector<ActiveAura> activeAuras;
+    std::vector<Character*> battleDisplayUnits;
 
     QGraphicsScene* sceneObj;
     std::vector<GridItem*> gridItems;
@@ -113,7 +111,6 @@ private:
     qreal benchGap;
     QPointF benchOrigin;
     BattlePhase battlePhase;
-    BattleKind currentBattleKind;
 };
 
 #endif // COMBAT_BATTLESCENE_H

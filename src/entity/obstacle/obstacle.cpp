@@ -5,4 +5,4 @@ Obstacle::Obstacle(bool blockAttack, int image)
     , blockAttackValue(blockAttack)
     , imageValue(image) {}
 
-void Obstacle::update(float,const Board& board) {}
+void Obstacle::update(float, Board&) {}

@@ -25,7 +25,11 @@ public:
     void modifyATTACL(int delta){attack+=delta;if(attack<=0)attack=0;}
     void modifyDEFESE(int delta){defense+=delta;if(defense<=0)defense=0;}
     void modifySHIELF(int delta){shield+=delta;if(shield<=0)shield = 0;}
+    void modifyRANGE(int delta){range+=delta;if(range<1)range = 1;}
+    void setHP(int value);
+    void setATTACK(int value){attack = value;if(attack<=0)attack=0;}
     void beattacked(int damage, Character* attacker = nullptr);
+    void heal(int amount, Character* source = nullptr);
 
     int getHP(){return hp;}
     int getMAXHP(){return maxhp;}

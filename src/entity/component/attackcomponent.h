@@ -2,9 +2,26 @@
 #define ATTACKCOMPONENT_H
 #include"component.h"
 #include <functional>
+#include <utility>
 #include <vector>
 
-using Skill = std::function<void(Character* caster, Character* target)>;
+struct Skill {
+    using Handler = std::function<void(Character* caster, Character* target)>;
+
+    Handler handler;
+    bool is_buff = false;
+
+    Skill() = default;
+    Skill(Handler handler, bool isBuff = false)
+        : handler(std::move(handler)), is_buff(isBuff) {}
+
+    void execute(Character* caster, Character* target) const
+    {
+        if (handler) {
+            handler(caster, target);
+        }
+    }
+};
 
 class AttackComponent:public component
 {
@@ -20,6 +37,7 @@ public:
     void update(float deltaTime,bool ismoving);
     void attack(Character* target);
     void useskill(Character* target);
+    void activateAndRemoveBuffSkills();
     void modifyAttackIntervalPercent(int percent);
 };
 

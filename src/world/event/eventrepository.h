@@ -9,7 +9,6 @@ class EventRepository {
 public:
     EventRepository();
 
-    std::optional<BattleConfig> battleFor(const EventContext& context, BattleKind kind) const;
     std::optional<EventDefinition> eventFor(const EventContext& context,
                                             const std::string& stepId = "start") const;
 

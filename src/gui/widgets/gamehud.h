@@ -18,6 +18,8 @@ public slots:
 
 signals:
     void saveRequested(int slot);
+    void bagRequested();
+    void shopRequested();
 
 private:
     QLabel* hpIconLabel;

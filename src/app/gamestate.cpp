@@ -72,7 +72,18 @@ static QJsonObject battleToJson(const BattleConfig& battle) {
     QJsonObject object;
     object["kind"] = battleKindToString(battle.kind);
     object["boardId"] = QString::fromStdString(battle.boardId);
-    object["enemyTemplateIds"] = intsToJson(battle.enemyTemplateIds);
+    QJsonArray enemies;
+    for (const EnemyPlacement& enemy : battle.enemies) {
+        QJsonObject enemyObject;
+        enemyObject["enemy"] = enemy.templateId;
+        QJsonObject position;
+        position["x"] = enemy.hex.x;
+        position["y"] = enemy.hex.y;
+        enemyObject["position"] = position;
+        enemies.append(enemyObject);
+    }
+    object["enemies"] = enemies;
+    object["statMultiplier"] = battle.statMultiplier;
     object["returnStepId"] = QString::fromStdString(battle.returnStepId);
     return object;
 }
@@ -81,7 +92,20 @@ static BattleConfig battleFromJson(const QJsonObject& object) {
     BattleConfig battle;
     battle.kind = battleKindFromString(object.value("kind").toString());
     battle.boardId = object.value("boardId").toString("default_board").toStdString();
-    battle.enemyTemplateIds = intsFromJson(object.value("enemyTemplateIds").toArray());
+    battle.statMultiplier = static_cast<float>(object.value("statMultiplier").toDouble(1.0));
+    const QJsonArray enemies = object.value("enemies").toArray();
+    for (const QJsonValue& value : enemies) {
+        const QJsonObject enemyObject = value.toObject();
+        const QJsonObject position = enemyObject.value("position").toObject();
+        EnemyPlacement enemy;
+        enemy.templateId = enemyObject.value("enemy").toInt();
+        enemy.hex.x = position.value("x").toInt();
+        enemy.hex.y = position.value("y").toInt();
+        enemy.hex.z = -enemy.hex.x - enemy.hex.y;
+        if (enemy.templateId > 0 && isValidHex(enemy.hex)) {
+            battle.enemies.push_back(enemy);
+        }
+    }
     battle.returnStepId = object.value("returnStepId").toString().toStdString();
     return battle;
 }
@@ -229,6 +253,74 @@ static HexTechCardRecord hexTechCardRecordFromJson(const QJsonObject& object) {
     return record;
 }
 
+static QJsonObject ownedCharacterCardToJson(const OwnedCharacterCard& card) {
+    QJsonObject object;
+    object["templateId"] = card.templateId;
+    object["starLevel"] = card.starLevel;
+    return object;
+}
+
+static OwnedCharacterCard ownedCharacterCardFromJson(const QJsonObject& object) {
+    OwnedCharacterCard card;
+    card.templateId = object.value("templateId").toInt();
+    card.starLevel = object.value("starLevel").toInt(1);
+    if (card.starLevel < 1) {
+        card.starLevel = 1;
+    }
+    if (card.starLevel > 3) {
+        card.starLevel = 3;
+    }
+    return card;
+}
+
+static QJsonObject shopOfferToJson(const ShopOffer& offer) {
+    QJsonObject object;
+    object["templateId"] = offer.templateId;
+    object["sold"] = offer.sold;
+    return object;
+}
+
+static ShopOffer shopOfferFromJson(const QJsonObject& object) {
+    ShopOffer offer;
+    offer.templateId = object.value("templateId").toInt();
+    offer.sold = object.value("sold").toBool(false);
+    return offer;
+}
+
+static QJsonObject shopStateToJson(const ShopState& shop) {
+    QJsonObject object;
+    object["level"] = shop.level;
+    object["exp"] = shop.exp;
+    object["rollCounter"] = shop.rollCounter;
+    QJsonArray offers;
+    for (const ShopOffer& offer : shop.offers) {
+        offers.append(shopOfferToJson(offer));
+    }
+    object["offers"] = offers;
+    return object;
+}
+
+static ShopState shopStateFromJson(const QJsonObject& object) {
+    ShopState shop;
+    shop.level = object.value("level").toInt(1);
+    shop.exp = object.value("exp").toInt(0);
+    shop.rollCounter = object.value("rollCounter").toInt(0);
+    if (shop.level < 1) {
+        shop.level = 1;
+    }
+    if (shop.level > 4) {
+        shop.level = 4;
+    }
+    if (shop.exp < 0) {
+        shop.exp = 0;
+    }
+    const QJsonArray offers = object.value("offers").toArray();
+    for (const QJsonValue& value : offers) {
+        shop.offers.push_back(shopOfferFromJson(value.toObject()));
+    }
+    return shop;
+}
+
 static QJsonArray stringsToJson(const std::vector<std::string>& values) {
     QJsonArray array;
     for (const std::string& value : values) {
@@ -271,6 +363,12 @@ QJsonObject GameState::toJson() const {
         choices.append(hexTechDefinitionToJson(definition));
     }
     object["currentHexTechChoices"] = choices;
+    QJsonArray ownedCards;
+    for (const OwnedCharacterCard& card : ownedCharacterCards) {
+        ownedCards.append(ownedCharacterCardToJson(card));
+    }
+    object["ownedCharacterCards"] = ownedCards;
+    object["shop"] = shopStateToJson(shop);
     return object;
 }
 
@@ -298,5 +396,16 @@ GameState GameState::fromJson(const QJsonObject& object) {
     for (const QJsonValue& value : choices) {
         state.currentHexTechChoices.push_back(hexTechDefinitionFromJson(value.toObject()));
     }
+    const QJsonArray ownedCards = object.value("ownedCharacterCards").toArray();
+    for (const QJsonValue& value : ownedCards) {
+        OwnedCharacterCard card = ownedCharacterCardFromJson(value.toObject());
+        if (card.templateId > 0) {
+            state.ownedCharacterCards.push_back(card);
+        }
+    }
+    if (state.ownedCharacterCards.empty()) {
+        state.ownedCharacterCards.push_back({1209, 1});
+    }
+    state.shop = shopStateFromJson(object.value("shop").toObject());
     return state;
 }

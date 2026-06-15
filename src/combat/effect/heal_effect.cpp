@@ -16,7 +16,7 @@ effect::BeAttackedHandler heal_effect::reverseDamageToHeal()//1
 
         const int defense = owner->getstats().getDEFENSE();
         const int healAmount = context.damage * 100 / (defense + 100);
-        owner->getstats().modifyHP(healAmount);
+        owner->getstats().heal(healAmount, context.attacker);
         context.cancelled = true;
     };
 }
@@ -30,6 +30,6 @@ effect::TurnHandler heal_effect::regenerationHeal()//4
         }
 
         const int amount = self.getParams().value("amount").toInt(2);
-        owner->getstats().modifyHP(amount);
+        owner->getstats().heal(amount);
     };
 }

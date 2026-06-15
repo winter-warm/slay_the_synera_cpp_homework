@@ -6,7 +6,7 @@
     { "effectid": 4, "type": "heal", "name": "regeneration_heal", "params": { "amount": 2 } },
     { "effectid": 5, "type": "attribute", "name": "attack_up_attribute", "params": { "stat": "attack", "value": 2 } },
 
-    { "effectid": 6, "type": "attribute", "name": "hextech_shield_8", "params": { "stat": "shield", "value": 8 } },
+    { "effectid": 6, "type": "attribute", "name": "hextech_shield_25_percent_hp", "params": { "stat": "shield_max_hp_percent", "value": 25 } },
     { "effectid": 7, "type": "attribute", "name": "hextech_start_mp_2", "params": { "stat": "mp", "value": 2 } },
     { "effectid": 8, "type": "attribute", "name": "hextech_max_mp_down_1", "params": { "stat": "max_mp", "value": -1 } },
     { "effectid": 9, "type": "attribute", "name": "hextech_attack_4", "params": { "stat": "attack", "value": 4 } },
@@ -25,6 +25,23 @@
     { "effectid": 22, "type": "attribute", "name": "hextech_damage_bonus_20", "params": { "percent": 120 } },
     { "effectid": 23, "type": "attribute", "name": "hextech_death_protection_half_hp", "params": { "healPercent": 50 } },
     { "effectid": 24, "type": "attribute", "name": "hextech_damage_bonus_25", "params": { "percent": 125 } },
-    { "effectid": 25, "type": "attribute", "name": "hextech_attack_speed_up", "params": { "stat": "attack_interval_percent", "value": 70 } }
+    { "effectid": 25, "type": "attribute", "name": "hextech_attack_speed_up", "params": { "stat": "attack_interval_percent", "value": 70 } },
+    { "effectid": 27, "type": "attribute", "name": "hextech_attack_up_after_damage", "params": { "percent": 5 } },
+
+    { "effectid": 201, "type": "control", "name": "temporary_team_pc" },
+    { "effectid": 202, "type": "control", "name": "temporary_team_enemy" },
+    { "effectid": 203, "type": "control", "name": "untargetable" },
+
+    { "effectid": 301, "type": "character", "name": "coco_start_stats" },
+    { "effectid": 302, "type": "character", "name": "coco_retreat_after_damage" },
+    { "effectid": 305, "type": "character", "name": "hanna_levitation" },
+    { "effectid": 306, "type": "character", "name": "leia_sight_induction" },
+    { "effectid": 308, "type": "character", "name": "leia_highest_attack_targeting" },
+    { "effectid": 309, "type": "character", "name": "leia_first_attack_double" },
+    { "effectid": 310, "type": "character", "name": "burning_percent_5" },
+    { "effectid": 312, "type": "character", "name": "noah_damage_reduction_50" },
+    { "effectid": 313, "type": "character", "name": "noah_regeneration_1_percent" },
+    { "effectid": 314, "type": "character", "name": "hiro_death_rewind" },
+    { "effectid": 315, "type": "character", "name": "margo_mimicry" }
   ]
 }

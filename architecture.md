@@ -53,15 +53,28 @@ Low-level tactical board model.
 
 Combat systems and battle runtime.
 
-- `BattleScene`: current tactical battle scene controller. It loads `Board`, builds the battle `QGraphicsScene`, manages preparation placement, creates battle copies, and switches between preparation and battle phase.
-- `BattleSystem`: intended owner of real battle rules, but currently still mostly empty.
+- `BattleRepository`: loads `src/combat/battle.json` and selects a map battle encounter for the current macro node.
+- `battle.json`: data-driven battle node pool. It defines `layer`, `elite`, `map_id`, and enemy placements.
+- `BattleScene`: tactical battle scene UI. It builds the `QGraphicsScene`, manages preparation placement, and syncs visible units from battle state.
+- `BattleSystem`: owns battle runtime state, tactical `Board`, battle copies, enemy construction, updates, death cleanup, and win/loss signals.
 - `context/`: future battle context data.
 - `buff/`: buff definitions, factories, and managers.
 - `effect/`: combat effects such as damage, healing, control, and attribute changes.
 - `equipment/`: equipment logic.
 - `map_utility`: should probably be renamed to `board_utility`, because this project now uses `map` for macro maps.
 
-Long term, `BattleScene` should focus on display and interaction, while `BattleSystem` should own battle rules.
+Battle data is intentionally separate from event data. `events.json` owns event text and choices; `battle.json` owns map battle encounters.
+
+`battle.json` layer rules:
+
+- `1`, `2`, `3`: regular battle pools for macro layers 1 through 3.
+- `10`, `20`, `30`: boss battle pools for macro layers 1 through 3.
+- `elite: false`: normal battle node pool.
+- `elite: true`: elite and boss battle node pools.
+
+Enemy placement in `battle.json` uses tactical hex `position.x` and `position.y`; code computes `z = -x-y`. `map_id` names the tactical Board JSON under `src/core/boards` or runtime `boards`.
+
+Enemy stat scaling is based on macro `MapNode::row`: the first battle row has no bonus, and each higher row adds 5% to enemy `maxhp`, `attack`, and `defense`. Scaling applies to constructed enemy instances only, never to character templates.
 
 ### `src/world/map`
 
@@ -239,6 +252,8 @@ src/world/event/eventresult.h
 
 This should let event pages show data-driven content instead of hardcoded placeholder text.
 
+Event data should not contain normal map battle pools. Special event battles should either request a battle through `BattleRepository` or reference future explicit battle ids.
+
 ### Player and Inventory State
 
 Recommended additions:
@@ -271,4 +286,3 @@ These should replace the current placeholder message boxes.
 - Keep tactical board JSON with `Board`, currently `src/core/default_board.json`.
 - Keep page navigation in `app`, not in `gui/pages`.
 - Keep battle rules in `combat`, not in `gui`.
-
