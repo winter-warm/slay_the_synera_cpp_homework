@@ -28,15 +28,18 @@ public:
 
 public slots:
     void setState(const GameState& state);
+    void setElapsedSeconds(int seconds);
     void startNodeBattle(int nodeId);
 
 signals:
     void startBattleRequested();
     void battleFinished(const BattleResult& result);
+    void battleChestOpened(int gold);
     void saveRequested(int slot);
     void bagRequested();
     void shopRequested();
     void panelsShouldClose();
+    void returnToStartRequested();
 
 protected:
     bool eventFilter(QObject* watched, QEvent* event) override;
@@ -46,10 +49,14 @@ private:
     void ensureStarterRoster();
     void syncRosterFromState();
     void applyStarScaling(Character* character, int starLevel);
+    int deploymentLimitForCurrentLayer() const;
     void syncFromBattleSystem();
     void positionSettlementButton();
     void beginSettlement(bool victory);
     void completeSettlement();
+    void completeVictoryChest();
+    int victoryChestGold() const;
+    int extraChestGoldFromHexTech() const;
 
     GameState currentState;
     GameHud* hud;
@@ -61,6 +68,7 @@ private:
     QTimer* battleTimer;
     BattleResult pendingBattleResult;
     bool settlementActive;
+    bool chestSettlementPending;
     std::vector<std::unique_ptr<Character>> roster;
     std::vector<OwnedCharacterCard> rosterSignature;
 };

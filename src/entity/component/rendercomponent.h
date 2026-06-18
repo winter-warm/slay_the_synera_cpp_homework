@@ -3,6 +3,8 @@
 
 #include "component.h"
 
+#include <vector>
+
 class CharacterHUD;
 
 class RenderComponent : public component
@@ -10,6 +12,9 @@ class RenderComponent : public component
 private:
     bool visible = true;
     CharacterHUD* hud = nullptr;
+    int pendingHitFlashCount = 0;
+    int pendingSkillBurstCount = 0;
+    std::vector<int> pendingAttackLungeTargets;
 public:
     RenderComponent(Character* owner);
     RenderComponent(const RenderComponent& other,Character* owner);
@@ -20,6 +25,12 @@ public:
     void hide();
     bool inVisible() const;
     void update();
+    void requestHitFlash();
+    bool takeHitFlash();
+    void requestAttackLunge(int targetId);
+    std::vector<int> takeAttackLungeTargets();
+    void requestSkillBurst();
+    bool takeSkillBurst();
 };
 
 #endif // RENDERCOMPONENT_H

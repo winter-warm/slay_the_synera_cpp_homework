@@ -35,8 +35,18 @@ void AttackComponent::update(float deltaTime, bool ismoving){
         return;
     }
     attack(target);
-    if(owner->getstats().getMP() >= owner->getstats().getMAXMP()){
+    bool hasActiveSkill = false;
+    for (const Skill& ele : skill) {
+        if (!ele.is_buff && ele.handler) {
+            hasActiveSkill = true;
+            break;
+        }
+    }
+    if(hasActiveSkill &&
+       owner->getstats().getMAXMP() > 0 &&
+       owner->getstats().getMP() >= owner->getstats().getMAXMP()){
         owner->getstats().modifyMP((-1) * owner->getstats().getMAXMP());
+        owner->getrender().requestSkillBurst();
         useskill(target);
     }
 }
@@ -60,6 +70,7 @@ void AttackComponent::attack(Character* target){
     if(context.cancelled || context.target == nullptr){
         return;
     }
+    owner->getrender().requestAttackLunge(context.target->id());
     context.target->getstats().beattacked(context.damage, owner);
     owner->getbuff().afterAttack(context);
     owner->getstats().modifyMP(1);

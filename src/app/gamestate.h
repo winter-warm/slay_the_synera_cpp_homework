@@ -18,6 +18,13 @@ struct CurrentEventState {
     std::string text;
     std::vector<EventOption> options;
     bool hexTechSelection = false;
+    bool restSelection = false;
+    bool restTrainingSelection = false;
+    bool ownedCardSelection = false;
+    std::string selectionPrompt;
+    std::string selectionFilter;
+    std::vector<EventAction> selectionActions;
+    int selectedOwnedCardIndex = -1;
 };
 
 struct GameState {
@@ -25,6 +32,7 @@ struct GameState {
     int playerHp = 80;
     int maxPlayerHp = 80;
     int gold = 0;
+    int elapsedSeconds = 0;
     int currentLayerId = 1;
     int playerNodeId = -1;
     int currentNodeId = -1;

@@ -15,7 +15,28 @@ enum class BattleKind {
 enum class EventActionType {
     FinishNode,
     StartBattle,
-    GoToStep
+    GoToStep,
+    ShowMessage,
+    Heal,
+    LoseHp,
+    ChangeMaxHp,
+    GrantGold,
+    LoseGold,
+    GrantRandomGold,
+    GrantCard,
+    GrantRandomCard,
+    UpgradeRandomOwnedCard,
+    UpgradeSelectedOwnedCard,
+    GrantShopExp,
+    GrantRandomEquipment,
+    ChooseOwnedCard
+};
+
+enum class RestOption {
+    Rest,
+    Train,
+    Dig,
+    Forge
 };
 
 struct EnemyPlacement {
@@ -34,11 +55,31 @@ struct BattleConfig {
 struct EventAction {
     EventActionType type = EventActionType::FinishNode;
     std::string nextStepId;
+    std::string title;
+    std::string message;
+    std::string prompt;
+    std::string filter;
+    int amount = 0;
+    int minAmount = 0;
+    int maxAmount = 0;
+    int templateId = 0;
     BattleConfig battle;
+    std::vector<EventAction> onChooseActions;
+};
+
+struct EventRequirement {
+    std::string type;
+    std::string value;
+    int amount = 0;
+    int templateId = 0;
 };
 
 struct EventOption {
     std::string label;
+    std::string description;
+    int requiresGold = -1;
+    int requiresHpAbove = -1;
+    std::vector<EventRequirement> requirements;
     std::vector<EventAction> actions;
 };
 

@@ -23,9 +23,9 @@
       "layerId": 1,
       "name": "Camp Spoils",
       "title": "顺手牵羊",
-      "description": "战斗胜利后对敌方营地地毯式搜索，获得更多金币。",
+      "description": "战斗胜利打开宝箱时额外获得 1 金币。",
       "cardImagePath": "assets/hextech/cards/camp_spoils.png",
-      "effects": [{ "type": "reward_modifier", "value": 10, "modifierKey": "gold_drop_percent" }]
+      "effects": [{ "type": "extra_chest_gold", "value": 1 }]
     },
     {
       "id": "first_wind",

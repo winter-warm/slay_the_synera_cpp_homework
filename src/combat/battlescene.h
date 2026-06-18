@@ -15,7 +15,10 @@ class BenchSlotItem;
 class Character;
 class GridItem;
 class HexLayout;
+class Object;
+class ObjectItem;
 class QGraphicsScene;
+class QGraphicsTextItem;
 class Unit;
 class UnitItem;
 
@@ -30,9 +33,11 @@ public:
     void setBoard(Board* board);
     void resetPreparation();
     void clearRoster();
+    void setDeploymentLimit(int limit);
     void setBattleCharacters(const std::vector<Character*>& characters);
     void removeCharacterItem(int id);
     void syncFromBattleSystem(const battlesystem& battleSystem);
+    bool spawnRewardChest(int seedSalt);
     std::vector<CharacterPlacement> preparedPlacements() const;
 
     Unit* addCharacter(Character* character, const std::string& displayName = "Character");
@@ -44,6 +49,9 @@ public:
     void handleDropCommand(int unitId, const QPointF& scenePos);
 
     int phase = 0;
+signals:
+    void rewardChestOpened();
+
 private:
     enum class BattlePhase { Prep, Battle };
     enum class UnitArea { Hidden, Board, Bench };
@@ -80,6 +88,19 @@ private:
     void clearHighlights();
     bool canApplyDrop(int unitId, const DropTarget& target) const;
     void applyDrop(int unitId, const DropTarget& target);
+    int boardRosterCount() const;
+    Unit* boardRosterUnitWithName(const std::string& name, int ignoredUnitId = -1) const;
+    void moveUnitToBench(Unit* unit);
+    void updateDeploymentText();
+    void consumeVisualEvents(UnitItem* item, Character* character);
+    void playHitFlash(UnitItem* item);
+    void playAttackLunge(UnitItem* item, UnitItem* targetItem);
+    void playSkillBurst(UnitItem* item);
+    void clearRewardChest();
+    void createObjectItem(Object* object);
+    void removeObjectItem(int id);
+    void handleObjectOpened(int objectId);
+    void playChestRewardBurst(const QPointF& center);
     void buildScene();
     void createUnitItem(Unit* unit);
     void syncFromState();
@@ -97,8 +118,11 @@ private:
 
     QGraphicsScene* sceneObj;
     std::vector<GridItem*> gridItems;
+    QGraphicsTextItem* deploymentTextItem;
     std::vector<BenchSlotItem*> benchItems;
     std::vector<UnitItem*> unitItems;
+    std::unique_ptr<Object> rewardChest;
+    ObjectItem* rewardChestItem;
 
     bool dragActive;
     int activeUnitId;
@@ -111,6 +135,7 @@ private:
     qreal benchGap;
     QPointF benchOrigin;
     BattlePhase battlePhase;
+    int deploymentLimit;
 };
 
 #endif // COMBAT_BATTLESCENE_H

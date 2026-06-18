@@ -24,10 +24,13 @@ public:
         std::string displayName;
         std::string magicName;
         std::string skillDescription;
+        std::vector<std::string> bonds;
         int rarity = 1;
         int maxHp = 100;
+        int maxMp = 3;
         int attack = 10;
         int defense = 0;
+        int range = 1;
         bool playerCharacter = true;
     };
     static std::optional<CharacterTemplateInfo> infoFor(int templateId);

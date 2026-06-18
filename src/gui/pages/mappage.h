@@ -19,12 +19,14 @@ public:
 
 public slots:
     void setState(const GameState& state);
+    void setElapsedSeconds(int seconds);
 
 signals:
     void nodeSelected(int nodeId);
     void saveRequested(int slot);
     void bagRequested();
     void shopRequested();
+    void returnToStartRequested();
 
 private:
     QString nodeIconPath(const MapNode& node) const;
@@ -37,7 +39,6 @@ private:
     QPropertyAnimation* scrollAnimation = nullptr;
     QGraphicsRectItem* entryBannerRect = nullptr;
     QGraphicsTextItem* entryBannerText = nullptr;
-    int lastAnimatedLayerId = -1;
     int entryAnimationLayerId = -1;
 };
 

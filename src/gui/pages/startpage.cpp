@@ -1,7 +1,9 @@
 #include "startpage.h"
+#include "app/recordmanager.h"
 #include <QApplication>
 #include <QCoreApplication>
 #include <QDir>
+#include <QDialog>
 #include <QIcon>
 #include <QLabel>
 #include <QMessageBox>
@@ -9,6 +11,8 @@
 #include <QGraphicsOpacityEffect>
 #include <QRandomGenerator>
 #include <QResizeEvent>
+#include <QStringList>
+#include <QTextEdit>
 #include <QToolButton>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -66,6 +70,43 @@ static QToolButton* makeImageButton(QWidget* parent, const QString& assetName) {
     return button;
 }
 
+static QString formatElapsed(int seconds) {
+    seconds = qMax(0, seconds);
+    const int hours = seconds / 3600;
+    const int minutes = (seconds % 3600) / 60;
+    const int secs = seconds % 60;
+    return QString("%1:%2:%3")
+        .arg(hours, 2, 10, QChar('0'))
+        .arg(minutes, 2, 10, QChar('0'))
+        .arg(secs, 2, 10, QChar('0'));
+}
+
+static QString recordText(const std::vector<RunRecord>& records) {
+    if (records.empty()) {
+        return QString::fromUtf8("暂无历史战绩");
+    }
+
+    QString text;
+    int index = 1;
+    for (const RunRecord& record : records) {
+        const QString result = record.result == "clear"
+                                   ? QString::fromUtf8("通关")
+                                   : QString::fromUtf8("死亡");
+        QStringList names;
+        for (const std::string& name : record.characterNames) {
+            names << QString::fromStdString(name);
+        }
+        text += QString::fromUtf8("%1. %2\n层数：第 %3 层\n角色：%4\n用时：%5\n时间：%6\n\n")
+                    .arg(index++)
+                    .arg(result)
+                    .arg(record.reachedLayer)
+                    .arg(names.isEmpty() ? QString::fromUtf8("无") : names.join(QString::fromUtf8("、")))
+                    .arg(formatElapsed(record.elapsedSeconds))
+                    .arg(QString::fromStdString(record.finishedAt));
+    }
+    return text.trimmed();
+}
+
 StartPage::StartPage(QWidget* parent)
     : QWidget(parent) {
     auto* root = new QVBoxLayout(this);
@@ -96,11 +137,13 @@ StartPage::StartPage(QWidget* parent)
 
     QToolButton* newButton = makeImageButton(background, "newgame.png");
     QToolButton* continueButton = makeImageButton(background, "continuegame.png");
+    QToolButton* historyButton = makeImageButton(background, "history.png");
     QToolButton* settingsButton = makeImageButton(background, "setting.png");
     QToolButton* exitButton = makeImageButton(background, "exit.png");
 
     menuLayout->addWidget(newButton, 0, Qt::AlignHCenter);
     menuLayout->addWidget(continueButton, 0, Qt::AlignHCenter);
+    menuLayout->addWidget(historyButton, 0, Qt::AlignHCenter);
     menuLayout->addWidget(settingsButton, 0, Qt::AlignHCenter);
     menuLayout->addWidget(exitButton, 0, Qt::AlignHCenter);
     overlay->addWidget(menuColumn, 0, Qt::AlignLeft);
@@ -113,6 +156,26 @@ StartPage::StartPage(QWidget* parent)
     });
     connect(continueButton, &QToolButton::clicked, this, [this]() {
         emit loadGameRequested(1);
+    });
+    connect(historyButton, &QToolButton::clicked, this, [this]() {
+        RecordManager manager;
+        std::string error;
+        const std::vector<RunRecord> records = manager.loadRecords(&error);
+        if (!error.empty()) {
+            QMessageBox::warning(this, QString::fromUtf8("历史战绩"), QString::fromStdString(error));
+            return;
+        }
+
+        QDialog dialog(this);
+        dialog.setWindowTitle(QString::fromUtf8("历史战绩"));
+        dialog.resize(520, 460);
+        auto* layout = new QVBoxLayout(&dialog);
+        auto* text = new QTextEdit(&dialog);
+        text->setReadOnly(true);
+        text->setText(recordText(records));
+        text->setStyleSheet("font-size: 16px; color: #241305; background: #f4dfad;");
+        layout->addWidget(text);
+        dialog.exec();
     });
     connect(settingsButton, &QToolButton::clicked, this, [this]() {
         QMessageBox::information(this, "Settings", "Settings placeholder.");

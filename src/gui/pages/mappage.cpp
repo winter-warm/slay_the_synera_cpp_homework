@@ -45,16 +45,28 @@ MapPage::MapPage(QWidget* parent)
     connect(hud, &GameHud::saveRequested, this, &MapPage::saveRequested);
     connect(hud, &GameHud::bagRequested, this, &MapPage::bagRequested);
     connect(hud, &GameHud::shopRequested, this, &MapPage::shopRequested);
+    connect(hud, &GameHud::returnToStartRequested, this, &MapPage::returnToStartRequested);
 }
 
 void MapPage::setState(const GameState& state) {
     hud->setState(state);
-    const bool playEntryScroll = state.currentLayerId != lastAnimatedLayerId;
+    const MapLayer* layer = state.map.layerById(state.currentLayerId);
+    const MapNode* startNode = layer ? layer->nodeById(layer->startNodeId) : nullptr;
+    const bool playEntryScroll = layer &&
+                                 startNode &&
+                                 state.playerNodeId == startNode->id &&
+                                 state.currentNodeId < 0 &&
+                                 std::find(state.completedNodeIds.begin(),
+                                           state.completedNodeIds.end(),
+                                           startNode->id) == state.completedNodeIds.end();
     if (playEntryScroll) {
-        lastAnimatedLayerId = state.currentLayerId;
         entryAnimationLayerId = state.currentLayerId;
     }
     drawLayer(state, playEntryScroll);
+}
+
+void MapPage::setElapsedSeconds(int seconds) {
+    hud->setElapsedSeconds(seconds);
 }
 
 QString MapPage::nodeIconPath(const MapNode& node) const {

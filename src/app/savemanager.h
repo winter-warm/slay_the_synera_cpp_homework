@@ -9,6 +9,7 @@ class SaveManager {
 public:
     bool saveGame(const GameState& state, int slot, std::string* error = nullptr) const;
     bool loadGame(GameState* state, int slot, std::string* error = nullptr) const;
+    bool deleteSave(int slot, std::string* error = nullptr) const;
     std::vector<int> existingSlots() const;
 
 private:

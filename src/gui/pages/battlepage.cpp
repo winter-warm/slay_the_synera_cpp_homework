@@ -2,6 +2,7 @@
 #include "combat/battlescene.h"
 #include "entity/character/characterfactory.h"
 #include "gui/widgets/gamehud.h"
+#include "world/hextech/hextechrepository.h"
 #include <QEvent>
 #include <QGraphicsView>
 #include <QHBoxLayout>
@@ -24,7 +25,8 @@ BattlePage::BattlePage(QWidget* parent)
     , battleSystem(nullptr)
     , battleTimer(new QTimer(this))
     , pendingBattleResult({})
-    , settlementActive(false) {
+    , settlementActive(false)
+    , chestSettlementPending(false) {
     auto* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -72,9 +74,11 @@ BattlePage::BattlePage(QWidget* parent)
         emit startBattleRequested();
     });
     connect(settlementButton, &QPushButton::clicked, this, &BattlePage::completeSettlement);
+    connect(game, &BattleScene::rewardChestOpened, this, &BattlePage::completeVictoryChest);
     connect(hud, &GameHud::saveRequested, this, &BattlePage::saveRequested);
     connect(hud, &GameHud::bagRequested, this, &BattlePage::bagRequested);
     connect(hud, &GameHud::shopRequested, this, &BattlePage::shopRequested);
+    connect(hud, &GameHud::returnToStartRequested, this, &BattlePage::returnToStartRequested);
 
     QTimer::singleShot(0, this, &BattlePage::fitSceneInView);
 }
@@ -120,14 +124,23 @@ std::vector<CharacterPlacement> BattlePage::preparedPlacements() const {
 void BattlePage::setState(const GameState& state) {
     currentState = state;
     hud->setState(state);
+    if (game) {
+        game->setDeploymentLimit(deploymentLimitForCurrentLayer());
+    }
     syncRosterFromState();
+}
+
+void BattlePage::setElapsedSeconds(int seconds) {
+    hud->setElapsedSeconds(seconds);
 }
 
 void BattlePage::startNodeBattle(int) {
     settlementActive = false;
+    chestSettlementPending = false;
     settlementButton->hide();
     if (battleSystem) {
         game->setBoard(&battleSystem->mutableBoard());
+        game->setDeploymentLimit(deploymentLimitForCurrentLayer());
         syncRosterFromState();
         syncFromBattleSystem();
     }
@@ -204,6 +217,16 @@ void BattlePage::applyStarScaling(Character* character, int starLevel) {
     stats.modifyDEFESE(defense - stats.getDEFENSE());
 }
 
+int BattlePage::deploymentLimitForCurrentLayer() const {
+    if (currentState.currentLayerId <= 1) {
+        return 4;
+    }
+    if (currentState.currentLayerId == 2) {
+        return 5;
+    }
+    return 6;
+}
+
 void BattlePage::syncFromBattleSystem() {
     if (battleSystem && !settlementActive) {
         game->syncFromBattleSystem(*battleSystem);
@@ -231,6 +254,17 @@ void BattlePage::beginSettlement(bool victory) {
     settlementActive = true;
     pendingBattleResult = {victory};
     startButton->hide();
+    chestSettlementPending = false;
+    if (victory) {
+        settlementButton->hide();
+        const int seedSalt = currentState.seed * 1103515245 +
+                             currentState.currentLayerId * 4099 +
+                             currentState.currentNodeId * 9176;
+        chestSettlementPending = game && game->spawnRewardChest(seedSalt);
+        if (chestSettlementPending) {
+            return;
+        }
+    }
     positionSettlementButton();
     settlementButton->show();
     settlementButton->raise();
@@ -239,7 +273,43 @@ void BattlePage::beginSettlement(bool victory) {
 void BattlePage::completeSettlement() {
     settlementButton->hide();
     settlementActive = false;
+    chestSettlementPending = false;
     emit battleFinished(pendingBattleResult);
+}
+
+void BattlePage::completeVictoryChest() {
+    if (!chestSettlementPending) {
+        return;
+    }
+    chestSettlementPending = false;
+    emit battleChestOpened(victoryChestGold());
+    completeSettlement();
+}
+
+int BattlePage::victoryChestGold() const {
+    int gold = 2 + currentState.currentLayerId;
+    if (currentState.currentBattle.kind == BattleKind::Elite) {
+        gold *= 2;
+    }
+    gold += extraChestGoldFromHexTech();
+    return gold;
+}
+
+int BattlePage::extraChestGoldFromHexTech() const {
+    int extra = 0;
+    HexTechRepository repository;
+    for (const HexTechCardRecord& record : currentState.selectedHexTechCards) {
+        const auto definition = repository.findById(record.hexTechId);
+        if (!definition) {
+            continue;
+        }
+        for (const HexTechEffect& effect : definition->effects) {
+            if (effect.type == "extra_chest_gold") {
+                extra += effect.value;
+            }
+        }
+    }
+    return extra;
 }
 
 

@@ -42,10 +42,16 @@ static characterfactory::CharacterTemplateInfo infoFromObject(const QJsonObject&
     info.displayName = characterObject.value("displayName").toString(characterObject.value("name").toString()).toStdString();
     info.magicName = characterObject.value("magicName").toString().toStdString();
     info.skillDescription = characterObject.value("skillDescription").toString().toStdString();
+    const QJsonArray bondValues = characterObject.value("bonds").toArray();
+    for (const QJsonValue& bondValue : bondValues) {
+        info.bonds.push_back(bondValue.toString().toStdString());
+    }
     info.rarity = clampRarity(characterObject.value("rarity").toInt(1));
     info.maxHp = stats.value("maxHp").toInt(100);
+    info.maxMp = stats.value("maxMp").toInt(3);
     info.attack = stats.value("attack").toInt(10);
     info.defense = stats.value("defense").toInt(0);
+    info.range = stats.value("range").toInt(1);
     info.playerCharacter = teamFromString(characterObject.value("team").toString()) == teams::pc;
     return info;
 }

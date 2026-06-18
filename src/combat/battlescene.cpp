@@ -1,16 +1,61 @@
 #include "battlescene.h"
 #include "entity/character/character.h"
+#include "entity/object/object.h"
 #include "entity/unit.h"
 #include "gui/board/benchslotitem.h"
 #include "gui/board/griditem.h"
 #include "gui/board/hexlayout.h"
+#include "gui/board/objectitem.h"
 #include "gui/board/unititem.h"
+#include <QBrush>
+#include <QEasingCurve>
+#include <QFont>
+#include <QGraphicsColorizeEffect>
+#include <QGraphicsRectItem>
 #include <QGraphicsScene>
+#include <QGraphicsTextItem>
+#include <QParallelAnimationGroup>
+#include <QPainter>
+#include <QPointer>
+#include <QPropertyAnimation>
+#include <QSequentialAnimationGroup>
+#include <QTimer>
+#include <QVariantAnimation>
 #include <algorithm>
+#include <cmath>
+#include <random>
 
 
-static constexpr qreal zGrid = 0.0, zBench = 0.2, zUnit = 1.0, zDraggingUnit = 2.0;
+static constexpr qreal zGrid = 0.0, zUnit = 1.0;
+static constexpr qreal zBench = 4.0, zBenchUnit = 5.0, zDraggingUnit = 6.0, zVisualEffect = 7.0;
 static constexpr qreal sceneW = 1280.0, sceneH = 720.0, scenePad = 40.0;
+static constexpr qreal pi = 3.14159265358979323846;
+
+class SquareParticle : public QGraphicsObject {
+public:
+    SquareParticle(const QColor& color, qreal size, QGraphicsItem* parent = nullptr)
+        : QGraphicsObject(parent)
+        , particleColor(color)
+        , particleSize(size)
+    {}
+
+    QRectF boundingRect() const override {
+        return QRectF(-particleSize * 0.5, -particleSize * 0.5, particleSize, particleSize);
+    }
+
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) override {
+        if (!painter) {
+            return;
+        }
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(particleColor);
+        painter->drawRect(boundingRect());
+    }
+
+private:
+    QColor particleColor;
+    qreal particleSize;
+};
 
 static QColor colorForZone(Board::Zone zone) {
     switch (zone) {
@@ -34,6 +79,8 @@ BattleScene::BattleScene(QObject* parent)
     , boardRef(nullptr)
     , layout(std::make_unique<HexLayout>())
     , sceneObj(new QGraphicsScene(this))
+    , deploymentTextItem(nullptr)
+    , rewardChestItem(nullptr)
     , dragActive(false)
     , activeUnitId(-1)
     , benchRows(2)
@@ -41,7 +88,8 @@ BattleScene::BattleScene(QObject* parent)
     , benchSize(78.0)
     , benchGap(10.0)
     , benchOrigin(0.0, 0.0)
-    , battlePhase(BattlePhase::Prep) {}
+    , battlePhase(BattlePhase::Prep)
+    , deploymentLimit(4) {}
 
 BattleScene::~BattleScene() {
     units.clear();
@@ -52,6 +100,7 @@ void BattleScene::initialize() {
 }
 
 void BattleScene::setBoard(Board* board) {
+    clearRewardChest();
     boardRef = board;
     battlePhase = BattlePhase::Prep;
     battleDisplayUnits.clear();
@@ -83,6 +132,7 @@ void BattleScene::resetPreparation() {
 }
 
 void BattleScene::clearRoster() {
+    clearRewardChest();
     Board* board = activeBoard();
     for (Unit* unit : units) {
         if (unit && board) {
@@ -95,6 +145,67 @@ void BattleScene::clearRoster() {
     units.clear();
     places.clear();
     syncFromState();
+}
+
+void BattleScene::setDeploymentLimit(int limit) {
+    deploymentLimit = std::max(1, limit);
+    updateDeploymentText();
+}
+
+bool BattleScene::spawnRewardChest(int seedSalt) {
+    Board* board = activeBoard();
+    if (!board) {
+        return false;
+    }
+
+    clearRewardChest();
+
+    auto collect = [board](auto predicate) {
+        std::vector<Hex> out;
+        for (const Hex& hex : board->cells()) {
+            if (board->empty(hex) && predicate(board->zone(hex))) {
+                out.push_back(hex);
+            }
+        }
+        return out;
+    };
+
+    std::vector<Hex> candidates = collect([](Board::Zone zone) {
+        return zone == Board::Zone::Enemy;
+    });
+    if (candidates.empty()) {
+        candidates = collect([](Board::Zone zone) {
+            return zone != Board::Zone::Player && zone != Board::Zone::None;
+        });
+    }
+    if (candidates.empty()) {
+        candidates = collect([](Board::Zone) {
+            return true;
+        });
+    }
+    if (candidates.empty()) {
+        return false;
+    }
+
+    std::mt19937 rng(static_cast<unsigned int>(seedSalt));
+    std::uniform_int_distribution<int> pick(0, static_cast<int>(candidates.size()) - 1);
+    const Hex hex = candidates[static_cast<size_t>(pick(rng))];
+
+    rewardChest = std::make_unique<Object>("reward_chest",
+                                           "assets/ui/battle_chest_closed.png",
+                                           "assets/ui/battle_chest_open.png");
+    Object* chest = rewardChest.get();
+    if (!board->add(chest, hex)) {
+        rewardChest.reset();
+        return false;
+    }
+
+    createObjectItem(chest);
+    if (rewardChestItem) {
+        rewardChestItem->setHex(hex);
+        rewardChestItem->setPos(layout->toWorld(hex));
+    }
+    return true;
 }
 
 void BattleScene::setBattleCharacters(const std::vector<Character*>& characters) {
@@ -426,6 +537,11 @@ bool BattleScene::canApplyDrop(int unitId, const DropTarget& target) const {
         if (source.area == UnitArea::Board) {
             return source.hasHex && board->unitAt(source.hex) == unit && source.hex != target.hex;
         }
+        const Unit* sameNameOnBoard = boardRosterUnitWithName(unit->name(), unitId);
+        const int projectedCount = boardRosterCount() + (sameNameOnBoard ? 0 : 1);
+        if (projectedCount > deploymentLimit) {
+            return false;
+        }
         return source.area == UnitArea::Bench;
     }
 
@@ -456,6 +572,9 @@ void BattleScene::applyDrop(int unitId, const DropTarget& target) {
     }
 
     if (target.area == UnitArea::Board) {
+        if (Unit* sameNameOnBoard = boardRosterUnitWithName(unit->name(), unitId)) {
+            moveUnitToBench(sameNameOnBoard);
+        }
         if (target.hasHex) {
             board->add(unit, target.hex);
         }
@@ -469,11 +588,334 @@ void BattleScene::applyDrop(int unitId, const DropTarget& target) {
     place.hasHex = target.hasHex;
     place.slot = target.slot;
     places[unitId] = place;
+    updateDeploymentText();
+}
+
+int BattleScene::boardRosterCount() const {
+    int count = 0;
+    for (const auto& entry : places) {
+        if (entry.second.area != UnitArea::Board || !entry.second.hasHex) {
+            continue;
+        }
+        Unit* unit = findUnitById(entry.first);
+        Character* character = dynamic_cast<Character*>(unit);
+        if (character && character->getteam().getteam() == teams::pc) {
+            ++count;
+        }
+    }
+    return count;
+}
+
+Unit* BattleScene::boardRosterUnitWithName(const std::string& name, int ignoredUnitId) const {
+    for (const auto& entry : places) {
+        if (entry.first == ignoredUnitId ||
+            entry.second.area != UnitArea::Board ||
+            !entry.second.hasHex) {
+            continue;
+        }
+        Unit* unit = findUnitById(entry.first);
+        Character* character = dynamic_cast<Character*>(unit);
+        if (character && character->getteam().getteam() == teams::pc && unit->name() == name) {
+            return unit;
+        }
+    }
+    return nullptr;
+}
+
+void BattleScene::moveUnitToBench(Unit* unit) {
+    if (!unit) {
+        return;
+    }
+    Board* board = activeBoard();
+    if (board) {
+        board->remove(unit);
+    }
+    const QPoint slot = firstFreeBenchSlot();
+    Placement place;
+    if (slot.x() >= 0) {
+        place.area = UnitArea::Bench;
+        place.slot = slot;
+    }
+    places[unit->id()] = place;
+}
+
+void BattleScene::updateDeploymentText() {
+    if (!deploymentTextItem) {
+        return;
+    }
+    deploymentTextItem->setPlainText(QString("%1/%2").arg(boardRosterCount()).arg(deploymentLimit));
+    deploymentTextItem->setVisible(isPreparationPhase());
+    QRectF bounds = rawBoardBounds();
+    if (bounds.isEmpty()) {
+        bounds = QRectF(scenePad, scenePad, sceneW - scenePad * 2.0, benchOrigin.y() - scenePad * 2.0);
+    }
+    const QRectF textBounds = deploymentTextItem->boundingRect();
+    deploymentTextItem->setPos(bounds.center().x() - textBounds.width() * 0.5,
+                               bounds.center().y() - textBounds.height() * 0.5);
+}
+
+void BattleScene::consumeVisualEvents(UnitItem* item, Character* character) {
+    if (!item || !character || battlePhase != BattlePhase::Battle) {
+        return;
+    }
+
+    if (character->getrender().takeHitFlash()) {
+        playHitFlash(item);
+    }
+
+    const std::vector<int> targets = character->getrender().takeAttackLungeTargets();
+    for (int targetId : targets) {
+        playAttackLunge(item, findUnitItem(targetId));
+    }
+
+    if (character->getrender().takeSkillBurst()) {
+        playSkillBurst(item);
+    }
+}
+
+void BattleScene::playHitFlash(UnitItem* item) {
+    if (!item) {
+        return;
+    }
+
+    auto* effect = new QGraphicsColorizeEffect(item);
+    effect->setColor(QColor(255, 35, 35));
+    effect->setStrength(0.85);
+    item->setGraphicsEffect(effect);
+
+    auto* fade = new QPropertyAnimation(effect, "strength", effect);
+    fade->setDuration(260);
+    fade->setStartValue(0.85);
+    fade->setEndValue(0.0);
+    fade->setEasingCurve(QEasingCurve::OutCubic);
+    QPointer<UnitItem> guardedItem(item);
+    QPointer<QGraphicsColorizeEffect> guardedEffect(effect);
+    connect(fade, &QPropertyAnimation::finished, this, [guardedItem, guardedEffect]() {
+        if (guardedItem && guardedEffect && guardedItem->graphicsEffect() == guardedEffect) {
+            guardedEffect->setEnabled(false);
+        }
+    });
+    fade->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void BattleScene::playAttackLunge(UnitItem* item, UnitItem* targetItem) {
+    if (!item || !targetItem || item == targetItem) {
+        return;
+    }
+
+    const QPointF start = item->pos();
+    QPointF direction = targetItem->pos() - start;
+    const qreal length = std::hypot(direction.x(), direction.y());
+    if (length <= 0.001) {
+        return;
+    }
+    direction /= length;
+    const QPointF peak = start + direction * std::min<qreal>(length * 0.5, 34.0);
+
+    QPointer<UnitItem> guardedItem(item);
+    auto* group = new QSequentialAnimationGroup(this);
+    auto* out = new QPropertyAnimation(guardedItem, "pos", group);
+    out->setDuration(70);
+    out->setStartValue(start);
+    out->setEndValue(peak);
+    out->setEasingCurve(QEasingCurve::OutQuad);
+
+    auto* back = new QPropertyAnimation(guardedItem, "pos", group);
+    back->setDuration(110);
+    back->setStartValue(peak);
+    back->setEndValue(start);
+    back->setEasingCurve(QEasingCurve::InOutQuad);
+
+    group->addAnimation(out);
+    group->addAnimation(back);
+    group->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void BattleScene::playSkillBurst(UnitItem* item) {
+    if (!item || !sceneObj) {
+        return;
+    }
+
+    const QPointF center = item->pos();
+    const QColor colors[] = {
+        QColor(255, 64, 96),
+        QColor(255, 196, 48),
+        QColor(80, 220, 140),
+        QColor(64, 152, 255),
+        QColor(190, 92, 255),
+        QColor(255, 120, 48)
+    };
+
+    auto* group = new QParallelAnimationGroup(this);
+    constexpr int particleCount = 28;
+    for (int i = 0; i < particleCount; ++i) {
+        const qreal angle = (2.0 * pi * i / particleCount) + ((i % 3) - 1) * 0.12;
+        const qreal distance = 38.0 + (i % 5) * 8.0;
+        const qreal size = 5.0 + (i % 4);
+        const QPointF end(center.x() + std::cos(angle) * distance,
+                          center.y() + std::sin(angle) * distance);
+
+        auto* particle = new SquareParticle(colors[i % 6], size);
+        particle->setPos(center);
+        particle->setOpacity(0.95);
+        particle->setRotation(i * 17);
+        particle->setZValue(zVisualEffect);
+        sceneObj->addItem(particle);
+
+        QPointer<SquareParticle> guardedParticle(particle);
+        auto* move = new QVariantAnimation(group);
+        move->setDuration(1500);
+        move->setStartValue(center);
+        move->setEndValue(end);
+        move->setEasingCurve(QEasingCurve::OutCubic);
+        connect(move, &QVariantAnimation::valueChanged, this, [guardedParticle](const QVariant& value) {
+            if (guardedParticle) {
+                guardedParticle->setPos(value.toPointF());
+            }
+        });
+
+        auto* fade = new QVariantAnimation(group);
+        fade->setDuration(1500);
+        fade->setStartValue(0.95);
+        fade->setEndValue(0.0);
+        fade->setEasingCurve(QEasingCurve::InQuad);
+        connect(fade, &QVariantAnimation::valueChanged, this, [guardedParticle](const QVariant& value) {
+            if (guardedParticle) {
+                guardedParticle->setOpacity(value.toReal());
+            }
+        });
+
+        group->addAnimation(move);
+        group->addAnimation(fade);
+    }
+
+    connect(group, &QParallelAnimationGroup::finished, this, [this, group]() {
+        const QList<QGraphicsItem*> items = sceneObj ? sceneObj->items() : QList<QGraphicsItem*>();
+        for (QGraphicsItem* graphicsItem : items) {
+            if (auto* particle = dynamic_cast<SquareParticle*>(graphicsItem)) {
+                if (particle->opacity() <= 0.01) {
+                    sceneObj->removeItem(particle);
+                    delete particle;
+                }
+            }
+        }
+        group->deleteLater();
+    });
+    group->start();
+}
+
+void BattleScene::clearRewardChest() {
+    if (rewardChest) {
+        if (Board* board = activeBoard()) {
+            board->remove(rewardChest.get());
+        }
+    }
+    if (rewardChestItem) {
+        sceneObj->removeItem(rewardChestItem);
+        delete rewardChestItem;
+        rewardChestItem = nullptr;
+    }
+    rewardChest.reset();
+}
+
+void BattleScene::createObjectItem(Object* object) {
+    if (!object || rewardChestItem) {
+        return;
+    }
+
+    rewardChestItem = new ObjectItem(object);
+    rewardChestItem->setZValue(zUnit);
+    sceneObj->addItem(rewardChestItem);
+    connect(rewardChestItem, &ObjectItem::opened,
+            this, &BattleScene::handleObjectOpened);
+}
+
+void BattleScene::removeObjectItem(int id) {
+    if (!rewardChestItem || rewardChestItem->objectId() != id) {
+        return;
+    }
+    sceneObj->removeItem(rewardChestItem);
+    delete rewardChestItem;
+    rewardChestItem = nullptr;
+}
+
+void BattleScene::handleObjectOpened(int objectId) {
+    if (!rewardChestItem || rewardChestItem->objectId() != objectId) {
+        return;
+    }
+    const QPointF center = rewardChestItem->pos();
+    playChestRewardBurst(center);
+    QTimer::singleShot(800, this, [this]() {
+        emit rewardChestOpened();
+    });
+}
+
+void BattleScene::playChestRewardBurst(const QPointF& center) {
+    if (!sceneObj) {
+        return;
+    }
+
+    auto* group = new QParallelAnimationGroup(this);
+    constexpr int particleCount = 18;
+    for (int i = 0; i < particleCount; ++i) {
+        const qreal angle = 2.0 * pi * i / particleCount;
+        const qreal distance = 26.0 + (i % 4) * 8.0;
+        const QPointF start(center.x(), center.y() - 18.0);
+        const QPointF end(start.x() + std::cos(angle) * distance,
+                          start.y() + std::sin(angle) * distance - 12.0);
+
+        auto* particle = new SquareParticle(QColor(255, 205, 55), 6.0);
+        particle->setPos(start);
+        particle->setOpacity(0.95);
+        particle->setZValue(zVisualEffect);
+        sceneObj->addItem(particle);
+
+        QPointer<SquareParticle> guardedParticle(particle);
+        auto* move = new QVariantAnimation(group);
+        move->setDuration(760);
+        move->setStartValue(start);
+        move->setEndValue(end);
+        move->setEasingCurve(QEasingCurve::OutCubic);
+        connect(move, &QVariantAnimation::valueChanged, this, [guardedParticle](const QVariant& value) {
+            if (guardedParticle) {
+                guardedParticle->setPos(value.toPointF());
+            }
+        });
+
+        auto* fade = new QVariantAnimation(group);
+        fade->setDuration(760);
+        fade->setStartValue(0.95);
+        fade->setEndValue(0.0);
+        connect(fade, &QVariantAnimation::valueChanged, this, [guardedParticle](const QVariant& value) {
+            if (guardedParticle) {
+                guardedParticle->setOpacity(value.toReal());
+            }
+        });
+
+        group->addAnimation(move);
+        group->addAnimation(fade);
+    }
+
+    connect(group, &QParallelAnimationGroup::finished, this, [this, group]() {
+        const QList<QGraphicsItem*> items = sceneObj ? sceneObj->items() : QList<QGraphicsItem*>();
+        for (QGraphicsItem* graphicsItem : items) {
+            if (auto* particle = dynamic_cast<SquareParticle*>(graphicsItem)) {
+                if (particle->opacity() <= 0.01) {
+                    sceneObj->removeItem(particle);
+                    delete particle;
+                }
+            }
+        }
+        group->deleteLater();
+    });
+    group->start();
 }
 
 void BattleScene::buildScene() {
     sceneObj->clear();
     gridItems.clear();
+    deploymentTextItem = nullptr;
+    rewardChestItem = nullptr;
     benchItems.clear();
     unitItems.clear();
     unitItemMap.clear();
@@ -514,6 +956,12 @@ void BattleScene::buildScene() {
         gridItems.push_back(gridItem);
     }
 
+    deploymentTextItem = sceneObj->addText("", QFont("Arial", 72, QFont::Black));
+    deploymentTextItem->setDefaultTextColor(QColor(255, 255, 255, 128));
+    deploymentTextItem->setZValue(0.55);
+    deploymentTextItem->setAcceptedMouseButtons(Qt::NoButton);
+    updateDeploymentText();
+
     const QRectF slotRect(0.0, 0.0, benchSize, benchSize);
 
     for (int row = 0; row < benchRows; ++row) {
@@ -530,7 +978,14 @@ void BattleScene::buildScene() {
         createUnitItem(unit);
     }
     for (Unit* unit : board->units()) {
-        if (unit && !isRosterUnit(unit)) {
+        if (Object* object = dynamic_cast<Object*>(unit)) {
+            createObjectItem(object);
+            Hex h;
+            if (rewardChestItem && board->posOf(object, &h)) {
+                rewardChestItem->setHex(h);
+                rewardChestItem->setPos(layout->toWorld(h));
+            }
+        } else if (unit && !isRosterUnit(unit)) {
             createUnitItem(unit);
         }
     }
@@ -540,7 +995,7 @@ void BattleScene::buildScene() {
 }
 
 void BattleScene::createUnitItem(Unit* unit) {
-    if (!unit || unitItemMap.find(unit->id()) != unitItemMap.end()) {
+    if (!unit || dynamic_cast<Object*>(unit) || unitItemMap.find(unit->id()) != unitItemMap.end()) {
         return;
     }
 
@@ -577,6 +1032,8 @@ void BattleScene::syncFromState() {
                 item->setHex(h);
                 item->setPos(layout->toWorld(h));
             }
+            item->update();
+            consumeVisualEvents(item, character);
             continue;
         }
 
@@ -592,6 +1049,8 @@ void BattleScene::syncFromState() {
 
             item->setHex(h);
             item->setPos(layout->toWorld(h));
+            item->update();
+            consumeVisualEvents(item, character);
             continue;
         }
 
@@ -623,9 +1082,12 @@ void BattleScene::syncFromState() {
             item->setPos(layout->toWorld(placement.hex));
         } else if (placement.area == UnitArea::Bench) {
             item->clearHex();
+            item->setZValue(zBenchUnit);
             item->setPos(benchSlotCenter(placement.slot));
         }
+        item->update();
     }
+    updateDeploymentText();
 }
 
 bool BattleScene::isBenchSlotFree(const QPoint& slotPos, int ignoredUnitId) const {

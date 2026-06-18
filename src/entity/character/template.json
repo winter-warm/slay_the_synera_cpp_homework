@@ -5,10 +5,11 @@
       "name": "Meruru",
       "displayName": "冰上梅露露",
       "magicName": "治愈",
-      "skillDescription": "可以治疗伤势，也能将物品修复。",
+      "skillDescription": "可以治疗伤势。",
       "rarity": 4,
       "bonds": [
-        "witch","pastor"
+        "witch",
+        "pastor"
       ],
       "team": "pc",
       "baseStats": {
@@ -19,18 +20,22 @@
         "shield": 0
       },
       "defaultSkills": [
-        { "name": "ReverseFuture", "is_buff": false }
+        {
+          "name": "ReverseFuture",
+          "is_buff": false
+        }
       ]
     },
     {
       "templateId": 1201,
       "name": "coco",
-      "displayName": "泽渡可可",
-      "magicName": "千里眼",
-      "skillDescription": "被照片或影像注视时，能以俯瞰视角看见对方状况。",
+      "displayName": "可可",
+      "magicName": "杀意感知",
+      "skillDescription": "每次受到攻击后向远离伤害源的方向传送一格(不占用回合，直接传送到最近可用地格)。并攻击范围+1，攻击力-10%。",
       "rarity": 2,
       "bonds": [
-        "witch","assassin"
+        "witch",
+        "assassin"
       ],
       "team": "pc",
       "baseStats": {
@@ -42,64 +47,76 @@
         "shield": 0
       },
       "defaultSkills": [
-        { "name": "KillingIntentSense", "is_buff": true }
+        {
+          "name": "KillingIntentSense",
+          "is_buff": true
+        }
       ]
     },
     {
       "templateId": 1202,
       "name": "sherry",
       "displayName": "橘雪莉",
-      "magicName": "怪力",
-      "skillDescription": "能够爆发惊人的怪力。",
+      "magicName": "诶诶、哦！",
+      "skillDescription": "造成对方生命值的伤害。",
       "rarity": 3,
       "bonds": [
-        "witch","soldier"
+        "witch",
+        "soldier"
       ],
       "team": "pc",
       "baseStats": {
         "maxHp": 130,
-        "maxMp": 15,
+        "maxMp": 8,
         "attack": 13,
         "defense": 8,
         "range": 1,
         "shield": 0
       },
       "defaultSkills": [
-        { "name": "EhEhOh", "is_buff": false }
+        {
+          "name": "EhEhOh",
+          "is_buff": false
+        }
       ]
     },
     {
       "templateId": 1203,
       "name": "hanna",
-      "displayName": "远野汉娜",
-      "magicName": "飘浮",
-      "skillDescription": "能够让自己稍微飘浮起来。",
+      "displayName": "汉娜",
+      "magicName": "浮空",
+      "skillDescription": "可以无视障碍，快速飞行到可以攻击的位置(传送)。",
       "rarity": 2,
       "bonds": [
-        "witch","mage"
+        "witch",
+        "mage"
       ],
       "team": "pc",
       "baseStats": {
         "maxHp": 85,
-        "maxMp": 10,
+        "maxMp": 3,
         "attack": 12,
         "defense": 3,
         "range": 2,
         "shield": 0
       },
       "defaultSkills": [
-        { "name": "Levitation", "is_buff": true }
+        {
+          "name": "Levitation",
+          "is_buff": true
+        }
       ]
     },
     {
       "templateId": 1204,
       "name": "leia",
-      "displayName": "莲见蕾雅",
-      "magicName": "视线诱导",
-      "skillDescription": "能够诱导并固定对方的视线。",
-      "rarity": 3,
+      "displayName": "蕾雅",
+      "magicName": "视线诱导 / 简易长矛",
+      "skillDescription": "1.视线诱导：开局15秒内无法被选中，若发动了攻击则解除无法选中。2.简易长矛：不再选择最近的敌人攻击，而是选择伤害最高的敌人，首次攻击翻倍。",
+      "rarity": 1,
       "bonds": [
-        "witch","assassin"
+        "witch",
+        "assassin"
       ],
       "team": "pc",
       "baseStats": {
@@ -111,19 +128,26 @@
         "shield": 0
       },
       "defaultSkills": [
-        { "name": "SightInduction", "is_buff": true },
-        { "name": "SimpleSpear", "is_buff": true }
+        {
+          "name": "SightInduction",
+          "is_buff": true
+        },
+        {
+          "name": "SimpleSpear",
+          "is_buff": true
+        }
       ]
     },
     {
       "templateId": 1205,
       "name": "alisa",
-      "displayName": "紫藤亚里沙",
-      "magicName": "点火",
-      "skillDescription": "能从手上点燃火柴程度的火焰。",
-      "rarity": 1,
+      "displayName": "亚里沙",
+      "magicName": "火球术",
+      "skillDescription": "造成10伤害，给予3秒灼烧[灼烧：每秒损失5%的生命]。",
+      "rarity": 2,
       "bonds": [
-        "witch","soldier"
+        "witch",
+        "soldier"
       ],
       "team": "pc",
       "baseStats": {
@@ -135,41 +159,49 @@
         "shield": 0
       },
       "defaultSkills": [
-        { "name": "Fireball", "is_buff": false }
+        {
+          "name": "Fireball",
+          "is_buff": false
+        }
       ]
     },
     {
       "templateId": 1206,
       "name": "anan",
-      "displayName": "夏目安安",
-      "magicName": "洗脑",
-      "skillDescription": "若让对方认可，就能暂时让对方言听计从。",
-      "rarity": 1,
+      "displayName": "安安",
+      "magicName": "言灵",
+      "skillDescription": "给予最近的敌人[洗脑]buff，持续10s[洗脑：视为另一方阵营]。",
+      "rarity": 3,
       "bonds": [
-        "witch","mage"
+        "witch",
+        "mage"
       ],
       "team": "pc",
       "baseStats": {
         "maxHp": 90,
-        "maxMp": 15,
-        "attack": 9,
+        "maxMp": 8,
+        "attack": 5,
         "defense": 3,
         "range": 2,
         "shield": 0
       },
       "defaultSkills": [
-        { "name": "Kotodama", "is_buff": false }
+        {
+          "name": "Kotodama",
+          "is_buff": false
+        }
       ]
     },
     {
       "templateId": 1207,
       "name": "noah",
-      "displayName": "城崎诺亚",
-      "magicName": "液体操作",
-      "skillDescription": "能将画出的图像用魔法重新绘制。",
+      "displayName": "诺亚",
+      "magicName": "液体操纵",
+      "skillDescription": "灵活地操纵血液，减伤50%，每秒恢复1%的生命。",
       "rarity": 2,
       "bonds": [
-        "witch","pastor"
+        "witch",
+        "pastor"
       ],
       "team": "pc",
       "baseStats": {
@@ -181,18 +213,22 @@
         "shield": 0
       },
       "defaultSkills": [
-        { "name": "LiquidManipulation", "is_buff": true }
+        {
+          "name": "LiquidManipulation",
+          "is_buff": true
+        }
       ]
     },
     {
       "templateId": 1208,
       "name": "nanoka",
-      "displayName": "黑部奈叶香",
-      "magicName": "幻视",
-      "skillDescription": "接触物品或人时，能随机看见相关的过去或未来。",
+      "displayName": "奈叶香",
+      "magicName": "枪击",
+      "skillDescription": "造成30伤害。",
       "rarity": 2,
       "bonds": [
-        "witch","none"
+        "witch",
+        "none"
       ],
       "team": "pc",
       "baseStats": {
@@ -204,22 +240,26 @@
         "shield": 0
       },
       "defaultSkills": [
-        { "name": "Gunshot", "is_buff": false }
+        {
+          "name": "Gunshot",
+          "is_buff": false
+        }
       ]
     },
     {
       "templateId": 1209,
       "name": "hiro",
-      "displayName": "二阶堂希罗",
+      "displayName": "希罗",
       "magicName": "死亡回溯",
-      "skillDescription": "一旦自己死亡，时间会回到死亡当天早上。",
+      "skillDescription": "濒死时最大生命值减少一半，再恢复全部生命，然后传送到随机空位，最多使用三次。",
       "rarity": 1,
       "bonds": [
-        "witch","assassin"
+        "witch",
+        "assassin"
       ],
       "team": "pc",
       "baseStats": {
-        "maxHp": 60,
+        "maxHp": 80,
         "maxMp": 10,
         "attack": 17,
         "defense": 2,
@@ -227,18 +267,22 @@
         "shield": 0
       },
       "defaultSkills": [
-        { "name": "DeathRewind", "is_buff": true }
+        {
+          "name": "DeathRewind",
+          "is_buff": true
+        }
       ]
     },
     {
       "templateId": 1210,
       "name": "margo",
-      "displayName": "宝生玛格",
+      "displayName": "玛格",
       "magicName": "模仿",
-      "skillDescription": "能够发出与以前听过的声音完全一致的声响。",
-      "rarity": 3,
+      "skillDescription": "初始攻击力为1，但被攻击时，攻击变为对方的攻击力。",
+      "rarity": 1,
       "bonds": [
-        "witch","none"
+        "witch",
+        "none"
       ],
       "team": "pc",
       "baseStats": {
@@ -250,18 +294,22 @@
         "shield": 0
       },
       "defaultSkills": [
-        { "name": "Mimicry", "is_buff": true }
+        {
+          "name": "Mimicry",
+          "is_buff": true
+        }
       ]
     },
     {
       "templateId": 1211,
       "name": "Ema",
-      "displayName": "樱羽艾玛",
+      "displayName": "艾玛",
       "magicName": "魔女杀手",
-      "skillDescription": "能够杀死魔女。",
+      "skillDescription": "不分敌我，将在场所有角色调整为1滴血，并随机改变所有角色的位置。",
       "rarity": 4,
       "bonds": [
-        "witch","none"
+        "witch",
+        "none"
       ],
       "team": "pc",
       "baseStats": {
@@ -273,7 +321,10 @@
         "shield": 0
       },
       "defaultSkills": [
-        { "name": "WitchKiller", "is_buff": false }
+        {
+          "name": "WitchKiller",
+          "is_buff": false
+        }
       ]
     },
     {
@@ -291,7 +342,10 @@
         "shield": 10
       },
       "defaultSkills": [
-        { "name": "Savage", "is_buff": false }
+        {
+          "name": "Savage",
+          "is_buff": false
+        }
       ]
     },
     {
@@ -309,7 +363,10 @@
         "shield": 8
       },
       "defaultSkills": [
-        { "name": "PawnAdvance", "is_buff": false }
+        {
+          "name": "PawnAdvance",
+          "is_buff": false
+        }
       ]
     },
     {
@@ -327,7 +384,10 @@
         "shield": 18
       },
       "defaultSkills": [
-        { "name": "CastleWall", "is_buff": false }
+        {
+          "name": "CastleWall",
+          "is_buff": false
+        }
       ]
     },
     {
@@ -345,7 +405,10 @@
         "shield": 8
       },
       "defaultSkills": [
-        { "name": "KnightFork", "is_buff": false }
+        {
+          "name": "KnightFork",
+          "is_buff": false
+        }
       ]
     },
     {
@@ -363,7 +426,10 @@
         "shield": 6
       },
       "defaultSkills": [
-        { "name": "DiagonalSmite", "is_buff": false }
+        {
+          "name": "DiagonalSmite",
+          "is_buff": false
+        }
       ]
     },
     {
@@ -381,7 +447,10 @@
         "shield": 10
       },
       "defaultSkills": [
-        { "name": "RoyalSweep", "is_buff": false }
+        {
+          "name": "RoyalSweep",
+          "is_buff": false
+        }
       ]
     },
     {
@@ -399,7 +468,10 @@
         "shield": 20
       },
       "defaultSkills": [
-        { "name": "KingCommand", "is_buff": false }
+        {
+          "name": "KingCommand",
+          "is_buff": false
+        }
       ]
     }
   ]

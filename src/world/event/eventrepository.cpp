@@ -6,6 +6,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonValue>
+#include <QDebug>
+#include <unordered_set>
 
 static QJsonObject loadRoot() {
     const QString runtimePath = QCoreApplication::applicationDirPath() + "/events/events.json";
@@ -43,6 +45,20 @@ static BattleConfig battleFromJson(const QJsonObject& object) {
     config.kind = battleKindFromString(object.value("kind").toString());
     config.boardId = object.value("boardId").toString("default_board").toStdString();
     config.returnStepId = object.value("returnStepId").toString().toStdString();
+    config.statMultiplier = static_cast<float>(object.value("statMultiplier").toDouble(1.0));
+    const QJsonArray enemies = object.value("enemies").toArray();
+    for (const QJsonValue& value : enemies) {
+        const QJsonObject enemyObject = value.toObject();
+        const QJsonObject position = enemyObject.value("position").toObject();
+        EnemyPlacement enemy;
+        enemy.templateId = enemyObject.value("enemy").toInt(enemyObject.value("templateId").toInt());
+        enemy.hex.x = position.value("x").toInt();
+        enemy.hex.y = position.value("y").toInt();
+        enemy.hex.z = -enemy.hex.x - enemy.hex.y;
+        if (enemy.templateId > 0 && isValidHex(enemy.hex)) {
+            config.enemies.push_back(enemy);
+        }
+    }
     return config;
 }
 
@@ -55,16 +71,72 @@ static EventAction actionFromJson(const QJsonObject& object) {
         action.battle.returnStepId = object.value("returnStepId").toString().toStdString();
     } else if (type == "goToStep") {
         action.type = EventActionType::GoToStep;
-        action.nextStepId = object.value("stepId").toString("start").toStdString();
+        action.nextStepId = object.value("stepId").toString(object.value("nextStepId").toString("start")).toStdString();
+    } else if (type == "showMessage") {
+        action.type = EventActionType::ShowMessage;
+    } else if (type == "heal") {
+        action.type = EventActionType::Heal;
+    } else if (type == "loseHp") {
+        action.type = EventActionType::LoseHp;
+    } else if (type == "changeMaxHp") {
+        action.type = EventActionType::ChangeMaxHp;
+    } else if (type == "grantGold") {
+        action.type = EventActionType::GrantGold;
+    } else if (type == "loseGold") {
+        action.type = EventActionType::LoseGold;
+    } else if (type == "grantRandomGold") {
+        action.type = EventActionType::GrantRandomGold;
+    } else if (type == "grantCard") {
+        action.type = EventActionType::GrantCard;
+    } else if (type == "grantRandomCard") {
+        action.type = EventActionType::GrantRandomCard;
+    } else if (type == "upgradeRandomOwnedCard") {
+        action.type = EventActionType::UpgradeRandomOwnedCard;
+    } else if (type == "grantShopExp") {
+        action.type = EventActionType::GrantShopExp;
+    } else if (type == "grantRandomEquipment") {
+        action.type = EventActionType::GrantRandomEquipment;
+    } else if (type == "chooseOwnedCard") {
+        action.type = EventActionType::ChooseOwnedCard;
+    } else if (type == "upgradeSelectedOwnedCard") {
+        action.type = EventActionType::UpgradeSelectedOwnedCard;
     } else {
         action.type = EventActionType::FinishNode;
     }
+    action.title = object.value("title").toString().toStdString();
+    action.message = object.value("message").toString().toStdString();
+    action.prompt = object.value("prompt").toString().toStdString();
+    action.filter = object.value("filter").toString().toStdString();
+    action.amount = object.value("amount").toInt();
+    action.minAmount = object.value("min").toInt(object.value("minAmount").toInt());
+    action.maxAmount = object.value("max").toInt(object.value("maxAmount").toInt());
+    action.templateId = object.value("templateId").toInt(object.value("cardId").toInt());
+    const QJsonArray onChoose = object.value("onChoose").toArray();
+    for (const QJsonValue& value : onChoose) {
+        action.onChooseActions.push_back(actionFromJson(value.toObject()));
+    }
     return action;
+}
+
+static EventRequirement requirementFromJson(const QJsonObject& object) {
+    EventRequirement requirement;
+    requirement.type = object.value("type").toString().toStdString();
+    requirement.value = object.value("value").toString().toStdString();
+    requirement.amount = object.value("amount").toInt();
+    requirement.templateId = object.value("templateId").toInt(object.value("cardId").toInt());
+    return requirement;
 }
 
 static EventOption optionFromJson(const QJsonObject& object) {
     EventOption option;
     option.label = object.value("label").toString("Continue").toStdString();
+    option.description = object.value("description").toString().toStdString();
+    option.requiresGold = object.contains("requiresGold") ? object.value("requiresGold").toInt() : -1;
+    option.requiresHpAbove = object.contains("requiresHpAbove") ? object.value("requiresHpAbove").toInt() : -1;
+    const QJsonArray requirements = object.value("requirements").toArray();
+    for (const QJsonValue& value : requirements) {
+        option.requirements.push_back(requirementFromJson(value.toObject()));
+    }
     const QJsonArray actions = object.value("actions").toArray();
     for (const QJsonValue& value : actions) {
         option.actions.push_back(actionFromJson(value.toObject()));
@@ -75,14 +147,18 @@ static EventOption optionFromJson(const QJsonObject& object) {
     return option;
 }
 
-static EventDefinition eventFromJson(int eventId, const std::string& stepId, const QJsonObject& object) {
+static EventDefinition eventFromJson(int eventId,
+                                     const std::string& stepId,
+                                     const QJsonObject& eventObject,
+                                     const QJsonObject& stepObject) {
     EventDefinition event;
     event.id = eventId;
     event.stepId = stepId;
-    event.title = object.value("title").toString("Event").toStdString();
-    event.backgroundPath = object.value("backgroundPath").toString().toStdString();
-    event.text = object.value("text").toString().toStdString();
-    const QJsonArray options = object.value("options").toArray();
+    event.title = stepObject.value("title").toString(eventObject.value("title").toString("Event")).toStdString();
+    event.backgroundPath =
+        stepObject.value("backgroundPath").toString(eventObject.value("backgroundPath").toString()).toStdString();
+    event.text = stepObject.value("text").toString().toStdString();
+    const QJsonArray options = stepObject.value("options").toArray();
     for (const QJsonValue& value : options) {
         event.options.push_back(optionFromJson(value.toObject()));
     }
@@ -95,8 +171,52 @@ static EventDefinition eventFromJson(int eventId, const std::string& stepId, con
     return event;
 }
 
+static void collectGoToSteps(const QJsonArray& actions, std::vector<QString>* stepIds) {
+    for (const QJsonValue& value : actions) {
+        const QJsonObject action = value.toObject();
+        if (action.value("type").toString() == "goToStep") {
+            stepIds->push_back(action.value("stepId").toString(action.value("nextStepId").toString("start")));
+        }
+        collectGoToSteps(action.value("onChoose").toArray(), stepIds);
+    }
+}
+
+static void validateEventTable(const QJsonObject& root) {
+    const QJsonObject events = root.value("events").toObject();
+    for (auto eventIt = events.begin(); eventIt != events.end(); ++eventIt) {
+        const QString eventId = eventIt.key();
+        const QJsonObject event = eventIt.value().toObject();
+        const QJsonObject steps = event.value("steps").toObject();
+        std::unordered_set<std::string> stepIds;
+        for (auto stepIt = steps.begin(); stepIt != steps.end(); ++stepIt) {
+            stepIds.insert(stepIt.key().toStdString());
+        }
+
+        for (auto stepIt = steps.begin(); stepIt != steps.end(); ++stepIt) {
+            const QJsonObject step = stepIt.value().toObject();
+            const QJsonArray options = step.value("options").toArray();
+            if (eventId != "2" && options.size() > 0 && (options.size() < 2 || options.size() > 4)) {
+                qWarning() << "Event" << eventId << "step" << stepIt.key()
+                           << "should have 2-4 options for the normal event template.";
+            }
+            std::vector<QString> referencedSteps;
+            for (const QJsonValue& optionValue : options) {
+                collectGoToSteps(optionValue.toObject().value("actions").toArray(), &referencedSteps);
+            }
+            for (const QString& referencedStep : referencedSteps) {
+                if (stepIds.find(referencedStep.toStdString()) == stepIds.end()) {
+                    qWarning() << "Event" << eventId << "step" << stepIt.key()
+                               << "references missing step" << referencedStep;
+                }
+            }
+        }
+    }
+}
+
 EventRepository::EventRepository()
-    : root(loadRoot()) {}
+    : root(loadRoot()) {
+    validateEventTable(root);
+}
 
 std::optional<EventDefinition> EventRepository::eventFor(const EventContext& context,
                                                          const std::string& stepId) const {
@@ -119,5 +239,5 @@ std::optional<EventDefinition> EventRepository::eventFor(const EventContext& con
     if (step.isEmpty()) {
         return std::nullopt;
     }
-    return eventFromJson(context.eventId, resolvedStepId, step);
+    return eventFromJson(context.eventId, resolvedStepId, event, step);
 }

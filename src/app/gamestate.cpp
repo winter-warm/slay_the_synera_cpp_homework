@@ -52,6 +52,34 @@ static QString actionTypeToString(EventActionType type) {
         return "startBattle";
     case EventActionType::GoToStep:
         return "goToStep";
+    case EventActionType::ShowMessage:
+        return "showMessage";
+    case EventActionType::Heal:
+        return "heal";
+    case EventActionType::LoseHp:
+        return "loseHp";
+    case EventActionType::ChangeMaxHp:
+        return "changeMaxHp";
+    case EventActionType::GrantGold:
+        return "grantGold";
+    case EventActionType::LoseGold:
+        return "loseGold";
+    case EventActionType::GrantRandomGold:
+        return "grantRandomGold";
+    case EventActionType::GrantCard:
+        return "grantCard";
+    case EventActionType::GrantRandomCard:
+        return "grantRandomCard";
+    case EventActionType::UpgradeRandomOwnedCard:
+        return "upgradeRandomOwnedCard";
+    case EventActionType::UpgradeSelectedOwnedCard:
+        return "upgradeSelectedOwnedCard";
+    case EventActionType::GrantShopExp:
+        return "grantShopExp";
+    case EventActionType::GrantRandomEquipment:
+        return "grantRandomEquipment";
+    case EventActionType::ChooseOwnedCard:
+        return "chooseOwnedCard";
     case EventActionType::FinishNode:
         return "finish";
     }
@@ -64,6 +92,48 @@ static EventActionType actionTypeFromString(const QString& value) {
     }
     if (value == "goToStep") {
         return EventActionType::GoToStep;
+    }
+    if (value == "showMessage") {
+        return EventActionType::ShowMessage;
+    }
+    if (value == "heal") {
+        return EventActionType::Heal;
+    }
+    if (value == "loseHp") {
+        return EventActionType::LoseHp;
+    }
+    if (value == "changeMaxHp") {
+        return EventActionType::ChangeMaxHp;
+    }
+    if (value == "grantGold") {
+        return EventActionType::GrantGold;
+    }
+    if (value == "loseGold") {
+        return EventActionType::LoseGold;
+    }
+    if (value == "grantRandomGold") {
+        return EventActionType::GrantRandomGold;
+    }
+    if (value == "grantCard") {
+        return EventActionType::GrantCard;
+    }
+    if (value == "grantRandomCard") {
+        return EventActionType::GrantRandomCard;
+    }
+    if (value == "upgradeRandomOwnedCard") {
+        return EventActionType::UpgradeRandomOwnedCard;
+    }
+    if (value == "upgradeSelectedOwnedCard") {
+        return EventActionType::UpgradeSelectedOwnedCard;
+    }
+    if (value == "grantShopExp") {
+        return EventActionType::GrantShopExp;
+    }
+    if (value == "grantRandomEquipment") {
+        return EventActionType::GrantRandomEquipment;
+    }
+    if (value == "chooseOwnedCard") {
+        return EventActionType::ChooseOwnedCard;
     }
     return EventActionType::FinishNode;
 }
@@ -114,7 +184,20 @@ static QJsonObject actionToJson(const EventAction& action) {
     QJsonObject object;
     object["type"] = actionTypeToString(action.type);
     object["nextStepId"] = QString::fromStdString(action.nextStepId);
+    object["title"] = QString::fromStdString(action.title);
+    object["message"] = QString::fromStdString(action.message);
+    object["prompt"] = QString::fromStdString(action.prompt);
+    object["filter"] = QString::fromStdString(action.filter);
+    object["amount"] = action.amount;
+    object["minAmount"] = action.minAmount;
+    object["maxAmount"] = action.maxAmount;
+    object["templateId"] = action.templateId;
     object["battle"] = battleToJson(action.battle);
+    QJsonArray onChoose;
+    for (const EventAction& followup : action.onChooseActions) {
+        onChoose.append(actionToJson(followup));
+    }
+    object["onChoose"] = onChoose;
     return object;
 }
 
@@ -122,13 +205,51 @@ static EventAction actionFromJson(const QJsonObject& object) {
     EventAction action;
     action.type = actionTypeFromString(object.value("type").toString());
     action.nextStepId = object.value("nextStepId").toString().toStdString();
+    action.title = object.value("title").toString().toStdString();
+    action.message = object.value("message").toString().toStdString();
+    action.prompt = object.value("prompt").toString().toStdString();
+    action.filter = object.value("filter").toString().toStdString();
+    action.amount = object.value("amount").toInt();
+    action.minAmount = object.value("minAmount").toInt();
+    action.maxAmount = object.value("maxAmount").toInt();
+    action.templateId = object.value("templateId").toInt();
     action.battle = battleFromJson(object.value("battle").toObject());
+    const QJsonArray onChoose = object.value("onChoose").toArray();
+    for (const QJsonValue& value : onChoose) {
+        action.onChooseActions.push_back(actionFromJson(value.toObject()));
+    }
     return action;
+}
+
+static QJsonObject requirementToJson(const EventRequirement& requirement) {
+    QJsonObject object;
+    object["type"] = QString::fromStdString(requirement.type);
+    object["value"] = QString::fromStdString(requirement.value);
+    object["amount"] = requirement.amount;
+    object["templateId"] = requirement.templateId;
+    return object;
+}
+
+static EventRequirement requirementFromJson(const QJsonObject& object) {
+    EventRequirement requirement;
+    requirement.type = object.value("type").toString().toStdString();
+    requirement.value = object.value("value").toString().toStdString();
+    requirement.amount = object.value("amount").toInt();
+    requirement.templateId = object.value("templateId").toInt();
+    return requirement;
 }
 
 static QJsonObject optionToJson(const EventOption& option) {
     QJsonObject object;
     object["label"] = QString::fromStdString(option.label);
+    object["description"] = QString::fromStdString(option.description);
+    object["requiresGold"] = option.requiresGold;
+    object["requiresHpAbove"] = option.requiresHpAbove;
+    QJsonArray requirements;
+    for (const EventRequirement& requirement : option.requirements) {
+        requirements.append(requirementToJson(requirement));
+    }
+    object["requirements"] = requirements;
     QJsonArray actions;
     for (const EventAction& action : option.actions) {
         actions.append(actionToJson(action));
@@ -140,6 +261,13 @@ static QJsonObject optionToJson(const EventOption& option) {
 static EventOption optionFromJson(const QJsonObject& object) {
     EventOption option;
     option.label = object.value("label").toString().toStdString();
+    option.description = object.value("description").toString().toStdString();
+    option.requiresGold = object.value("requiresGold").toInt(-1);
+    option.requiresHpAbove = object.value("requiresHpAbove").toInt(-1);
+    const QJsonArray requirements = object.value("requirements").toArray();
+    for (const QJsonValue& value : requirements) {
+        option.requirements.push_back(requirementFromJson(value.toObject()));
+    }
     const QJsonArray actions = object.value("actions").toArray();
     for (const QJsonValue& value : actions) {
         option.actions.push_back(actionFromJson(value.toObject()));
@@ -156,6 +284,17 @@ static QJsonObject currentEventToJson(const CurrentEventState& event) {
     object["backgroundPath"] = QString::fromStdString(event.backgroundPath);
     object["text"] = QString::fromStdString(event.text);
     object["hexTechSelection"] = event.hexTechSelection;
+    object["restSelection"] = event.restSelection;
+    object["restTrainingSelection"] = event.restTrainingSelection;
+    object["ownedCardSelection"] = event.ownedCardSelection;
+    object["selectionPrompt"] = QString::fromStdString(event.selectionPrompt);
+    object["selectionFilter"] = QString::fromStdString(event.selectionFilter);
+    object["selectedOwnedCardIndex"] = event.selectedOwnedCardIndex;
+    QJsonArray selectionActions;
+    for (const EventAction& action : event.selectionActions) {
+        selectionActions.append(actionToJson(action));
+    }
+    object["selectionActions"] = selectionActions;
     QJsonArray options;
     for (const EventOption& option : event.options) {
         options.append(optionToJson(option));
@@ -173,6 +312,16 @@ static CurrentEventState currentEventFromJson(const QJsonObject& object) {
     event.backgroundPath = object.value("backgroundPath").toString().toStdString();
     event.text = object.value("text").toString().toStdString();
     event.hexTechSelection = object.value("hexTechSelection").toBool(false);
+    event.restSelection = object.value("restSelection").toBool(false);
+    event.restTrainingSelection = object.value("restTrainingSelection").toBool(false);
+    event.ownedCardSelection = object.value("ownedCardSelection").toBool(false);
+    event.selectionPrompt = object.value("selectionPrompt").toString().toStdString();
+    event.selectionFilter = object.value("selectionFilter").toString().toStdString();
+    event.selectedOwnedCardIndex = object.value("selectedOwnedCardIndex").toInt(-1);
+    const QJsonArray selectionActions = object.value("selectionActions").toArray();
+    for (const QJsonValue& value : selectionActions) {
+        event.selectionActions.push_back(actionFromJson(value.toObject()));
+    }
     const QJsonArray options = object.value("options").toArray();
     for (const QJsonValue& value : options) {
         event.options.push_back(optionFromJson(value.toObject()));
@@ -343,6 +492,7 @@ QJsonObject GameState::toJson() const {
     object["playerHp"] = playerHp;
     object["maxPlayerHp"] = maxPlayerHp;
     object["gold"] = gold;
+    object["elapsedSeconds"] = elapsedSeconds;
     object["currentLayerId"] = currentLayerId;
     object["playerNodeId"] = playerNodeId;
     object["currentNodeId"] = currentNodeId;
@@ -378,6 +528,7 @@ GameState GameState::fromJson(const QJsonObject& object) {
     state.playerHp = object.value("playerHp").toInt(80);
     state.maxPlayerHp = object.value("maxPlayerHp").toInt(80);
     state.gold = object.value("gold").toInt();
+    state.elapsedSeconds = object.value("elapsedSeconds").toInt(0);
     state.currentLayerId = object.value("currentLayerId").toInt(1);
     state.playerNodeId = object.value("playerNodeId").toInt(-1);
     state.currentNodeId = object.value("currentNodeId").toInt(-1);

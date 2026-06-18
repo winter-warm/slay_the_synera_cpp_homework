@@ -48,6 +48,7 @@ void StatsComponent::beattacked(int damage, Character* attacker){
     }else{
         modifySHIELF(-1*dhp);
     }
+    owner->getrender().requestHitFlash();
     owner->getbuff().afterBeAttacked(context);
 }
 

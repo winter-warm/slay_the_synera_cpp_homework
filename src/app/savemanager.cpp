@@ -67,6 +67,27 @@ bool SaveManager::loadGame(GameState* state, int slot, std::string* error) const
     return true;
 }
 
+bool SaveManager::deleteSave(int slot, std::string* error) const {
+    if (slot != 1) {
+        if (error) {
+            *error = "Only one save file is supported.";
+        }
+        return false;
+    }
+
+    QFile file(QString::fromStdString(savePath(slot)));
+    if (!file.exists()) {
+        return true;
+    }
+    if (!file.remove()) {
+        if (error) {
+            *error = file.errorString().toStdString();
+        }
+        return false;
+    }
+    return true;
+}
+
 std::vector<int> SaveManager::existingSlots() const {
     std::vector<int> saveSlots;
     if (QFile::exists(QString::fromStdString(savePath(1)))) {

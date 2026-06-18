@@ -43,6 +43,11 @@ AppWindow::AppWindow(QWidget* parent)
     connect(mapPage, &MapPage::shopRequested, this, [this]() {
         cardPanel->toggleShop();
     });
+    connect(mapPage, &MapPage::returnToStartRequested, this, [this]() {
+        manager->pauseElapsedTimer();
+        cardPanel->closePanel();
+        stack->setCurrentWidget(startPage);
+    });
 
     connect(eventPage, &EventPage::eventFinished,
             manager, &GameManager::finishEvent);
@@ -50,6 +55,16 @@ AppWindow::AppWindow(QWidget* parent)
             manager, &GameManager::chooseEventOption);
     connect(eventPage, &EventPage::hexTechCardSelected,
             manager, &GameManager::chooseHexTechCard);
+    connect(eventPage, &EventPage::restOptionSelected,
+            manager, &GameManager::chooseRestOption);
+    connect(eventPage, &EventPage::restTrainingCardSelected,
+            manager, &GameManager::chooseRestTrainingCard);
+    connect(eventPage, &EventPage::eventOwnedCardSelected,
+            manager, &GameManager::chooseEventOwnedCard);
+    connect(eventPage, &EventPage::trainingPanelRequested, this, [this]() {
+        cardPanel->showTraining();
+        cardPanel->raise();
+    });
     connect(eventPage, &EventPage::saveRequested,
             manager, &GameManager::saveToSlot);
     connect(eventPage, &EventPage::bagRequested, this, [this]() {
@@ -58,9 +73,16 @@ AppWindow::AppWindow(QWidget* parent)
     connect(eventPage, &EventPage::shopRequested, this, [this]() {
         cardPanel->toggleShop();
     });
+    connect(eventPage, &EventPage::returnToStartRequested, this, [this]() {
+        manager->pauseElapsedTimer();
+        cardPanel->closePanel();
+        stack->setCurrentWidget(startPage);
+    });
 
     connect(battlePage, &BattlePage::battleFinished,
             manager, &GameManager::finishBattle);
+    connect(battlePage, &BattlePage::battleChestOpened,
+            manager, &GameManager::grantBattleChestGold);
     connect(battlePage, &BattlePage::saveRequested,
             manager, &GameManager::saveToSlot);
     connect(battlePage, &BattlePage::bagRequested, this, [this]() {
@@ -74,6 +96,11 @@ AppWindow::AppWindow(QWidget* parent)
         cardPanel->toggleShop();
     });
     connect(battlePage, &BattlePage::panelsShouldClose, cardPanel, &CardPanel::closePanel);
+    connect(battlePage, &BattlePage::returnToStartRequested, this, [this]() {
+        manager->pauseElapsedTimer();
+        cardPanel->closePanel();
+        stack->setCurrentWidget(startPage);
+    });
     battlePage->setBattleSystem(&manager->currentBattleSystem());
     connect(battlePage, &BattlePage::startBattleRequested, this, [this]() {
         manager->startPreparedBattle(battlePage->preparedPlacements());
@@ -82,6 +109,10 @@ AppWindow::AppWindow(QWidget* parent)
             manager, &GameManager::buyShopOffer);
     connect(cardPanel, &CardPanel::mergeRequested,
             manager, &GameManager::mergeOwnedCharacterCards);
+    connect(cardPanel, &CardPanel::trainRequested, this, [this](int ownedCardIndex) {
+        cardPanel->closePanel();
+        manager->chooseRestTrainingCard(ownedCardIndex);
+    });
 
     connect(manager, &GameManager::stateChanged,
             mapPage, &MapPage::setState);
@@ -91,6 +122,12 @@ AppWindow::AppWindow(QWidget* parent)
             battlePage, &BattlePage::setState);
     connect(manager, &GameManager::stateChanged,
             cardPanel, &CardPanel::setGameState);
+    connect(manager, &GameManager::elapsedSecondsChanged,
+            mapPage, &MapPage::setElapsedSeconds);
+    connect(manager, &GameManager::elapsedSecondsChanged,
+            eventPage, &EventPage::setElapsedSeconds);
+    connect(manager, &GameManager::elapsedSecondsChanged,
+            battlePage, &BattlePage::setElapsedSeconds);
 
     connect(manager, &GameManager::showMapRequested, this, [this]() {
         stack->setCurrentWidget(mapPage);
@@ -99,6 +136,11 @@ AppWindow::AppWindow(QWidget* parent)
     connect(manager, &GameManager::showEventRequested, this, [this](int nodeId) {
         eventPage->showEvent(nodeId);
         stack->setCurrentWidget(eventPage);
+        if (manager->state().currentEvent.restTrainingSelection) {
+            cardPanel->showTraining();
+        } else if (cardPanel->mode() == CardPanel::Mode::Training) {
+            cardPanel->closePanel();
+        }
         cardPanel->raise();
     });
     connect(manager, &GameManager::showBattleRequested, this, [this](int nodeId) {
@@ -107,7 +149,13 @@ AppWindow::AppWindow(QWidget* parent)
         cardPanel->raise();
     });
     connect(manager, &GameManager::gameCompletedRequested, this, [this]() {
-        QMessageBox::information(this, "Complete", "All layers complete. Victory placeholder.");
+        cardPanel->closePanel();
+        QMessageBox::information(this, QString::fromUtf8("通关"), QString::fromUtf8("恭喜通关，战绩已记录。"));
+        stack->setCurrentWidget(startPage);
+    });
+    connect(manager, &GameManager::gameOverRequested, this, [this]() {
+        cardPanel->closePanel();
+        QMessageBox::information(this, QString::fromUtf8("Game Over"), QString::fromUtf8("生命归零，战绩已记录。"));
         stack->setCurrentWidget(startPage);
     });
     connect(manager, &GameManager::messageRequested, this, [this](const QString& title, const QString& message) {

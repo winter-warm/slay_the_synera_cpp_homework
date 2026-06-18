@@ -40,7 +40,7 @@ static int randomEventId(std::mt19937& rng, int layerId) {
         return MapEventId::Rest;
     }
     if (roll <= 32) {
-        return MapEventId::FirstEvent + randomInt(rng, 0, 5) + layerId * 10;
+        return layerId * 100 + randomInt(rng, 0, 99);
     }
     if (roll <= 84) {
         return MapEventId::NormalBattle;

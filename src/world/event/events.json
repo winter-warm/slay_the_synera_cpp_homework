@@ -1,13 +1,22 @@
 {
   "events": {
     "default": {
+      "title": "路边奇遇",
       "steps": {
         "start": {
-          "title": "Roadside Event",
-          "text": "A quiet event placeholder waits for real story content.",
+          "text": "道路在雾气里延伸，一段短暂的插曲等待你做出选择。",
           "options": [
             {
-              "label": "Leave",
+              "label": "搜寻",
+              "description": "获得1-3金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 1, "max": 3 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "离开",
+              "description": "什么也不做，继续前进",
               "actions": [{ "type": "finish" }]
             }
           ]
@@ -22,20 +31,32 @@
           "options": [
             {
               "label": "Continue",
+              "description": "Return to the map",
               "actions": [{ "type": "finish" }]
             }
           ]
         }
       }
     },
-    "15": {
+    "100": {
+      "title": "林间祭坛",
       "steps": {
         "start": {
-          "title": "Ambush Test",
-          "text": "A suspicious path offers a future branch point.",
+          "text": "你在林间发现一座发光的古老祭坛，石面上的符文像呼吸一样明灭。",
           "options": [
             {
-              "label": "Fight through",
+              "label": "献上金币",
+              "description": "失去10金币，获得一张随机卡牌",
+              "requiresGold": 10,
+              "actions": [
+                { "type": "loseGold", "amount": 10 },
+                { "type": "grantRandomCard" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "触碰符文",
+              "description": "进入一场战斗，胜利后继续调查",
               "actions": [
                 {
                   "type": "startBattle",
@@ -45,18 +66,49 @@
               ]
             },
             {
-              "label": "Avoid it",
-              "actions": [{ "type": "finish" }]
+              "label": "汲取微光",
+              "description": "恢复8点生命，不超过生命上限",
+              "actions": [
+                { "type": "heal", "amount": 8 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "磨炼卡牌",
+              "description": "选择一张未到三星的卡，升一星",
+              "requirements": [{ "type": "hasTrainableCard" }],
+              "actions": [
+                {
+                  "type": "chooseOwnedCard",
+                  "prompt": "选择一张未到三星的卡，升一星",
+                  "filter": "starBelow3",
+                  "onChoose": [
+                    { "type": "upgradeSelectedOwnedCard" },
+                    { "type": "finish" }
+                  ]
+                }
+              ]
             }
           ]
         },
         "afterBattle": {
-          "title": "Ambush Cleared",
-          "text": "The path is safe again.",
+          "text": "守护祭坛的敌人消散了，符文余光凝成一小枚温热的碎片。",
           "options": [
             {
-              "label": "Return to the map",
-              "actions": [{ "type": "finish" }]
+              "label": "收下碎片",
+              "description": "获得3-6金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 3, "max": 6 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "修整片刻",
+              "description": "恢复5点生命",
+              "actions": [
+                { "type": "heal", "amount": 5 },
+                { "type": "finish" }
+              ]
             }
           ]
         }

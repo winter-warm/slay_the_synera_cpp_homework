@@ -145,13 +145,13 @@ Macro map page.
 
 ### `EventPage`
 
-Event page placeholder.
+Data-driven event page.
 
-- Displays a placeholder event.
-- Can finish event.
-- Can trigger a placeholder battle.
-
-Needs a future `EventManager`.
+- Normal events use a shared template: full-page background, right-side text panel, and 2-4 option buttons.
+- Rest and HexTech remain special event views because their interaction is visually and mechanically different.
+- Pages display `GameState::currentEvent` and emit selections; `GameManager` owns event flow and rewards.
+- Normal event options can be disabled by configured requirements. Hover text shows the option description or the unmet requirement.
+- Some event actions can enter a secondary selection flow, currently used for choosing owned character cards.
 
 ### `BattlePage`
 
@@ -242,17 +242,31 @@ These should describe one combat encounter, its units, phase, rewards, and resul
 
 ### Event System
 
-Recommended additions:
+Implemented as a data-driven flow:
+
+- `src/world/event/events.json` defines event text, backgrounds, steps, options, requirements, and action lists.
+- `EventRepository` loads event steps and keeps event text separate from battle pools.
+- `GameManager::chooseEventOption` validates requirements and dispatches event actions.
+- `GameManager::executeEventAction` is the single place for event rewards and flow transitions.
+- `finish`, `goToStep`, and `startBattle` stop the current action list and change flow.
+- Reward actions such as gold, HP, cards, shop experience, and equipment placeholders can be composed before a flow action.
+- Secondary flows use action data, for example `chooseOwnedCard` followed by `onChoose` actions.
+
+Event id ranges encode macro layer and should be kept consistent with `MapGenerator`:
 
 ```text
-src/world/event/event.h
-src/world/event/eventmanager.h/.cpp
-src/world/event/eventresult.h
+0     start / HexTech special entry
+1     boss battle
+2     rest special entry
+3     normal battle
+4     elite battle
+15-20 layer 1 normal events
+25-30 layer 2 normal events
+35-40 layer 3 normal events
+45-50 reserved layer 4 special events, not used by current random map generation
 ```
 
-This should let event pages show data-driven content instead of hardcoded placeholder text.
-
-Event data should not contain normal map battle pools. Special event battles should either request a battle through `BattleRepository` or reference future explicit battle ids.
+Normal map battle pools still belong in `src/combat/battle.json`, not `events.json`. Event-triggered battles should request a battle through `BattleRepository` by `kind`, or use explicit enemy placements only for special event battles.
 
 ### Player and Inventory State
 
