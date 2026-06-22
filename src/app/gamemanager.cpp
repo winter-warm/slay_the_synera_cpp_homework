@@ -88,6 +88,18 @@ static std::mt19937 eventActionRng(const GameState& state, int optionIndex, int 
                                                   actionIndex * 17u));
 }
 
+static std::string replaceAll(std::string text, const std::string& from, const std::string& to) {
+    if (from.empty()) {
+        return text;
+    }
+    size_t position = 0;
+    while ((position = text.find(from, position)) != std::string::npos) {
+        text.replace(position, from.size(), to);
+        position += to.size();
+    }
+    return text;
+}
+
 static std::string hexTechIntroTitleForLayer(int layerId) {
     if (layerId == 1) {
         return "启航";
@@ -435,6 +447,54 @@ bool GameManager::executeEventAction(const EventAction& action, int optionIndex,
                                   : QString::fromStdString(action.title);
         emit messageRequested(title, QString::fromStdString(action.message));
         return true;
+    }
+    case EventActionType::LotteryScratch: {
+        if (currentState.gold < action.amount) {
+            emit messageRequested(QString::fromUtf8("金币不足"), QString::fromUtf8("你的金币不够。"));
+            return false;
+        }
+        if (action.lotteryPayouts.empty()) {
+            return false;
+        }
+
+        currentState.gold -= action.amount;
+        int totalWeight = 0;
+        for (const LotteryPayout& payout : action.lotteryPayouts) {
+            totalWeight += std::max(1, payout.weight);
+        }
+
+        std::mt19937 rng = eventActionRng(currentState, optionIndex, actionIndex);
+        std::uniform_int_distribution<int> distribution(1, std::max(1, totalWeight));
+        int roll = distribution(rng);
+        LotteryPayout selected = action.lotteryPayouts.front();
+        for (const LotteryPayout& payout : action.lotteryPayouts) {
+            roll -= std::max(1, payout.weight);
+            if (roll <= 0) {
+                selected = payout;
+                break;
+            }
+        }
+        currentState.gold += std::max(0, selected.value);
+
+        std::string resultText = selected.value > action.amount
+                                     ? action.winText
+                                     : (selected.value < action.amount ? action.loseText : action.evenText);
+        resultText = replaceAll(resultText, "{payout}", std::to_string(selected.value));
+        resultText = replaceAll(resultText, "{cost}", std::to_string(action.amount));
+        if (!action.resultSuffix.empty()) {
+            resultText += "\n\n" + action.resultSuffix;
+        }
+
+        currentState.currentEvent.text = resultText;
+        currentState.currentEvent.options.clear();
+        EventOption leaveOption;
+        leaveOption.label = QString::fromUtf8("离开").toStdString();
+        leaveOption.description = QString::fromUtf8("继续赶路").toStdString();
+        leaveOption.actions.push_back(EventAction{});
+        currentState.currentEvent.options.push_back(leaveOption);
+        emit stateChanged(currentState);
+        emit showEventRequested(currentState.currentNodeId);
+        return false;
     }
     case EventActionType::Heal:
         currentState.playerHp = std::min(currentState.maxPlayerHp,

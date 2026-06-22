@@ -1,7 +1,15 @@
 #include "attackcomponent.h"
 #include "core/board.h"
 #include "entity/character/character.h"
+#include <algorithm>
+#include <random>
 #include <utility>
+
+static std::mt19937& attackRng()
+{
+    static std::mt19937 rng{std::random_device{}()};
+    return rng;
+}
 
 AttackComponent::AttackComponent(Character* owner, Skill defaultSkill)
     : component(owner)
@@ -70,6 +78,13 @@ void AttackComponent::attack(Character* target){
     if(context.cancelled || context.target == nullptr){
         return;
     }
+    if(context.critChancePercent > 0){
+        std::uniform_int_distribution<int> distribution(1, 100);
+        if(distribution(attackRng()) <= std::min(100, context.critChancePercent)){
+            context.critical = true;
+            context.damage += context.damage * std::max(0, context.critDamagePercent) / 100;
+        }
+    }
     owner->getrender().requestAttackLunge(context.target->id());
     context.target->getstats().beattacked(context.damage, owner);
     owner->getbuff().afterAttack(context);
@@ -81,6 +96,8 @@ void AttackComponent::useskill(Character* target){
     for(auto& ele : skill){
         ele.execute(owner, target);
     }
+    SkillContext context{owner, target};
+    owner->getbuff().afterSkill(context);
 }
 
 void AttackComponent::activateAndRemoveBuffSkills(){

@@ -19,6 +19,7 @@ public:
     using AttackHandler = std::function<void(effect&, AttackContext&)>;
     using BeAttackedHandler = std::function<void(effect&, BeAttackedContext&)>;
     using HealHandler = std::function<void(effect&, HealContext&)>;
+    using SkillHandler = std::function<void(effect&, SkillContext&)>;
     using AddBuffHandler = std::function<void(effect&, AddBuffContext&)>;
     using DeathHandler = std::function<void(effect&, DeathContext&)>;
     using TurnHandler = std::function<void(effect&, TurnContext&)>;
@@ -40,6 +41,7 @@ public:
     void beforeBeAttacked(BeAttackedContext& context);
     void afterBeAttacked(BeAttackedContext& context);
     void beforeHeal(HealContext& context);
+    void afterSkill(SkillContext& context);
     void beforeAddBuff(AddBuffContext& context);
     void beforeDeath(DeathContext& context);
     void onTurnStart(TurnContext& context);
@@ -52,6 +54,7 @@ public:
     void setBeforeBeAttacked(BeAttackedHandler handler){beforeBeAttackedFunc = std::move(handler);}
     void setAfterBeAttacked(BeAttackedHandler handler){afterBeAttackedFunc = std::move(handler);}
     void setBeforeHeal(HealHandler handler){beforeHealFunc = std::move(handler);}
+    void setAfterSkill(SkillHandler handler){afterSkillFunc = std::move(handler);}
     void setBeforeAddBuff(AddBuffHandler handler){beforeAddBuffFunc = std::move(handler);}
     void setBeforeDeath(DeathHandler handler){beforeDeathFunc = std::move(handler);}
     void setOnTurnStart(TurnHandler handler){onTurnStartFunc = std::move(handler);}
@@ -70,6 +73,7 @@ private:
     BeAttackedHandler beforeBeAttackedFunc;
     BeAttackedHandler afterBeAttackedFunc;
     HealHandler beforeHealFunc;
+    SkillHandler afterSkillFunc;
     AddBuffHandler beforeAddBuffFunc;
     DeathHandler beforeDeathFunc;
     TurnHandler onTurnStartFunc;

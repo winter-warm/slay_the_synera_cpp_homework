@@ -74,6 +74,8 @@ static EventAction actionFromJson(const QJsonObject& object) {
         action.nextStepId = object.value("stepId").toString(object.value("nextStepId").toString("start")).toStdString();
     } else if (type == "showMessage") {
         action.type = EventActionType::ShowMessage;
+    } else if (type == "lotteryScratch") {
+        action.type = EventActionType::LotteryScratch;
     } else if (type == "heal") {
         action.type = EventActionType::Heal;
     } else if (type == "loseHp") {
@@ -105,6 +107,10 @@ static EventAction actionFromJson(const QJsonObject& object) {
     }
     action.title = object.value("title").toString().toStdString();
     action.message = object.value("message").toString().toStdString();
+    action.winText = object.value("winText").toString().toStdString();
+    action.loseText = object.value("loseText").toString().toStdString();
+    action.evenText = object.value("evenText").toString().toStdString();
+    action.resultSuffix = object.value("resultSuffix").toString().toStdString();
     action.prompt = object.value("prompt").toString().toStdString();
     action.filter = object.value("filter").toString().toStdString();
     action.amount = object.value("amount").toInt();
@@ -114,6 +120,17 @@ static EventAction actionFromJson(const QJsonObject& object) {
     const QJsonArray onChoose = object.value("onChoose").toArray();
     for (const QJsonValue& value : onChoose) {
         action.onChooseActions.push_back(actionFromJson(value.toObject()));
+    }
+    const QJsonArray payouts = object.value("payouts").toArray();
+    for (const QJsonValue& value : payouts) {
+        const QJsonObject payoutObject = value.toObject();
+        LotteryPayout payout;
+        payout.value = payoutObject.value("value").toInt();
+        payout.weight = payoutObject.value("weight").toInt(1);
+        if (payout.weight < 1) {
+            payout.weight = 1;
+        }
+        action.lotteryPayouts.push_back(payout);
     }
     return action;
 }

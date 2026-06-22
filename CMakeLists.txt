@@ -58,6 +58,14 @@ add_custom_command(TARGET Synera_Starter POST_BUILD
         "${CMAKE_CURRENT_SOURCE_DIR}/src/combat/battle.json"
         "$<TARGET_FILE_DIR:Synera_Starter>/battle/battle.json"
     COMMAND ${CMAKE_COMMAND} -E make_directory
+        "$<TARGET_FILE_DIR:Synera_Starter>/equipment"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/combat/equipment/basic_equipment.json"
+        "$<TARGET_FILE_DIR:Synera_Starter>/equipment/basic_equipment.json"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/combat/equipment/advanced_equipment.json"
+        "$<TARGET_FILE_DIR:Synera_Starter>/equipment/advanced_equipment.json"
+    COMMAND ${CMAKE_COMMAND} -E make_directory
         "$<TARGET_FILE_DIR:Synera_Starter>/hextech"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_CURRENT_SOURCE_DIR}/src/world/hextech/hextech.json"
@@ -88,6 +96,14 @@ add_custom_target(copy_runtime_assets ALL
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_CURRENT_SOURCE_DIR}/src/combat/battle.json"
         "$<TARGET_FILE_DIR:Synera_Starter>/battle/battle.json"
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+        "$<TARGET_FILE_DIR:Synera_Starter>/equipment"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/combat/equipment/basic_equipment.json"
+        "$<TARGET_FILE_DIR:Synera_Starter>/equipment/basic_equipment.json"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/combat/equipment/advanced_equipment.json"
+        "$<TARGET_FILE_DIR:Synera_Starter>/equipment/advanced_equipment.json"
     COMMAND ${CMAKE_COMMAND} -E make_directory
         "$<TARGET_FILE_DIR:Synera_Starter>/hextech"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different

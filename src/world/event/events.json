@@ -55,7 +55,7 @@
               ]
             },
             {
-              "label": "触碰符文",
+              "label": "触摸符文",
               "description": "进入一场战斗，胜利后继续调查",
               "actions": [
                 {
@@ -92,7 +92,7 @@
           ]
         },
         "afterBattle": {
-          "text": "守护祭坛的敌人消散了，符文余光凝成一小枚温热的碎片。",
+          "text": "守护祭坛的敌人消散了，符文余光凝成一小簇温热的碎片。",
           "options": [
             {
               "label": "收下碎片",
@@ -109,6 +109,115 @@
                 { "type": "heal", "amount": 5 },
                 { "type": "finish" }
               ]
+            }
+          ]
+        }
+      }
+    },
+    "400": {
+      "title": "彩票店",
+      "backgroundPath": "assets/events/lottery_shop.png",
+      "steps": {
+        "start": {
+          "text": "你路过一家彩票店，就像看到野生的宝箱？难道你不想看看究竟是宝箱还是宝箱怪？",
+          "options": [
+            {
+              "label": "试试3元的",
+              "description": "小赌怡情，大赌伤身",
+              "requiresGold": 3,
+              "actions": [
+                {
+                  "type": "lotteryScratch",
+                  "amount": 3,
+                  "payouts": [
+                    { "value": 0, "weight": 3 },
+                    { "value": 1, "weight": 1 },
+                    { "value": 2, "weight": 1 },
+                    { "value": 3, "weight": 1 },
+                    { "value": 4, "weight": 1 },
+                    { "value": 5, "weight": 1 },
+                    { "value": 6, "weight": 1 },
+                    { "value": 7, "weight": 1 },
+                    { "value": 8, "weight": 1 }
+                  ],
+                  "winText": "\"小赌怡情，大赌伤身\"，你默念着，却已经想要下一张了。",
+                  "loseText": "你笑着把它丢进垃圾桶，心里骂了一句\"果然\"。",
+                  "evenText": "\"保本了\"，你觉得这是今天最大的安慰。",
+                  "resultSuffix": "无论如何，你还要继续赶路了。"
+                }
+              ]
+            },
+            {
+              "label": "试试5元的",
+              "description": "你感觉今天幸运女神站在你这边",
+              "requiresGold": 5,
+              "actions": [
+                {
+                  "type": "lotteryScratch",
+                  "amount": 5,
+                  "payouts": [
+                    { "value": 0, "weight": 1 },
+                    { "value": 1, "weight": 1 },
+                    { "value": 2, "weight": 1 },
+                    { "value": 3, "weight": 1 },
+                    { "value": 4, "weight": 1 },
+                    { "value": 5, "weight": 1 },
+                    { "value": 6, "weight": 1 },
+                    { "value": 7, "weight": 1 },
+                    { "value": 8, "weight": 1 },
+                    { "value": 9, "weight": 1 },
+                    { "value": 10, "weight": 1 }
+                  ],
+                  "winText": "五块刮出{payout}块，你差点亲一口那张彩票。",
+                  "loseText": "\"今天运气女神站在我这边\"。你刮出个{payout}，女神下班了。",
+                  "evenText": "五块变五块，你叹了口气，\"白激动一场\"。",
+                  "resultSuffix": "无论如何，你还要继续赶路了。"
+                }
+              ]
+            },
+            {
+              "label": "试试10元的",
+              "description": "上面写着超级大奖40元，万一呢？",
+              "requiresGold": 10,
+              "actions": [
+                {
+                  "type": "lotteryScratch",
+                  "amount": 10,
+                  "payouts": [
+                    { "value": 5, "weight": 1 },
+                    { "value": 6, "weight": 1 },
+                    { "value": 7, "weight": 1 },
+                    { "value": 8, "weight": 1 },
+                    { "value": 9, "weight": 1 },
+                    { "value": 10, "weight": 1 },
+                    { "value": 40, "weight": 4 }
+                  ],
+                  "winText": "十块刮出四十块，你面不改色揣进兜里，出门差点撞门上。",
+                  "loseText": "十块刮了个寂寞，你站在门口吹了会儿风，决定戒赌到明天早上。",
+                  "evenText": "十块变十块，你反复看了三遍，最后说：“行吧，没亏就是赢。”",
+                  "resultSuffix": "无论如何，你还要继续赶路了。"
+                }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "真的不试一试吗？",
+              "actions": [
+                {
+                  "type": "goToStep",
+                  "stepId": "leave"
+                }
+              ]
+            }
+          ]
+        },
+        "leave": {
+          "text": "你转过身去。省下这笔钱。概率从来不站在任何人一边，这是设计好的游戏。\n可你还是回头看了一眼。橱窗里的刮刮乐亮晶晶的，像一个个未完待续的故事。\n你笑了笑，推门走了出去。\n\n无论如何，你还要继续赶路了。",
+          "options": [
+            {
+              "label": "离开",
+              "description": "继续赶路",
+              "actions": [{ "type": "finish" }]
             }
           ]
         }

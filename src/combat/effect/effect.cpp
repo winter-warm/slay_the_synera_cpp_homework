@@ -42,6 +42,10 @@ void effect::beforeHeal(HealContext& context){
     if(beforeHealFunc){beforeHealFunc(*this, context);}
 }
 
+void effect::afterSkill(SkillContext& context){
+    if(afterSkillFunc){afterSkillFunc(*this, context);}
+}
+
 void effect::beforeAddBuff(AddBuffContext& context){
     if(beforeAddBuffFunc){beforeAddBuffFunc(*this, context);}
 }

@@ -17,6 +17,7 @@ enum class EventActionType {
     StartBattle,
     GoToStep,
     ShowMessage,
+    LotteryScratch,
     Heal,
     LoseHp,
     ChangeMaxHp,
@@ -52,11 +53,20 @@ struct BattleConfig {
     std::string returnStepId;
 };
 
+struct LotteryPayout {
+    int value = 0;
+    int weight = 1;
+};
+
 struct EventAction {
     EventActionType type = EventActionType::FinishNode;
     std::string nextStepId;
     std::string title;
     std::string message;
+    std::string winText;
+    std::string loseText;
+    std::string evenText;
+    std::string resultSuffix;
     std::string prompt;
     std::string filter;
     int amount = 0;
@@ -64,6 +74,7 @@ struct EventAction {
     int maxAmount = 0;
     int templateId = 0;
     BattleConfig battle;
+    std::vector<LotteryPayout> lotteryPayouts;
     std::vector<EventAction> onChooseActions;
 };
 

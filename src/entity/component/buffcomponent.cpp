@@ -35,6 +35,10 @@ void BuffComponent::beforeHeal(HealContext& context){
     buffmanager.beforeHeal(context);
 }
 
+void BuffComponent::afterSkill(SkillContext& context){
+    buffmanager.afterSkill(context);
+}
+
 void BuffComponent::beforeAddBuff(AddBuffContext& context){
     buffmanager.beforeAddBuff(context);
 }

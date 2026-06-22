@@ -58,6 +58,13 @@ void buff::beforeHeal(HealContext& context){
     recordTrigger(BuffTrigger::BeforeHeal);
 }
 
+void buff::afterSkill(SkillContext& context){
+    for(auto& ele:effects){
+        ele->afterSkill(context);
+    }
+    recordTrigger(BuffTrigger::AfterSkill);
+}
+
 void buff::beforeAddBuff(AddBuffContext& context){
     for(auto& ele:effects){
         ele->beforeAddBuff(context);

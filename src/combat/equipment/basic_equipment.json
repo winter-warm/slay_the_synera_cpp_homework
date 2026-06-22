@@ -1,0 +1,160 @@
+{
+  "equipment": [
+    {
+      "id": 1,
+      "group": 1,
+      "name": "iron_rider_short_sword",
+      "title": "铁骑短剑",
+      "effectText": "攻击力 +10%，暴击率+20%",
+      "iconPath": "assets/equipment/basic/a1.png",
+      "modifiers": [
+        { "stat": "attack_percent", "value": 10 },
+        { "stat": "crit_chance_percent", "value": 20 }
+      ],
+      "buffIds": []
+    },
+    {
+      "id": 2,
+      "group": 1,
+      "name": "silver_feather_longbow",
+      "title": "银羽长弓",
+      "effectText": "攻击速度 +15%，攻击范围+1",
+      "iconPath": "assets/equipment/basic/a2.png",
+      "modifiers": [
+        { "stat": "attack_speed_percent", "value": 15 },
+        { "stat": "attack_range_flat", "value": 1 }
+      ],
+      "buffIds": []
+    },
+    {
+      "id": 3,
+      "group": 1,
+      "name": "shadow_fang_dagger",
+      "title": "影牙匕首",
+      "effectText": "暴击率 +40%，暴击伤害 +100%",
+      "iconPath": "assets/equipment/basic/a3.png",
+      "modifiers": [
+        { "stat": "crit_chance_percent", "value": 40 },
+        { "stat": "crit_damage_percent", "value": 100 }
+      ],
+      "buffIds": []
+    },
+    {
+      "id": 4,
+      "group": 1,
+      "name": "star_pattern_staff",
+      "title": "星纹法杖",
+      "effectText": "初始 MP +3，最大 MP -1",
+      "iconPath": "assets/equipment/basic/a4.png",
+      "modifiers": [
+        { "stat": "initial_mp_flat", "value": 3 },
+        { "stat": "max_mp_flat", "value": -1 }
+      ],
+      "buffIds": []
+    },
+    {
+      "id": 5,
+      "group": 1,
+      "name": "holy_glow_pendant",
+      "title": "圣辉吊坠",
+      "effectText": "治疗效果 +30%，最大生命值 +8%",
+      "iconPath": "assets/equipment/basic/a5.png",
+      "modifiers": [
+        { "stat": "healing_done_percent", "value": 30 },
+        { "stat": "max_hp_percent", "value": 8 }
+      ],
+      "buffIds": []
+    },
+    {
+      "id": 6,
+      "group": 1,
+      "name": "dragon_scale_round_shield",
+      "title": "龙鳞圆盾",
+      "effectText": "初始护盾量 +20%的最大生命值，最大生命值 +20%",
+      "iconPath": "assets/equipment/basic/a6.png",
+      "modifiers": [
+        { "stat": "initial_shield_max_hp_percent", "value": 20 },
+        { "stat": "max_hp_percent", "value": 20 }
+      ],
+      "buffIds": []
+    },
+    {
+      "id": 1,
+      "group": 2,
+      "name": "flame_gem",
+      "title": "烈焰宝石",
+      "effectText": "攻击力 +10%，暴击伤害 +60%",
+      "iconPath": "assets/equipment/basic/b1.png",
+      "modifiers": [
+        { "stat": "attack_percent", "value": 10 },
+        { "stat": "crit_damage_percent", "value": 60 }
+      ],
+      "buffIds": []
+    },
+    {
+      "id": 2,
+      "group": 2,
+      "name": "gale_wing",
+      "title": "疾风羽翼",
+      "effectText": "攻击速度 +30%，闪避率 +40%",
+      "iconPath": "assets/equipment/basic/b2.png",
+      "modifiers": [
+        { "stat": "attack_speed_percent", "value": 30 },
+        { "stat": "dodge_chance_percent", "value": 40 }
+      ],
+      "buffIds": []
+    },
+    {
+      "id": 3,
+      "group": 2,
+      "name": "frost_crystal",
+      "title": "寒霜水晶",
+      "effectText": "初始 MP +2，最大 MP -1",
+      "iconPath": "assets/equipment/basic/b3.png",
+      "modifiers": [
+        { "stat": "initial_mp_flat", "value": 2 },
+        { "stat": "max_mp_flat", "value": -1 }
+      ],
+      "buffIds": []
+    },
+    {
+      "id": 4,
+      "group": 2,
+      "name": "moonshadow_ribbon",
+      "title": "月影丝带",
+      "effectText": "暴击率 +20%，闪避率 +20%",
+      "iconPath": "assets/equipment/basic/b4.png",
+      "modifiers": [
+        { "stat": "crit_chance_percent", "value": 20 },
+        { "stat": "dodge_chance_percent", "value": 20 }
+      ],
+      "buffIds": []
+    },
+    {
+      "id": 5,
+      "group": 2,
+      "name": "life_tree_seed",
+      "title": "生命树种",
+      "effectText": "最大生命值 +30%，受到治疗 +20%",
+      "iconPath": "assets/equipment/basic/b5.png",
+      "modifiers": [
+        { "stat": "max_hp_percent", "value": 30 },
+        { "stat": "healing_taken_percent", "value": 20 }
+      ],
+      "buffIds": []
+    },
+    {
+      "id": 6,
+      "group": 2,
+      "name": "crown_fragment",
+      "title": "王冠碎片",
+      "effectText": "暴击伤害 +50%，初始护盾量 +10%的最大生命值",
+      "iconPath": "assets/equipment/basic/b6.png",
+      "modifiers": [
+        { "stat": "crit_damage_percent", "value": 50 },
+        { "stat": "initial_shield_max_hp_percent", "value": 10 }
+      ],
+      "buffIds": []
+    }
+  ]
+}

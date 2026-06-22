@@ -13,6 +13,9 @@ struct AttackContext {
     Character* target = nullptr;
     int damage = 0;
     bool cancelled = false;
+    int critChancePercent = 0;
+    int critDamagePercent = 100;
+    bool critical = false;
 };
 
 struct BeAttackedContext {
@@ -20,6 +23,8 @@ struct BeAttackedContext {
     Character* target = nullptr;
     int damage = 0;
     bool cancelled = false;
+    int dodgeChancePercent = 0;
+    bool dodged = false;
 };
 
 struct HealContext {
@@ -27,6 +32,13 @@ struct HealContext {
     Character* target = nullptr;
     int amount = 0;
     bool cancelled = false;
+    int healingDonePercent = 0;
+    int healingTakenPercent = 0;
+};
+
+struct SkillContext {
+    Character* caster = nullptr;
+    Character* target = nullptr;
 };
 
 struct AddBuffContext {

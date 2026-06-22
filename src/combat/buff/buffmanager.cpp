@@ -54,6 +54,12 @@ void BuffManager::beforeHeal(HealContext& context){
     }
 }
 
+void BuffManager::afterSkill(SkillContext& context){
+    for(auto& ele:buffs){
+        ele->afterSkill(context);
+    }
+}
+
 void BuffManager::beforeAddBuff(AddBuffContext& context){
     for(auto& ele:buffs){
         ele->beforeAddBuff(context);
