@@ -21,7 +21,7 @@ public:
     void modifyHP(int delta){hp+=delta;}
     void modifyMAXHP(int delta);
     bool modifyMP(int delta);
-    void modifyMAXMP(int delta){maxmp+=delta;}
+    void modifyMAXMP(int delta);
     void modifyATTACL(int delta){attack+=delta;if(attack<=0)attack=0;}
     void modifyDEFESE(int delta){defense+=delta;if(defense<=0)defense=0;}
     void modifySHIELF(int delta){shield+=delta;if(shield<=0)shield = 0;}

@@ -13,6 +13,10 @@ static bool canAttackFrom(Character* self, const Board& board, const Hex& from, 
 MoveComponent::MoveComponent(const MoveComponent& other, Character* owner):component(other, owner) {
     path = other.path; targetSelector = other.targetSelector;
     pathFinder = other.pathFinder; target = other.target;
+    previousTargetSelector = other.previousTargetSelector;
+    previousPathFinder = other.previousPathFinder;
+    restoreTargetSelectorAfterSelection = other.restoreTargetSelectorAfterSelection;
+    restorePathFinderAfterPath = other.restorePathFinderAfterPath;
 }
 
 bool MoveComponent::update(Board& board) {
@@ -30,12 +34,22 @@ bool MoveComponent::update(Board& board) {
        !board.posOf(target, &targetHex) ||
        target->isdead()) {
         target = targetSelector(owner, board);
+        if(restoreTargetSelectorAfterSelection) {
+            targetSelector = std::move(previousTargetSelector);
+            previousTargetSelector = nullptr;
+            restoreTargetSelectorAfterSelection = false;
+        }
         path.clear();
     }
     if(target == nullptr || !board.posOf(target, &targetHex))return false;
     if(canAttackFrom(owner, board, selfHex, targetHex))return false;
 
     path = pathFinder(owner, target, board);
+    if(restorePathFinderAfterPath) {
+        pathFinder = std::move(previousPathFinder);
+        previousPathFinder = nullptr;
+        restorePathFinderAfterPath = false;
+    }
     if(path.empty())return false;
 
     const Hex next = path.front();
@@ -46,6 +60,34 @@ bool MoveComponent::update(Board& board) {
 
     path.clear();
     return false;
+}
+
+void MoveComponent::setTargetSelector(TargetSelector selector) {
+    targetSelector = std::move(selector);
+    previousTargetSelector = nullptr;
+    restoreTargetSelectorAfterSelection = false;
+    invalidateTargeting();
+}
+
+void MoveComponent::setTargetSelectorOnce(TargetSelector selector) {
+    previousTargetSelector = targetSelector;
+    targetSelector = std::move(selector);
+    restoreTargetSelectorAfterSelection = true;
+    invalidateTargeting();
+}
+
+void MoveComponent::setPathFinder(PathFinder finder) {
+    pathFinder = std::move(finder);
+    previousPathFinder = nullptr;
+    restorePathFinderAfterPath = false;
+    invalidatePath();
+}
+
+void MoveComponent::setPathFinderOnce(PathFinder finder) {
+    previousPathFinder = pathFinder;
+    pathFinder = std::move(finder);
+    restorePathFinderAfterPath = true;
+    invalidatePath();
 }
 
 Character* nearestEnemy(Character* self, const Board& board) {
@@ -100,6 +142,46 @@ Character* highestAttackEnemy(Character* self, const Board& board) {
         }
     }
     return best;
+}
+
+Character* lowestHpEnemy(Character* self, const Board& board) {
+    Character* best = nullptr;
+    for(Unit* unit : board.units()) {
+        Character* candidate = dynamic_cast<Character*>(unit);
+        if(!candidate ||
+           candidate == self ||
+           !candidate->isTargetable() ||
+           candidate->isdead() ||
+           candidate->getteam().getteam() == self->getteam().getteam()) {
+            continue;
+        }
+        if(best == nullptr || candidate->getstats().getHP() < best->getstats().getHP()) {
+            best = candidate;
+        }
+    }
+    return best;
+}
+
+TargetSelector targetSelectorFromKind(TargetSelectorKind kind) {
+    switch(kind) {
+    case TargetSelectorKind::NearestEnemy:
+        return nearestEnemy;
+    case TargetSelectorKind::HighestAttackEnemy:
+        return highestAttackEnemy;
+    case TargetSelectorKind::LowestHpEnemy:
+        return lowestHpEnemy;
+    }
+    return nearestEnemy;
+}
+
+PathFinder pathFinderFromKind(PathFinderKind kind) {
+    switch(kind) {
+    case PathFinderKind::Astar:
+        return Astar;
+    case PathFinderKind::FlyToAttackPosition:
+        return flyToAttackPosition;
+    }
+    return Astar;
 }
 
 std::vector<Hex> Astar(Character* self, Character* target, const Board& board) {

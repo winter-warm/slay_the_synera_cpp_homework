@@ -369,7 +369,7 @@
       "recipe": { "moldId": 4, "elementId": 4 },
       "effectText": "初始MP +4，最大MP -1，暴击率 +30%，闪避率 +20%",
       "skillName": "equip_yuexiang_lunzhuan",
-      "skillText": "装备者暴击后，立即不消耗mp释放一次技能。",
+      "skillText": "装备者主动释放时在满月与新月间交替。满月：下一次普攻额外造成180%攻击力伤害。新月：为生命值最低的友方回复其最大生命值20%。",
       "iconPath": "assets/equipment/advanced/44.png",
       "modifiers": [
         { "stat": "initial_mp_flat", "value": 4 },
@@ -608,7 +608,7 @@
       "recipe": { "moldId": 6, "elementId": 6 },
       "effectText": "初始护盾量 +42%，最大生命值 +18%，暴击伤害 +20%",
       "skillName": "equip_wangguan_shouhu",
-      "skillText": "战斗开始时，所有友军获得20%初始护盾量。",
+      "skillText": "战斗开始时守护最近的友方。被守护友方受到伤害前，取消该次伤害，由装备者承受120%的原始伤害。",
       "iconPath": "assets/equipment/advanced/66.png",
       "modifiers": [
         { "stat": "initial_shield_max_hp_percent", "value": 42 },

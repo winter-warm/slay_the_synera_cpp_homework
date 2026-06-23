@@ -37,6 +37,7 @@ public:
     void update(float deltaTime,bool ismoving);
     void attack(Character* target);
     void useskill(Character* target);
+    void addSkill(Skill addedSkill);
     void activateAndRemoveBuffSkills();
     void modifyAttackIntervalPercent(int percent);
 };

@@ -26,11 +26,17 @@ void StatsComponent::modifyMAXHP(int delta){
 
 bool StatsComponent::modifyMP(int delta){
     mp+=delta;
-    if(mp>=maxmp){
-        mp-=maxmp;
-        return true;
+    if(mp < 0){
+        mp = 0;
     }
-    return false;
+    return maxmp > 0 && mp >= maxmp;
+}
+
+void StatsComponent::modifyMAXMP(int delta){
+    maxmp += delta;
+    if(maxmp < 0){
+        maxmp = 0;
+    }
 }
 
 void StatsComponent::setHP(int value){

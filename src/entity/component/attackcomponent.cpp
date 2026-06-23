@@ -50,12 +50,13 @@ void AttackComponent::update(float deltaTime, bool ismoving){
             break;
         }
     }
-    if(hasActiveSkill &&
-       owner->getstats().getMAXMP() > 0 &&
-       owner->getstats().getMP() >= owner->getstats().getMAXMP()){
-        owner->getstats().modifyMP((-1) * owner->getstats().getMAXMP());
+    const int skillCost = owner->getstats().getMAXMP();
+    int skillCasts = hasActiveSkill && skillCost > 0 ? owner->getstats().getMP() / skillCost : 0;
+    while(skillCasts > 0 && target && target->isTargetable()){
+        owner->getstats().modifyMP(-skillCost);
         owner->getrender().requestSkillBurst();
         useskill(target);
+        --skillCasts;
     }
 }
 
@@ -98,6 +99,10 @@ void AttackComponent::useskill(Character* target){
     }
     SkillContext context{owner, target};
     owner->getbuff().afterSkill(context);
+}
+
+void AttackComponent::addSkill(Skill addedSkill){
+    skill.push_back(std::move(addedSkill));
 }
 
 void AttackComponent::activateAndRemoveBuffSkills(){
