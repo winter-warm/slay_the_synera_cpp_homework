@@ -1205,7 +1205,7 @@ void BattleScene::buildScene() {
     trashItem->setPos(benchOrigin.x() - benchGap - benchSize, benchOrigin.y());
     trashItem->setAcceptedMouseButtons(Qt::NoButton);
 
-    trashTextItem = sceneObj->addText(QString::fromUtf8("鍥炴敹\n鍨冨溇妗?), QFont("Arial", 13, QFont::Black));
+    trashTextItem = sceneObj->addText(QString::fromUtf8("回收\n垃圾桶"), QFont("Arial", 13, QFont::Black));
     trashTextItem->setDefaultTextColor(QColor(255, 238, 198));
     trashTextItem->setZValue(zTrash + 0.5);
     trashTextItem->setAcceptedMouseButtons(Qt::NoButton);
