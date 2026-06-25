@@ -1,5 +1,11 @@
 # Synera Starter Agent Rules
 
+## Architecture Documentation
+
+- Before changing code, first check `architecture.md` to confirm the current module boundaries and class responsibilities.
+- If a change adds, removes, moves, or renames a class, changes a class responsibility, changes dependency direction, changes resource ownership, or changes runtime data flow, update `architecture.md` in the same task.
+- Keep `architecture.md` in Chinese and treat it as the source of truth for project structure.
+
 ## Qt and STL Boundary
 
 - Use Qt types freely in GUI code, Qt signal/slot boundaries, painting, graphics scenes, widgets, and Qt file/JSON integration.

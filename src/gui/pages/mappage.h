@@ -26,6 +26,7 @@ signals:
     void saveRequested(int slot);
     void bagRequested();
     void shopRequested();
+    void equipmentRequested();
     void returnToStartRequested();
 
 private:

@@ -30,12 +30,13 @@ AttackComponent::AttackComponent(const AttackComponent& other, Character* owner)
     : component(other, owner),
       skill(other.skill),
       cooldown(other.cooldown),
-      attackInterval(other.attackInterval)
+      attackInterval(other.attackInterval),
+      actionLocks(other.actionLocks)
 {}
 
 void AttackComponent::update(float deltaTime, bool ismoving){
     cooldown -= deltaTime;
-    if(ismoving || cooldown > 0.0f){
+    if(actionLocks > 0 || ismoving || cooldown > 0.0f){
         return;
     }
     Character* target = owner->gettarget();

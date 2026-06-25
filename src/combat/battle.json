@@ -1,109 +1,11 @@
 {
   "battles": [
     {
-      "layer": 1,
+      "layer": 4,
       "elite": false,
       "map_id": "default_board",
       "enemy": [
-        { "position": { "x": 4, "y": -5 }, "enemy": 1002 }
-      ]
-    },
-    {
-      "layer": 1,
-      "elite": false,
-      "map_id": "default_board",
-      "enemy": [
-        { "position": { "x": 3, "y": -4 }, "enemy": 1101 },
-        { "position": { "x": 7, "y": -8 }, "enemy": 1101 }
-      ]
-    },
-    {
-      "layer": 1,
-      "elite": true,
-      "map_id": "default_board",
-      "enemy": [
-        { "position": { "x": 2, "y": -3 }, "enemy": 1102 },
-        { "position": { "x": 5, "y": -6 }, "enemy": 1103 },
-        { "position": { "x": 8, "y": -9 }, "enemy": 1104 }
-      ]
-    },
-    {
-      "layer": 2,
-      "elite": false,
-      "map_id": "default_board",
-      "enemy": [
-        { "position": { "x": 3, "y": -4 }, "enemy": 1002 },
-        { "position": { "x": 7, "y": -8 }, "enemy": 1002 }
-      ]
-    },
-    {
-      "layer": 2,
-      "elite": false,
-      "map_id": "default_board",
-      "enemy": [
-        { "position": { "x": 2, "y": -3 }, "enemy": 1101 },
-        { "position": { "x": 5, "y": -6 }, "enemy": 1104 },
-        { "position": { "x": 8, "y": -9 }, "enemy": 1101 }
-      ]
-    },
-    {
-      "layer": 2,
-      "elite": true,
-      "map_id": "default_board",
-      "enemy": [
-        { "position": { "x": 2, "y": -3 }, "enemy": 1105 },
-        { "position": { "x": 6, "y": -7 }, "enemy": 1102 },
-        { "position": { "x": 9, "y": -10 }, "enemy": 1103 }
-      ]
-    },
-    {
-      "layer": 3,
-      "elite": false,
-      "map_id": "default_board",
-      "enemy": [
-        { "position": { "x": 2, "y": -3 }, "enemy": 1002 },
-        { "position": { "x": 5, "y": -6 }, "enemy": 1101 },
-        { "position": { "x": 8, "y": -9 }, "enemy": 1002 }
-      ]
-    },
-    {
-      "layer": 3,
-      "elite": true,
-      "map_id": "default_board",
-      "enemy": [
-        { "position": { "x": 1, "y": -2 }, "enemy": 1106 },
-        { "position": { "x": 5, "y": -6 }, "enemy": 1105 },
-        { "position": { "x": 9, "y": -10 }, "enemy": 1102 }
-      ]
-    },
-    {
-      "layer": 10,
-      "elite": true,
-      "map_id": "default_board",
-      "enemy": [
-        { "position": { "x": 4, "y": -5 }, "enemy": 1106 },
-        { "position": { "x": 7, "y": -8 }, "enemy": 1102 }
-      ]
-    },
-    {
-      "layer": 20,
-      "elite": true,
-      "map_id": "default_board",
-      "enemy": [
-        { "position": { "x": 3, "y": -4 }, "enemy": 1106 },
-        { "position": { "x": 6, "y": -7 }, "enemy": 1105 },
-        { "position": { "x": 9, "y": -10 }, "enemy": 1102 }
-      ]
-    },
-    {
-      "layer": 30,
-      "elite": true,
-      "map_id": "default_board",
-      "enemy": [
-        { "position": { "x": 2, "y": -3 }, "enemy": 1106 },
-        { "position": { "x": 5, "y": -6 }, "enemy": 1105 },
-        { "position": { "x": 8, "y": -9 }, "enemy": 1102 },
-        { "position": { "x": 10, "y": -11 }, "enemy": 1103 }
+        { "position": { "x": 4, "y": -5 }, "enemy": 4006 }
       ]
     }
   ]

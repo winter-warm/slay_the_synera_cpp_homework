@@ -329,9 +329,11 @@ EventPage::EventPage(QWidget* parent)
     , optionsWidget(nullptr)
     , optionsLayout(nullptr)
     , hexTechLayout(nullptr)
+    , restOptionsWidget(new QWidget(this))
     , restScrollArea(new QScrollArea(this))
     , restLayout(nullptr)
     , restDescriptionLabel(new QLabel(this))
+    , restEquipmentHintLabel(new QLabel(this))
     , confirmHexTechButton(new QPushButton(QString::fromUtf8("确认选择"), this))
     , selectedHexTechChoice(-1) {
     setAutoFillBackground(false);
@@ -368,7 +370,7 @@ EventPage::EventPage(QWidget* parent)
     hexTechOuterLayout->setSpacing(14);
     hexTechLayout = new QHBoxLayout();
     hexTechLayout->setAlignment(Qt::AlignCenter);
-    hexTechLayout->setSpacing(42);
+    hexTechLayout->setSpacing(30);
     hexTechOuterLayout->addLayout(hexTechLayout);
     confirmHexTechButton->setEnabled(false);
     confirmHexTechButton->setVisible(false);
@@ -388,6 +390,11 @@ EventPage::EventPage(QWidget* parent)
         padding: 12px 0;
     )");
     contentLayout->addWidget(restDescriptionLabel);
+
+    restOptionsWidget->setAttribute(Qt::WA_TranslucentBackground);
+    restOptionsWidget->setFixedSize(1260, 340);
+    restOptionsWidget->setVisible(false);
+    contentLayout->addWidget(restOptionsWidget, 0, Qt::AlignHCenter);
 
     auto* restWidget = new QWidget(restScrollArea);
     restWidget->setAttribute(Qt::WA_TranslucentBackground);
@@ -411,13 +418,32 @@ EventPage::EventPage(QWidget* parent)
             background: transparent;
         }
     )");
-    contentLayout->addWidget(restScrollArea, 1);
+    contentLayout->addWidget(restScrollArea, 0, Qt::AlignHCenter);
+
+    restEquipmentHintLabel->setAlignment(Qt::AlignCenter);
+    restEquipmentHintLabel->setWordWrap(true);
+    restEquipmentHintLabel->setVisible(false);
+    restEquipmentHintLabel->setFixedHeight(58);
+    restEquipmentHintLabel->setFixedWidth(940);
+    restEquipmentHintLabel->setStyleSheet(R"(
+        font-size: 18px;
+        font-weight: 800;
+        color: #fff4cd;
+        background-color: rgba(18, 18, 18, 155);
+        border: 2px solid rgba(255, 208, 96, 150);
+        border-radius: 8px;
+        padding: 8px 18px;
+    )");
+    restEquipmentHintLabel->setText(QString::fromUtf8("你可以在这里脱下装备和合成装备(拖动合成，蓝色胚子和绿色素材合成高级装备)"));
+    contentLayout->addStretch(1);
+    contentLayout->addWidget(restEquipmentHintLabel, 0, Qt::AlignHCenter | Qt::AlignBottom);
 
     layout->addWidget(content, 1);
 
     connect(hud, &GameHud::saveRequested, this, &EventPage::saveRequested);
     connect(hud, &GameHud::bagRequested, this, &EventPage::bagRequested);
     connect(hud, &GameHud::shopRequested, this, &EventPage::shopRequested);
+    connect(hud, &GameHud::equipmentRequested, this, &EventPage::equipmentRequested);
     connect(hud, &GameHud::returnToStartRequested, this, &EventPage::returnToStartRequested);
     connect(confirmHexTechButton, &QPushButton::clicked, this, [this]() {
         if (selectedHexTechChoice >= 0) {
@@ -507,11 +533,18 @@ void EventPage::rebuildOptions() {
         }
         delete item;
     }
+    for (QWidget* widget : restOptionsWidget->findChildren<QWidget*>(QString(), Qt::FindDirectChildrenOnly)) {
+        delete widget;
+    }
     selectedHexTechChoice = -1;
     confirmHexTechButton->setEnabled(false);
     confirmHexTechButton->setVisible(false);
     restDescriptionLabel->setVisible(false);
+    restEquipmentHintLabel->setVisible(false);
+    restOptionsWidget->setVisible(false);
     restScrollArea->setVisible(false);
+    restScrollArea->setMinimumSize(0, 0);
+    restScrollArea->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
     normalEventView->setVisible(false);
 
     if (!currentState.currentEvent.active) {
@@ -521,6 +554,19 @@ void EventPage::rebuildOptions() {
 
     if (currentState.currentEvent.hexTechSelection) {
         setSpecialEventLayoutVisible(true);
+        contentLayout->setContentsMargins(48, 8, 48, 24);
+        titleLabel->setFixedHeight(58);
+        bodyLabel->setFixedSize(1180, 118);
+        bodyLabel->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+        bodyLabel->setStyleSheet(R"(
+            font-size: 18px;
+            line-height: 130%;
+            color: #ffffff;
+            background-color: rgba(22, 23, 25, 115);
+            border: 1px solid rgba(255, 230, 170, 95);
+            border-radius: 8px;
+            padding: 10px 18px;
+        )");
         confirmHexTechButton->setVisible(true);
         for (int i = 0; i < static_cast<int>(currentState.currentHexTechChoices.size()); ++i) {
             hexTechLayout->addWidget(createHexTechCard(i));
@@ -530,13 +576,27 @@ void EventPage::rebuildOptions() {
 
     if (currentState.currentEvent.restSelection) {
         setSpecialEventLayoutVisible(true);
+        contentLayout->setContentsMargins(8, 8, 8, 16);
+        bodyLabel->setVisible(false);
+        restEquipmentHintLabel->setVisible(true);
         restDescriptionLabel->setVisible(true);
         restDescriptionLabel->setText(QString::fromUtf8("选择一项行动"));
-        restScrollArea->setVisible(true);
-        restLayout->addWidget(createRestOptionCard(RestOption::Rest), 1, 0, Qt::AlignTop);
-        restLayout->addWidget(createRestOptionCard(RestOption::Train), 0, 1, Qt::AlignTop);
-        restLayout->addWidget(createRestOptionCard(RestOption::Dig), 0, 2, Qt::AlignTop);
-        restLayout->addWidget(createRestOptionCard(RestOption::Forge), 1, 3, Qt::AlignTop);
+        restOptionsWidget->setVisible(true);
+        const struct {
+            RestOption option;
+            QPoint pos;
+        } placements[] = {
+            {RestOption::Rest, QPoint(0, 112)},
+            {RestOption::Train, QPoint(320, 20)},
+            {RestOption::Dig, QPoint(640, 20)},
+            {RestOption::Forge, QPoint(960, 112)},
+        };
+        for (const auto& placement : placements) {
+            QWidget* card = createRestOptionCard(placement.option);
+            card->setParent(restOptionsWidget);
+            card->move(placement.pos);
+            card->show();
+        }
         return;
     }
 
@@ -595,7 +655,7 @@ QWidget* EventPage::createHexTechCard(int choiceIndex) {
     const HexTechDefinition& choice = currentState.currentHexTechChoices[static_cast<size_t>(choiceIndex)];
 
     auto* frame = new HexTechCardFrame(this);
-    frame->setFixedWidth(270);
+    frame->setFixedWidth(300);
     frame->setCursor(Qt::PointingHandCursor);
     frame->setProperty("choiceIndex", choiceIndex);
     frame->setStyleSheet(R"(
@@ -605,7 +665,7 @@ QWidget* EventPage::createHexTechCard(int choiceIndex) {
             border-radius: 8px;
         }
         QFrame[selected="true"] {
-            border: 3px solid #f0c85a;
+            border: 2px solid #f0c85a;
             background-color: rgba(36, 29, 16, 150);
         }
     )");
@@ -615,7 +675,7 @@ QWidget* EventPage::createHexTechCard(int choiceIndex) {
     layout->setSpacing(10);
 
     auto* imageLabel = new QLabel(frame);
-    imageLabel->setFixedSize(230, 322);
+    imageLabel->setFixedSize(246, 344);
     imageLabel->setAlignment(Qt::AlignCenter);
     imageLabel->setStyleSheet("background: transparent; border: none;");
     const QPixmap pixmap = loadScaledPixmap(assetPath(choice.cardImagePath), imageLabel->size());
@@ -629,14 +689,17 @@ QWidget* EventPage::createHexTechCard(int choiceIndex) {
     auto* title = new QLabel(QString::fromStdString(choice.title), frame);
     title->setWordWrap(true);
     title->setAlignment(Qt::AlignCenter);
+    title->setMinimumWidth(246);
+    title->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
     title->setStyleSheet("font-size: 22px; font-weight: 800; color: #ffffff; border: none; background: transparent;");
     layout->addWidget(title);
 
     auto* description = new QLabel(QString::fromStdString(choice.description), frame);
     description->setWordWrap(true);
     description->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
-    description->setMinimumHeight(78);
-    description->setStyleSheet("font-size: 17px; color: #ffffff; border: none; background: transparent;");
+    description->setMinimumSize(246, 112);
+    description->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
+    description->setStyleSheet("font-size: 16px; line-height: 130%; color: #ffffff; border: none; background: transparent;");
     layout->addWidget(description);
 
     frame->setProperty("selected", false);
@@ -661,7 +724,7 @@ QWidget* EventPage::createHexTechCard(int choiceIndex) {
 
 QWidget* EventPage::createRestOptionCard(RestOption option) {
     auto* frame = new RestCardFrame(this);
-    frame->setFixedSize(324, 236);
+    frame->setFixedSize(300, 226);
     frame->setCursor(Qt::PointingHandCursor);
     frame->setAttribute(Qt::WA_StyledBackground, true);
     const bool trainDisabled = option == RestOption::Train && !hasTrainableCards();
@@ -682,7 +745,7 @@ QWidget* EventPage::createRestOptionCard(RestOption option) {
     )");
 
     auto* layout = new QVBoxLayout(frame);
-    layout->setContentsMargins(10, 10, 10, 12);
+    layout->setContentsMargins(0, 0, 0, 10);
     layout->setSpacing(8);
 
     auto* image = new QLabel(frame);
@@ -697,7 +760,7 @@ QWidget* EventPage::createRestOptionCard(RestOption option) {
 
     auto* label = new QLabel(restOptionLabel(option), frame);
     label->setAlignment(Qt::AlignCenter);
-    label->setStyleSheet("font-size: 26px; font-weight: 900; color: #5a310a; background: transparent; border: none;");
+    label->setStyleSheet("font-size: 25px; font-weight: 900; color: #5a310a; background: transparent; border: none;");
     layout->addWidget(label);
 
     if (trainDisabled) {
@@ -857,6 +920,7 @@ void EventPage::setSpecialEventLayoutVisible(bool visible) {
         return;
     }
 
+    contentLayout->setContentsMargins(48, 12, 48, 32);
     titleLabel->setVisible(visible);
     bodyLabel->setVisible(visible);
     optionsWidget->setVisible(visible);
@@ -879,9 +943,13 @@ void EventPage::setSpecialEventLayoutVisible(bool visible) {
     contentLayout->setAlignment(bodyLabel, Qt::AlignCenter);
     contentLayout->setAlignment(optionsWidget, Qt::AlignCenter);
     contentLayout->setAlignment(restDescriptionLabel, Qt::AlignCenter);
+    contentLayout->setAlignment(restOptionsWidget, Qt::AlignCenter);
     contentLayout->setAlignment(restScrollArea, Qt::AlignCenter);
+    titleLabel->setMinimumHeight(0);
+    titleLabel->setMaximumHeight(QWIDGETSIZE_MAX);
     titleLabel->setStyleSheet("font-size: 32px; font-weight: 800; color: #ffffff; background: transparent;");
     bodyLabel->setMinimumHeight(0);
+    bodyLabel->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
     bodyLabel->setStyleSheet("font-size: 19px; color: #ffffff; background: transparent;");
     restDescriptionLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     restDescriptionLabel->setFixedHeight(100);

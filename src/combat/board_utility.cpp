@@ -46,7 +46,7 @@ bool blockedBetween(const Board& board, const Hex& from, const Hex& to) {
     const std::vector<Hex> cells = line(board, from, to);
     for (int i = 1; i + 1 < static_cast<int>(cells.size()); ++i) {
         Obstacle* obstacle = dynamic_cast<Obstacle*>(board.unitAt(cells[i]));
-        if (obstacle && obstacle->getBlockAttack()) {
+        if (obstacle && obstacle->blocksAttack()) {
             return true;
         }
     }

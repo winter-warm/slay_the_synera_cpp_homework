@@ -38,6 +38,7 @@ private:
     PathFinder previousPathFinder;
     bool restoreTargetSelectorAfterSelection = false;
     bool restorePathFinderAfterPath = false;
+    int moveLocks = 0;
     void invalidateTargeting(){target = nullptr; path.clear();}
     void invalidatePath(){path.clear();}
 public:
@@ -54,6 +55,8 @@ public:
     void setPathFinder(PathFinderKind kind){setPathFinder(pathFinderFromKind(kind));}
     void setPathFinderOnce(PathFinder finder);
     void setPathFinderOnce(PathFinderKind kind){setPathFinderOnce(pathFinderFromKind(kind));}
+    void addMoveLock(){++moveLocks; invalidatePath();}
+    void removeMoveLock(){if(moveLocks > 0){--moveLocks;} invalidatePath();}
 };
 
 #endif // MOVECOMPONENT_H

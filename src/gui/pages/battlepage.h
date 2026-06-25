@@ -3,16 +3,18 @@
 
 #include "app/gamemanager.h"
 #include "combat/battlesystem.h"
+#include "gui/battle/battlescene.h"
 #include <QWidget>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 class Character;
 class battlesystem;
-class BattleScene;
 class GameHud;
 class QEvent;
 class QGraphicsView;
+class QLabel;
 class QPushButton;
 class QTimer;
 
@@ -35,9 +37,13 @@ signals:
     void startBattleRequested();
     void battleFinished(const BattleResult& result);
     void battleChestOpened(int gold);
+    void battleChestEquipmentClaimed(EquipmentGroup group, int equipmentId);
     void saveRequested(int slot);
     void bagRequested();
     void shopRequested();
+    void equipmentRequested();
+    void equipEquipmentRequested(int equipmentInstanceId, int ownedCardUid);
+    void battlePreparationModeChanged(bool active);
     void panelsShouldClose();
     void returnToStartRequested();
 
@@ -56,21 +62,29 @@ private:
     void completeSettlement();
     void completeVictoryChest();
     int victoryChestGold() const;
+    int rewardModifierPercent(const std::string& modifierKey) const;
+    std::vector<BattleScene::EquipmentRewardVisual> rollVictoryEquipmentDrops() const;
     int extraChestGoldFromHexTech() const;
+    bool isEquipmentDropAllowed() const;
+    void showEquipmentWarning();
 
     GameState currentState;
     GameHud* hud;
     QGraphicsView* view;
     QPushButton* startButton;
     QPushButton* settlementButton;
+    QLabel* equipmentWarningLabel;
     BattleScene* game;
     battlesystem* battleSystem;
     QTimer* battleTimer;
     BattleResult pendingBattleResult;
     bool settlementActive;
     bool chestSettlementPending;
+    int pendingRewardEquipmentClaims = 0;
+    std::vector<BattleScene::EquipmentRewardVisual> pendingRewardEquipmentDrops;
     std::vector<std::unique_ptr<Character>> roster;
     std::vector<OwnedCharacterCard> rosterSignature;
+    std::unordered_map<int, int> unitIdToOwnedCardUid;
 };
 
 #endif // GUI_PAGES_BATTLEPAGE_H

@@ -1,35 +1,10 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include "entity/component/interactcomponent.h"
+#include "entity/component/spritecomponent.h"
 #include "entity/unit.h"
 #include <string>
-
-class ObjectRenderComponent {
-public:
-    ObjectRenderComponent(std::string closedImagePath = {}, std::string openImagePath = {});
-
-    const std::string& imagePath(bool opened) const;
-    void setImagePaths(std::string closedImagePath, std::string openImagePath);
-    bool isVisible() const { return visible; }
-    void setVisible(bool value) { visible = value; }
-
-private:
-    std::string closedPath;
-    std::string openPath;
-    bool visible = true;
-};
-
-class ObjectInteractComponent {
-public:
-    bool canInteract() const { return enabled && !used; }
-    bool tryInteract();
-    void setEnabled(bool value) { enabled = value; }
-    void reset();
-
-private:
-    bool enabled = true;
-    bool used = false;
-};
 
 class Object : public Unit
 {
@@ -41,17 +16,17 @@ public:
     const std::string& objectType() const { return objectTypeValue; }
     bool opened() const { return openedValue; }
     void open();
-    ObjectRenderComponent& render() { return renderComponent; }
-    const ObjectRenderComponent& render() const { return renderComponent; }
-    ObjectInteractComponent& interact() { return interactComponent; }
-    const ObjectInteractComponent& interact() const { return interactComponent; }
+    SpriteComponent& sprite() { return spriteComponent; }
+    const SpriteComponent& sprite() const { return spriteComponent; }
+    InteractComponent& interact() { return interactComponent; }
+    const InteractComponent& interact() const { return interactComponent; }
     void update(float deltatime, Board& board) override;
 
 private:
     std::string objectTypeValue;
     bool openedValue = false;
-    ObjectRenderComponent renderComponent;
-    ObjectInteractComponent interactComponent;
+    SpriteComponent spriteComponent;
+    InteractComponent interactComponent;
 };
 
 #endif // OBJECT_H

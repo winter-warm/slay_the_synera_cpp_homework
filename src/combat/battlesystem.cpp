@@ -1,5 +1,6 @@
 #include "battlesystem.h"
 #include "combat/buff/bufffactory.h"
+#include "combat/equipment/equipmentrepository.h"
 #include "entity/character/character.h"
 #include "entity/character/characterfactory.h"
 #include "entity/equipskill/equipskill.h"
@@ -20,8 +21,8 @@ bool battlesystem::loadBattle(const BattleConfig& config) {
     clear();
     currentBattleKind = config.kind;
 
-    if (!board.load(boardPathForId(config.boardId))) {
-        if (!board.load(boardPathForId("default_board"))) {
+    if (!board.load(boardPathForId(config.boardId), config.boardId)) {
+        if (!board.load(boardPathForId("default_board"), "default_board")) {
             emit boardChanged();
             return false;
         }
@@ -87,7 +88,10 @@ bool battlesystem::startFromPreparedUnits(const std::vector<CharacterPlacement>&
 
     for (const CharacterPlacement& placement : placements) {
         if (placement.source) {
-            addRecordFromSource(placement.source, placement.hex);
+            addRecordFromSource(placement.source, placement.hex,
+                                placement.hasEquipment,
+                                placement.equipmentGroup,
+                                placement.equipmentId);
         }
     }
 
@@ -142,15 +146,16 @@ void battlesystem::update(float deltaTime) {
     }
 
     std::vector<Character*> list;
-    list.reserve(characters.size());
-    for (auto& entry : characters) {
-        if (entry.second.character) {
-            list.push_back(entry.second.character.get());
+    for (Unit* unit : board.units()) {
+        Character* character = dynamic_cast<Character*>(unit);
+        if (character) {
+            list.push_back(character);
         }
     }
 
     for (Character* character : list) {
-        if (character && characters.find(character->id()) != characters.end()) {
+        Hex hex;
+        if (character && board.posOf(character, &hex)) {
             character->setCurrentBoard(&board);
             character->update(deltaTime, board);
         }
@@ -260,7 +265,23 @@ void battlesystem::addEquipmentBuffs(Character* character, const Character* sour
     equipskill::addEquipmentActiveSkills(character, *source->getquipe());
 }
 
-void battlesystem::addRecordFromSource(Character* source, const Hex& hex) {
+void battlesystem::addEquipmentBuffs(Character* character, EquipmentGroup group, int equipmentId) {
+    if (!character || equipmentId <= 0) {
+        return;
+    }
+    EquipmentRepository repository;
+    const auto equipment = group == EquipmentGroup::Advanced
+                               ? repository.findAdvanced(equipmentId)
+                               : repository.findBasic(group, equipmentId);
+    if (!equipment) {
+        return;
+    }
+    equipskill::addEquipmentStartBuffs(character, *equipment);
+    equipskill::addEquipmentActiveSkills(character, *equipment);
+}
+
+void battlesystem::addRecordFromSource(Character* source, const Hex& hex, bool hasEquipment,
+                                       EquipmentGroup equipmentGroup, int equipmentId) {
     if (!source) {
         return;
     }
@@ -268,7 +289,11 @@ void battlesystem::addRecordFromSource(Character* source, const Hex& hex) {
     auto copy = std::make_unique<Character>(*source);
     Character* character = copy.get();
     character->clearPosition();
-    addEquipmentBuffs(character, source);
+    if (hasEquipment) {
+        addEquipmentBuffs(character, equipmentGroup, equipmentId);
+    } else {
+        addEquipmentBuffs(character, source);
+    }
     character->getattack().activateAndRemoveBuffSkills();
     addAuraBuffs(character);
 
@@ -288,26 +313,34 @@ void battlesystem::addRecordFromSource(Character* source, const Hex& hex) {
 
 void battlesystem::removeDeadCharacters() {
     std::vector<int> deadIds;
-    for (auto& entry : characters) {
-        Character* character = entry.second.character.get();
+    for (Unit* unit : board.units()) {
+        Character* character = dynamic_cast<Character*>(unit);
         if (character && character->isdead()) {
-            deadIds.push_back(entry.first);
+            deadIds.push_back(character->id());
         }
     }
 
     for (int id : deadIds) {
         auto it = characters.find(id);
-        if (it == characters.end()) {
+        if (it != characters.end()) {
+            if (it->second.character) {
+                board.remove(it->second.character.get());
+            }
+            pcTeamIds.erase(id);
+            enemyTeamIds.erase(id);
+            characters.erase(it);
+            emit characterRemoved(id);
             continue;
         }
 
-        if (it->second.character) {
-            board.remove(it->second.character.get());
+        for (Unit* unit : board.units()) {
+            Character* character = dynamic_cast<Character*>(unit);
+            if (character && character->id() == id) {
+                board.remove(character);
+                emit characterRemoved(id);
+                break;
+            }
         }
-        pcTeamIds.erase(id);
-        enemyTeamIds.erase(id);
-        characters.erase(it);
-        emit characterRemoved(id);
     }
 }
 
@@ -315,11 +348,24 @@ void battlesystem::finishIfTeamDead() {
     if (!running) {
         return;
     }
-    if (!pcTeamIds.empty() && !enemyTeamIds.empty()) {
+    bool pcAlive = false;
+    bool enemyAlive = false;
+    for (Unit* unit : board.units()) {
+        Character* character = dynamic_cast<Character*>(unit);
+        if (!character || character->isdead()) {
+            continue;
+        }
+        if (character->getteam().getteam() == teams::enemy) {
+            enemyAlive = true;
+        } else {
+            pcAlive = true;
+        }
+    }
+    if (pcAlive && enemyAlive) {
         return;
     }
 
     running = false;
-    const bool pcAllDead = pcTeamIds.empty();
+    const bool pcAllDead = !pcAlive;
     emit battleEnded(pcAllDead);
 }

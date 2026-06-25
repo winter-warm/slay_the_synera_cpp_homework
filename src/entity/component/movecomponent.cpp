@@ -17,9 +17,15 @@ MoveComponent::MoveComponent(const MoveComponent& other, Character* owner):compo
     previousPathFinder = other.previousPathFinder;
     restoreTargetSelectorAfterSelection = other.restoreTargetSelectorAfterSelection;
     restorePathFinderAfterPath = other.restorePathFinderAfterPath;
+    moveLocks = other.moveLocks;
 }
 
 bool MoveComponent::update(Board& board) {
+    if(moveLocks > 0) {
+        path.clear();
+        return false;
+    }
+
     Hex selfHex;
     if(!board.posOf(owner, &selfHex)) {
         target = nullptr;

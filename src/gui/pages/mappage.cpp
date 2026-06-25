@@ -45,6 +45,7 @@ MapPage::MapPage(QWidget* parent)
     connect(hud, &GameHud::saveRequested, this, &MapPage::saveRequested);
     connect(hud, &GameHud::bagRequested, this, &MapPage::bagRequested);
     connect(hud, &GameHud::shopRequested, this, &MapPage::shopRequested);
+    connect(hud, &GameHud::equipmentRequested, this, &MapPage::equipmentRequested);
     connect(hud, &GameHud::returnToStartRequested, this, &MapPage::returnToStartRequested);
 }
 

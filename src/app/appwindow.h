@@ -5,8 +5,10 @@
 
 class BattlePage;
 class CardPanel;
+class EquipmentPanel;
 class EventPage;
 class GameManager;
+class QLabel;
 class QResizeEvent;
 class MapPage;
 class QStackedWidget;
@@ -22,6 +24,10 @@ protected:
     void resizeEvent(QResizeEvent* event) override;
 
 private:
+    BattlePage* ensureBattlePage();
+    void showCenterToast(const QString& text);
+    void positionCenterToast();
+
     GameManager* manager;
     QStackedWidget* stack;
     StartPage* startPage;
@@ -29,6 +35,8 @@ private:
     EventPage* eventPage;
     BattlePage* battlePage;
     CardPanel* cardPanel;
+    EquipmentPanel* equipmentPanel;
+    QLabel* centerToastLabel;
 };
 
 #endif // APP_APPWINDOW_H

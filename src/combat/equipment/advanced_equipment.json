@@ -14,8 +14,7 @@
         { "stat": "attack_percent", "value": 40 },
         { "stat": "crit_damage_percent", "value": 100 },
         { "stat": "crit_chance_percent", "value": 25 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 12,
@@ -31,8 +30,7 @@
         { "stat": "attack_percent", "value": 30 },
         { "stat": "attack_speed_percent", "value": 50 },
         { "stat": "dodge_chance_percent", "value": 50 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 13,
@@ -48,8 +46,7 @@
         { "stat": "attack_percent", "value": 18 },
         { "stat": "initial_mp_flat", "value": 4 },
         { "stat": "max_mp_flat", "value": -1 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 14,
@@ -65,8 +62,7 @@
         { "stat": "attack_percent", "value": 15 },
         { "stat": "crit_chance_percent", "value": 60 },
         { "stat": "dodge_chance_percent", "value": 30 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 15,
@@ -82,8 +78,7 @@
         { "stat": "attack_percent", "value": 18 },
         { "stat": "max_hp_percent", "value": 50 },
         { "stat": "healing_taken_percent", "value": 20 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 16,
@@ -99,8 +94,7 @@
         { "stat": "attack_percent", "value": 24 },
         { "stat": "crit_damage_percent", "value": 100 },
         { "stat": "initial_shield_max_hp_percent", "value": 10 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 21,
@@ -116,8 +110,7 @@
         { "stat": "attack_speed_percent", "value": 28 },
         { "stat": "attack_percent", "value": 12 },
         { "stat": "attack_range_flat", "value": 1 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 22,
@@ -132,8 +125,7 @@
       "modifiers": [
         { "stat": "attack_speed_percent", "value": 100 },
         { "stat": "attack_range_flat", "value": 1 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 23,
@@ -150,8 +142,7 @@
         { "stat": "attack_range_flat", "value": 1 },
         { "stat": "initial_mp_flat", "value": 3 },
         { "stat": "max_mp_flat", "value": -1 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 24,
@@ -168,8 +159,7 @@
         { "stat": "attack_range_flat", "value": 1 },
         { "stat": "crit_chance_percent", "value": 24 },
         { "stat": "dodge_chance_percent", "value": 20 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 25,
@@ -186,8 +176,7 @@
         { "stat": "attack_range_flat", "value": 1 },
         { "stat": "max_hp_percent", "value": 20 },
         { "stat": "healing_taken_percent", "value": 20 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 26,
@@ -204,8 +193,7 @@
         { "stat": "attack_range_flat", "value": 2 },
         { "stat": "crit_damage_percent", "value": 50 },
         { "stat": "initial_shield_max_hp_percent", "value": 10 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 31,
@@ -221,8 +209,7 @@
         { "stat": "crit_chance_percent", "value": 25 },
         { "stat": "crit_damage_percent", "value": 55 },
         { "stat": "attack_percent", "value": 8 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 32,
@@ -239,8 +226,7 @@
         { "stat": "crit_damage_percent", "value": 80 },
         { "stat": "attack_speed_percent", "value": 20 },
         { "stat": "dodge_chance_percent", "value": 30 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 33,
@@ -256,8 +242,7 @@
         { "stat": "crit_damage_percent", "value": 60 },
         { "stat": "initial_mp_flat", "value": 3 },
         { "stat": "max_mp_flat", "value": -1 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 34,
@@ -273,8 +258,7 @@
         { "stat": "crit_chance_percent", "value": 35 },
         { "stat": "crit_damage_percent", "value": 120 },
         { "stat": "dodge_chance_percent", "value": 10 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 35,
@@ -290,8 +274,7 @@
         { "stat": "crit_chance_percent", "value": 22 },
         { "stat": "crit_damage_percent", "value": 80 },
         { "stat": "max_hp_percent", "value": 18 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 36,
@@ -307,8 +290,7 @@
         { "stat": "crit_chance_percent", "value": 70 },
         { "stat": "crit_damage_percent", "value": 150 },
         { "stat": "max_hp_percent", "value": -50 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 41,
@@ -324,8 +306,7 @@
         { "stat": "initial_mp_flat", "value": 5 },
         { "stat": "max_mp_flat", "value": -1 },
         { "stat": "crit_damage_percent", "value": 60 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 42,
@@ -342,8 +323,7 @@
         { "stat": "max_mp_flat", "value": -1 },
         { "stat": "attack_speed_percent", "value": 18 },
         { "stat": "dodge_chance_percent", "value": 20 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 43,
@@ -358,8 +338,7 @@
       "modifiers": [
         { "stat": "initial_mp_flat", "value": 7 },
         { "stat": "max_mp_flat", "value": -2 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 44,
@@ -376,8 +355,7 @@
         { "stat": "max_mp_flat", "value": -1 },
         { "stat": "crit_chance_percent", "value": 30 },
         { "stat": "dodge_chance_percent", "value": 20 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 45,
@@ -393,8 +371,7 @@
         { "stat": "initial_mp_flat", "value": 4 },
         { "stat": "max_mp_flat", "value": -1 },
         { "stat": "max_hp_percent", "value": 20 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 46,
@@ -411,8 +388,7 @@
         { "stat": "max_mp_flat", "value": -1 },
         { "stat": "crit_damage_percent", "value": 50 },
         { "stat": "initial_shield_max_hp_percent", "value": 20 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 51,
@@ -427,8 +403,7 @@
       "modifiers": [
         { "stat": "healing_done_percent", "value": 50 },
         { "stat": "attack_percent", "value": 20 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 52,
@@ -444,8 +419,7 @@
         { "stat": "healing_done_percent", "value": 30 },
         { "stat": "dodge_chance_percent", "value": 20 },
         { "stat": "attack_speed_percent", "value": 30 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 53,
@@ -461,8 +435,7 @@
         { "stat": "healing_done_percent", "value": 22 },
         { "stat": "initial_mp_flat", "value": 5 },
         { "stat": "max_mp_flat", "value": -1 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 54,
@@ -477,8 +450,7 @@
       "modifiers": [
         { "stat": "healing_done_percent", "value": 18 },
         { "stat": "crit_chance_percent", "value": 10 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 55,
@@ -494,8 +466,7 @@
         { "stat": "healing_done_percent", "value": 50 },
         { "stat": "max_hp_percent", "value": 50 },
         { "stat": "healing_taken_percent", "value": 50 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 56,
@@ -511,8 +482,7 @@
         { "stat": "healing_done_percent", "value": 30 },
         { "stat": "initial_shield_max_hp_percent", "value": 30 },
         { "stat": "crit_damage_percent", "value": 20 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 61,
@@ -528,8 +498,7 @@
         { "stat": "initial_shield_max_hp_percent", "value": 35 },
         { "stat": "max_hp_percent", "value": 20 },
         { "stat": "attack_percent", "value": 8 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 62,
@@ -545,8 +514,7 @@
         { "stat": "initial_shield_max_hp_percent", "value": 40 },
         { "stat": "max_hp_percent", "value": 20 },
         { "stat": "defense_percent", "value": 50 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 63,
@@ -563,8 +531,7 @@
         { "stat": "max_hp_percent", "value": 15 },
         { "stat": "initial_mp_flat", "value": 3 },
         { "stat": "max_mp_flat", "value": -1 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 64,
@@ -581,8 +548,7 @@
         { "stat": "max_hp_percent", "value": 12 },
         { "stat": "crit_chance_percent", "value": 30 },
         { "stat": "dodge_chance_percent", "value": 10 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 65,
@@ -597,8 +563,7 @@
       "modifiers": [
         { "stat": "initial_shield_max_hp_percent", "value": 34 },
         { "stat": "max_hp_percent", "value": 28 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 66,
@@ -614,8 +579,7 @@
         { "stat": "initial_shield_max_hp_percent", "value": 42 },
         { "stat": "max_hp_percent", "value": 18 },
         { "stat": "crit_damage_percent", "value": 20 }
-      ],
-      "buffIds": []
+      ]
     }
   ]
 }

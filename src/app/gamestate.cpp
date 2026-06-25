@@ -1,6 +1,7 @@
 #include "gamestate.h"
 #include <QJsonArray>
 #include <QString>
+#include <algorithm>
 #include <vector>
 
 static QJsonArray intsToJson(const std::vector<int>& values) {
@@ -438,6 +439,7 @@ static QJsonObject ownedCharacterCardToJson(const OwnedCharacterCard& card) {
     QJsonObject object;
     object["templateId"] = card.templateId;
     object["starLevel"] = card.starLevel;
+    object["uid"] = card.uid;
     return object;
 }
 
@@ -445,6 +447,7 @@ static OwnedCharacterCard ownedCharacterCardFromJson(const QJsonObject& object) 
     OwnedCharacterCard card;
     card.templateId = object.value("templateId").toInt();
     card.starLevel = object.value("starLevel").toInt(1);
+    card.uid = object.value("uid").toInt(0);
     if (card.starLevel < 1) {
         card.starLevel = 1;
     }
@@ -452,6 +455,31 @@ static OwnedCharacterCard ownedCharacterCardFromJson(const QJsonObject& object) 
         card.starLevel = 3;
     }
     return card;
+}
+
+static QJsonObject ownedEquipmentToJson(const OwnedEquipment& equipment) {
+    QJsonObject object;
+    object["instanceId"] = equipment.instanceId;
+    object["group"] = static_cast<int>(equipment.group);
+    object["equipmentId"] = equipment.equipmentId;
+    object["equippedCardUid"] = equipment.equippedCardUid;
+    return object;
+}
+
+static OwnedEquipment ownedEquipmentFromJson(const QJsonObject& object) {
+    OwnedEquipment equipment;
+    equipment.instanceId = object.value("instanceId").toInt(0);
+    const int groupValue = object.value("group").toInt(static_cast<int>(EquipmentGroup::Mold));
+    if (groupValue == static_cast<int>(EquipmentGroup::Element)) {
+        equipment.group = EquipmentGroup::Element;
+    } else if (groupValue == static_cast<int>(EquipmentGroup::Advanced)) {
+        equipment.group = EquipmentGroup::Advanced;
+    } else {
+        equipment.group = EquipmentGroup::Mold;
+    }
+    equipment.equipmentId = object.value("equipmentId").toInt(0);
+    equipment.equippedCardUid = object.value("equippedCardUid").toInt(-1);
+    return equipment;
 }
 
 static QJsonObject shopOfferToJson(const ShopOffer& offer) {
@@ -550,6 +578,13 @@ QJsonObject GameState::toJson() const {
         ownedCards.append(ownedCharacterCardToJson(card));
     }
     object["ownedCharacterCards"] = ownedCards;
+    QJsonArray equipmentArray;
+    for (const OwnedEquipment& equipment : ownedEquipment) {
+        equipmentArray.append(ownedEquipmentToJson(equipment));
+    }
+    object["ownedEquipment"] = equipmentArray;
+    object["nextOwnedCardUid"] = nextOwnedCardUid;
+    object["nextEquipmentInstanceId"] = nextEquipmentInstanceId;
     object["shop"] = shopStateToJson(shop);
     return object;
 }
@@ -586,8 +621,14 @@ GameState GameState::fromJson(const QJsonObject& object) {
             state.ownedCharacterCards.push_back(card);
         }
     }
-    if (state.ownedCharacterCards.empty()) {
-        state.ownedCharacterCards.push_back({1209, 1});
+    state.nextOwnedCardUid = object.value("nextOwnedCardUid").toInt(1);
+    const QJsonArray equipmentArray = object.value("ownedEquipment").toArray();
+    state.nextEquipmentInstanceId = object.value("nextEquipmentInstanceId").toInt(1);
+    for (const QJsonValue& value : equipmentArray) {
+        OwnedEquipment equipment = ownedEquipmentFromJson(value.toObject());
+        if (equipment.instanceId > 0 && equipment.equipmentId > 0) {
+            state.ownedEquipment.push_back(equipment);
+        }
     }
     state.shop = shopStateFromJson(object.value("shop").toObject());
     return state;

@@ -10,8 +10,7 @@
       "modifiers": [
         { "stat": "attack_percent", "value": 10 },
         { "stat": "crit_chance_percent", "value": 20 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 2,
@@ -23,8 +22,7 @@
       "modifiers": [
         { "stat": "attack_speed_percent", "value": 15 },
         { "stat": "attack_range_flat", "value": 1 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 3,
@@ -36,8 +34,7 @@
       "modifiers": [
         { "stat": "crit_chance_percent", "value": 40 },
         { "stat": "crit_damage_percent", "value": 100 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 4,
@@ -49,8 +46,7 @@
       "modifiers": [
         { "stat": "initial_mp_flat", "value": 3 },
         { "stat": "max_mp_flat", "value": -1 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 5,
@@ -62,8 +58,7 @@
       "modifiers": [
         { "stat": "healing_done_percent", "value": 30 },
         { "stat": "max_hp_percent", "value": 8 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 6,
@@ -75,8 +70,7 @@
       "modifiers": [
         { "stat": "initial_shield_max_hp_percent", "value": 20 },
         { "stat": "max_hp_percent", "value": 20 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 1,
@@ -88,8 +82,7 @@
       "modifiers": [
         { "stat": "attack_percent", "value": 10 },
         { "stat": "crit_damage_percent", "value": 60 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 2,
@@ -101,8 +94,7 @@
       "modifiers": [
         { "stat": "attack_speed_percent", "value": 30 },
         { "stat": "dodge_chance_percent", "value": 40 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 3,
@@ -114,8 +106,7 @@
       "modifiers": [
         { "stat": "initial_mp_flat", "value": 2 },
         { "stat": "max_mp_flat", "value": -1 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 4,
@@ -127,8 +118,7 @@
       "modifiers": [
         { "stat": "crit_chance_percent", "value": 20 },
         { "stat": "dodge_chance_percent", "value": 20 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 5,
@@ -140,8 +130,7 @@
       "modifiers": [
         { "stat": "max_hp_percent", "value": 30 },
         { "stat": "healing_taken_percent", "value": 20 }
-      ],
-      "buffIds": []
+      ]
     },
     {
       "id": 6,
@@ -153,8 +142,7 @@
       "modifiers": [
         { "stat": "crit_damage_percent", "value": 50 },
         { "stat": "initial_shield_max_hp_percent", "value": 10 }
-      ],
-      "buffIds": []
+      ]
     }
   ]
 }

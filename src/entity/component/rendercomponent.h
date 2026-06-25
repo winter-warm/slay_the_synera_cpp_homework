@@ -5,21 +5,16 @@
 
 #include <vector>
 
-class CharacterHUD;
-
 class RenderComponent : public component
 {
 private:
     bool visible = true;
-    CharacterHUD* hud = nullptr;
     int pendingHitFlashCount = 0;
     int pendingSkillBurstCount = 0;
     std::vector<int> pendingAttackLungeTargets;
 public:
     RenderComponent(Character* owner);
     RenderComponent(const RenderComponent& other,Character* owner);
-    void bindHUD(CharacterHUD* characterHUD);
-    CharacterHUD* getHUD() const;
     void setVisible(bool value);
     void show();
     void hide();

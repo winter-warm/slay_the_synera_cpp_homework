@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include "combat/equipment/equipment.h"
 
 struct HexTechCardRecord {
     std::string hexTechId;
@@ -16,6 +17,14 @@ struct HexTechCardRecord {
 struct OwnedCharacterCard {
     int templateId = 0;
     int starLevel = 1;
+    int uid = 0;
+};
+
+struct OwnedEquipment {
+    int instanceId = 0;
+    EquipmentGroup group = EquipmentGroup::Mold;
+    int equipmentId = 0;
+    int equippedCardUid = -1;
 };
 
 struct ShopOffer {

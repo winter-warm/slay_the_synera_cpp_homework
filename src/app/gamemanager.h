@@ -42,8 +42,12 @@ public slots:
     void finishBattle(const BattleResult& result = {});
     void startPreparedBattle(const std::vector<CharacterPlacement>& placements);
     void grantBattleChestGold(int gold);
+    void grantBattleChestEquipment(EquipmentGroup group, int equipmentId);
     void buyShopOffer(int offerIndex);
     void mergeOwnedCharacterCards(int firstIndex, int secondIndex);
+    void unequipAllEquipment();
+    void composeEquipment(int firstInstanceId, int secondInstanceId);
+    void equipEquipmentToCard(int equipmentInstanceId, int ownedCardUid);
     void pauseElapsedTimer();
 
 signals:
@@ -55,6 +59,7 @@ signals:
     void gameCompletedRequested();
     void gameOverRequested();
     void messageRequested(const QString& title, const QString& message);
+    void centerToastRequested(const QString& text);
 
 private:
     void setState(const GameState& state);
@@ -69,6 +74,11 @@ private:
     void loadRestEvent();
     void finishRestEvent();
     void grantRandomEquipmentFromRest();
+    OwnedCharacterCard makeOwnedCharacterCard(int templateId, int starLevel);
+    OwnedEquipment makeOwnedEquipment(EquipmentGroup group, int equipmentId);
+    OwnedEquipment* findOwnedEquipment(int instanceId);
+    const OwnedEquipment* findOwnedEquipment(int instanceId) const;
+    bool isRestEventActive() const;
     void startBattle(const BattleConfig& config);
     void ensureCardEconomyInitialized();
     void refreshShopOffers();

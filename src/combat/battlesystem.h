@@ -3,6 +3,7 @@
 
 #include "core/board.h"
 #include "core/hex.h"
+#include "combat/equipment/equipment.h"
 #include "entity/component/teamcomponent.h"
 #include "world/aura/aura.h"
 #include "world/event/eventtypes.h"
@@ -17,6 +18,9 @@ class Character;
 struct CharacterPlacement {
     Character* source = nullptr;
     Hex hex;
+    bool hasEquipment = false;
+    EquipmentGroup equipmentGroup = EquipmentGroup::Mold;
+    int equipmentId = 0;
 };
 
 struct CharacterRecord {
@@ -55,7 +59,9 @@ private:
     void applyStatMultiplier(Character* character, float multiplier);
     void addAuraBuffs(Character* character);
     void addEquipmentBuffs(Character* character, const Character* source);
-    void addRecordFromSource(Character* source, const Hex& hex);
+    void addEquipmentBuffs(Character* character, EquipmentGroup group, int equipmentId);
+    void addRecordFromSource(Character* source, const Hex& hex, bool hasEquipment = false,
+                             EquipmentGroup equipmentGroup = EquipmentGroup::Mold, int equipmentId = 0);
     void removeDeadCharacters();
     void finishIfTeamDead();
 

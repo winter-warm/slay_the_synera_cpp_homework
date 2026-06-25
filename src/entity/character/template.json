@@ -328,39 +328,1513 @@
       ]
     },
     {
-      "templateId": 1002,
-      "name": "goblin",
+      "templateId": 1301,
+      "name": "alley_thug",
+      "displayName": "巷口混混",
+      "magicName": "街头乱拳",
+      "skillDescription": "每第4次攻击造成额外伤害。",
+      "rarity": 1,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 115,
+        "maxMp": 99,
+        "attack": 17,
+        "defense": 3,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "StreetBrawl",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 1302,
+      "name": "tavern_bouncer",
+      "displayName": "酒馆打手",
+      "magicName": "反击 / 举桌防御",
+      "skillDescription": "受击后反击；满MP获得护盾。",
+      "rarity": 1,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 170,
+        "maxMp": 5,
+        "attack": 15,
+        "defense": 8,
+        "range": 1,
+        "shield": 25
+      },
+      "defaultSkills": [
+        {
+          "name": "ShieldBreakCounter",
+          "is_buff": true
+        },
+        {
+          "name": "TableGuard",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1303,
+      "name": "pickpocket",
+      "displayName": "小偷",
+      "magicName": "顺手牵羊",
+      "skillDescription": "削弱目标攻击并强化自己。",
+      "rarity": 1,
+      "bonds": [
+        "assassin"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 95,
+        "maxMp": 6,
+        "attack": 16,
+        "defense": 2,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "Pickpocket",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1304,
+      "name": "vagrant_archer",
+      "displayName": "流浪弓手",
+      "magicName": "专注射击",
+      "skillDescription": "连续攻击同一目标时伤害提高。",
+      "rarity": 1,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 105,
+        "maxMp": 99,
+        "attack": 19,
+        "defense": 2,
+        "range": 3,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "FocusShot",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 1305,
+      "name": "trainee_swordsman",
+      "displayName": "见习剑士",
+      "magicName": "冒险者热血",
+      "skillDescription": "满MP后下一击造成高额伤害。",
+      "rarity": 1,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 135,
+        "maxMp": 10,
+        "attack": 20,
+        "defense": 5,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "AdventurerHeat",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1306,
+      "name": "watch_crossbowman",
+      "displayName": "治安弩手",
+      "magicName": "压制射击",
+      "skillDescription": "攻击低生命目标时造成额外伤害。",
+      "rarity": 1,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 105,
+        "maxMp": 99,
+        "attack": 22,
+        "defense": 2,
+        "range": 4,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "SuppressiveShot",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 1307,
+      "name": "training_dummy",
+      "displayName": "训练木人",
+      "magicName": "练习靶子",
+      "skillDescription": "受击时获得护盾。",
+      "rarity": 1,
+      "bonds": [
+        "building"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 250,
+        "maxMp": 99,
+        "attack": 3,
+        "defense": 15,
+        "range": 1,
+        "shield": 45
+      },
+      "defaultSkills": [
+        {
+          "name": "TrainingDummy",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 1308,
+      "name": "city_arrow_tower",
+      "displayName": "城镇箭塔",
+      "magicName": "连射机关",
+      "skillDescription": "满MP额外射击一次。",
+      "rarity": 1,
+      "bonds": [
+        "building"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 95,
+        "maxMp": 3,
+        "attack": 25,
+        "defense": 6,
+        "range": 5,
+        "shield": 20
+      },
+      "defaultSkills": [
+        {
+          "name": "ArrowTowerBurst",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1309,
+      "name": "clockwork_soldier",
+      "displayName": "发条小兵",
+      "magicName": "发条过载",
+      "skillDescription": "生命较低时攻击更强。",
+      "rarity": 1,
+      "bonds": [
+        "building"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 125,
+        "maxMp": 99,
+        "attack": 18,
+        "defense": 5,
+        "range": 1,
+        "shield": 12
+      },
+      "defaultSkills": [
+        {
+          "name": "ClockworkOverload",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 1310,
+      "name": "street_sweeper_bot",
+      "displayName": "扫街机器人",
+      "magicName": "清扫模式",
+      "skillDescription": "满MP翻倍当前护盾。",
+      "rarity": 1,
+      "bonds": [
+        "building"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 165,
+        "maxMp": 5,
+        "attack": 13,
+        "defense": 8,
+        "range": 1,
+        "shield": 35
+      },
+      "defaultSkills": [
+        {
+          "name": "CleaningMode",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1401,
+      "name": "iron_baton_enforcer",
+      "displayName": "铁棍打手",
+      "magicName": "强行开路",
+      "skillDescription": "战斗开始时提高攻击。",
+      "rarity": 2,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 285,
+        "maxMp": 99,
+        "attack": 25,
+        "defense": 10,
+        "range": 1,
+        "shield": 70
+      },
+      "defaultSkills": [
+        {
+          "name": "ForceThrough",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 1402,
+      "name": "black_alley_assassin",
+      "displayName": "黑巷刺客",
+      "magicName": "背巷伏击",
+      "skillDescription": "战斗开始时攻击强化。",
+      "rarity": 2,
+      "bonds": [
+        "assassin"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 185,
+        "maxMp": 99,
+        "attack": 32,
+        "defense": 4,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "AlleyAmbush",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 1403,
+      "name": "mechanical_guard_captain",
+      "displayName": "机械守卫队长",
+      "magicName": "指挥信号",
+      "skillDescription": "满MP强化友方单位。",
+      "rarity": 2,
+      "bonds": [
+        "building"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 275,
+        "maxMp": 12,
+        "attack": 28,
+        "defense": 8,
+        "range": 2,
+        "shield": 45
+      },
+      "defaultSkills": [
+        {
+          "name": "GuardCaptainSignal",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1404,
+      "name": "heavy_city_cannon",
+      "displayName": "重型城防炮",
+      "magicName": "装填炮击",
+      "skillDescription": "满MP对目标邻格造成范围伤害。",
+      "rarity": 2,
+      "bonds": [
+        "building"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 320,
+        "maxMp": 16,
+        "attack": 44,
+        "defense": 12,
+        "range": 5,
+        "shield": 95
+      },
+      "defaultSkills": [
+        {
+          "name": "HeavyCannonShot",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1501,
+      "name": "trial_guardian",
+      "displayName": "试炼盾卫",
+      "magicName": "守护壁垒",
+      "skillDescription": "开局为友方提供护盾。",
+      "rarity": 3,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 350,
+        "maxMp": 99,
+        "attack": 24,
+        "defense": 14,
+        "range": 1,
+        "shield": 110
+      },
+      "defaultSkills": [
+        {
+          "name": "GuardianWall",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 1502,
+      "name": "trial_archer",
+      "displayName": "试炼弓手",
+      "magicName": "锁定射击",
+      "skillDescription": "满MP造成高额单体伤害。",
+      "rarity": 3,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 220,
+        "maxMp": 10,
+        "attack": 35,
+        "defense": 5,
+        "range": 4,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "LockShot",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1503,
+      "name": "trial_priest",
+      "displayName": "试炼牧师",
+      "magicName": "治愈祷言",
+      "skillDescription": "满MP治疗生命最低友方。",
+      "rarity": 3,
+      "bonds": [
+        "pastor"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 240,
+        "maxMp": 14,
+        "attack": 18,
+        "defense": 6,
+        "range": 3,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "HealingPrayer",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 2001,
+      "name": "forest_wolf",
+      "displayName": "森林狼",
+      "magicName": "群猎本能",
+      "skillDescription": "友方越多攻击越强。",
+      "rarity": 1,
+      "bonds": [
+        "beast"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 170,
+        "maxMp": 99,
+        "attack": 25,
+        "defense": 4,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "PackHunter",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 2002,
+      "name": "wild_boar",
+      "displayName": "野猪",
+      "magicName": "野蛮冲撞",
+      "skillDescription": "开局获得护盾和攻击。",
+      "rarity": 1,
+      "bonds": [
+        "beast"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 255,
+        "maxMp": 99,
+        "attack": 22,
+        "defense": 9,
+        "range": 1,
+        "shield": 15
+      },
+      "defaultSkills": [
+        {
+          "name": "BoarCharge",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 2003,
+      "name": "young_poison_vine",
+      "displayName": "毒藤幼株",
+      "magicName": "缠绕根须",
+      "skillDescription": "满MP控制目标。",
+      "rarity": 1,
+      "bonds": [
+        "mage"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 150,
+        "maxMp": 8,
+        "attack": 18,
+        "defense": 4,
+        "range": 3,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "RootSnare",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 2004,
+      "name": "woodland_archer",
+      "displayName": "林地射手",
+      "magicName": "隐蔽射击",
+      "skillDescription": "首次攻击伤害提升。",
+      "rarity": 1,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 150,
+        "maxMp": 99,
+        "attack": 31,
+        "defense": 3,
+        "range": 4,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "HiddenShot",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 2005,
+      "name": "mushroom_sprite",
+      "displayName": "蘑菇怪",
+      "magicName": "孢子治疗",
+      "skillDescription": "死亡时治疗周围友方。",
+      "rarity": 1,
+      "bonds": [
+        "pastor"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 145,
+        "maxMp": 99,
+        "attack": 16,
+        "defense": 3,
+        "range": 2,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "SporeHeal",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 2006,
+      "name": "goblin_grunt",
+      "displayName": "哥布林小兵",
+      "magicName": "掠夺本能",
+      "skillDescription": "攻击低血目标更强。",
+      "rarity": 1,
+      "bonds": [
+        "beast"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 165,
+        "maxMp": 99,
+        "attack": 24,
+        "defense": 5,
+        "range": 1,
+        "shield": 6
+      },
+      "defaultSkills": [
+        {
+          "name": "GoblinPlunder",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 2007,
+      "name": "goblin_spearman",
+      "displayName": "哥布林投矛手",
+      "magicName": "乱投长矛",
+      "skillDescription": "满MP造成目标邻格溅射伤害。",
+      "rarity": 1,
+      "bonds": [
+        "beast"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 135,
+        "maxMp": 8,
+        "attack": 29,
+        "defense": 3,
+        "range": 3,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "GoblinSpearSplash",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 2008,
+      "name": "goblin_bomber",
+      "displayName": "哥布林炸弹客",
+      "magicName": "不稳定炸弹",
+      "skillDescription": "满MP造成范围爆炸。",
+      "rarity": 1,
       "bonds": [
         "beast"
       ],
       "team": "enemy",
       "baseStats": {
         "maxHp": 120,
-        "maxMp": 10,
-        "attack": 10,
-        "defense": 6,
-        "shield": 10
+        "maxMp": 9,
+        "attack": 35,
+        "defense": 2,
+        "range": 3,
+        "shield": 0
       },
       "defaultSkills": [
         {
-          "name": "Savage",
+          "name": "GoblinBomb",
           "is_buff": false
         }
       ]
     },
     {
-      "templateId": 1101,
+      "templateId": 2009,
+      "name": "goblin_drummer",
+      "displayName": "哥布林鼓手",
+      "magicName": "混乱鼓点",
+      "skillDescription": "周期性强化友方。",
+      "rarity": 1,
+      "bonds": [
+        "beast"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 135,
+        "maxMp": 99,
+        "attack": 14,
+        "defense": 4,
+        "range": 2,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "GoblinDrums",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 2010,
+      "name": "flower_fae",
+      "displayName": "花妖",
+      "magicName": "花粉治愈",
+      "skillDescription": "满MP治疗友方。",
+      "rarity": 1,
+      "bonds": [
+        "mage"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 125,
+        "maxMp": 10,
+        "attack": 27,
+        "defense": 3,
+        "range": 3,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "PollenHeal",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 2011,
+      "name": "thorn_treant",
+      "displayName": "荆棘树人",
+      "magicName": "荆棘反甲",
+      "skillDescription": "受击时反弹部分伤害。",
+      "rarity": 1,
+      "bonds": [
+        "beast"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 305,
+        "maxMp": 99,
+        "attack": 19,
+        "defense": 12,
+        "range": 1,
+        "shield": 25
+      },
+      "defaultSkills": [
+        {
+          "name": "ThornArmor",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 2012,
+      "name": "blue_moss_slime",
+      "displayName": "蓝苔史莱姆",
+      "magicName": "分裂再生",
+      "skillDescription": "死亡时召唤一个小史莱姆。",
+      "rarity": 1,
+      "bonds": [
+        "beast"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 210,
+        "maxMp": 99,
+        "attack": 18,
+        "defense": 6,
+        "range": 1,
+        "shield": 10
+      },
+      "defaultSkills": [
+        {
+          "name": "SlimeSplit",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 2101,
+      "name": "goblin_chief",
+      "displayName": "哥布林酋长",
+      "magicName": "部落号令",
+      "skillDescription": "满MP强化友方。",
+      "rarity": 2,
+      "bonds": [
+        "beast"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 380,
+        "maxMp": 12,
+        "attack": 38,
+        "defense": 9,
+        "range": 1,
+        "shield": 25
+      },
+      "defaultSkills": [
+        {
+          "name": "GoblinCommand",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 2102,
+      "name": "goblin_alchemist",
+      "displayName": "哥布林炼金师",
+      "magicName": "混乱药剂",
+      "skillDescription": "满MP随机治疗、加盾或加攻。",
+      "rarity": 2,
+      "bonds": [
+        "mage"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 260,
+        "maxMp": 10,
+        "attack": 32,
+        "defense": 5,
+        "range": 3,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "GoblinAlchemy",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 2103,
+      "name": "silver_mane_alpha",
+      "displayName": "银鬃狼王",
+      "magicName": "狼群统领",
+      "skillDescription": "满MP强化友方。",
+      "rarity": 2,
+      "bonds": [
+        "beast"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 330,
+        "maxMp": 12,
+        "attack": 36,
+        "defense": 8,
+        "range": 1,
+        "shield": 15
+      },
+      "defaultSkills": [
+        {
+          "name": "WolfKingAura",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 2104,
+      "name": "ancient_tree_guard",
+      "displayName": "古树卫士",
+      "magicName": "年轮守护",
+      "skillDescription": "受击后获得护盾。",
+      "rarity": 2,
+      "bonds": [
+        "beast"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 500,
+        "maxMp": 99,
+        "attack": 28,
+        "defense": 15,
+        "range": 1,
+        "shield": 55
+      },
+      "defaultSkills": [
+        {
+          "name": "AncientGuard",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 2105,
+      "name": "vinespeaker_priest",
+      "displayName": "魔藤祭司",
+      "magicName": "森林审判",
+      "skillDescription": "满MP削弱目标攻击。",
+      "rarity": 2,
+      "bonds": [
+        "mage"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 310,
+        "maxMp": 12,
+        "attack": 26,
+        "defense": 7,
+        "range": 3,
+        "shield": 10
+      },
+      "defaultSkills": [
+        {
+          "name": "VineJudgement",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 2201,
+      "name": "moon_deer_spirit",
+      "displayName": "月神鹿灵",
+      "magicName": "月光祝福 / 引渡",
+      "skillDescription": "满MP治疗护盾友方，并召唤哥布林。",
+      "rarity": 3,
+      "bonds": [
+        "beast"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 620,
+        "maxMp": 14,
+        "attack": 40,
+        "defense": 12,
+        "range": 3,
+        "shield": 80
+      },
+      "defaultSkills": [
+        {
+          "name": "MoonBlessing",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 3001,
+      "name": "skeleton_soldier",
+      "displayName": "骷髅兵",
+      "magicName": "碎骨重组",
+      "skillDescription": "死亡时复活一次。",
+      "rarity": 1,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 190,
+        "maxMp": 99,
+        "attack": 36,
+        "defense": 5,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "BoneReform",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 3002,
+      "name": "skeleton_archer",
+      "displayName": "骷髅弓手",
+      "magicName": "骨箭诅咒",
+      "skillDescription": "满MP削弱目标攻击。",
+      "rarity": 1,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 190,
+        "maxMp": 8,
+        "attack": 41,
+        "defense": 4,
+        "range": 4,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "BoneCurse",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 3003,
+      "name": "ghost",
+      "displayName": "幽灵",
+      "magicName": "虚体穿透",
+      "skillDescription": "满MP攻击目标邻格敌人。",
+      "rarity": 1,
+      "bonds": [
+        "assassin"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 180,
+        "maxMp": 8,
+        "attack": 34,
+        "defense": 4,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "GhostPierce",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 3004,
+      "name": "gargoyle_servant",
+      "displayName": "石像仆从",
+      "magicName": "石肤防御",
+      "skillDescription": "受击后获得护盾。",
+      "rarity": 1,
+      "bonds": [
+        "building"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 420,
+        "maxMp": 99,
+        "attack": 27,
+        "defense": 14,
+        "range": 1,
+        "shield": 45
+      },
+      "defaultSkills": [
+        {
+          "name": "StoneSkin",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 3005,
+      "name": "cursed_bat",
+      "displayName": "诅咒蝙蝠",
+      "magicName": "吸血尖叫",
+      "skillDescription": "攻击后恢复生命。",
+      "rarity": 1,
+      "bonds": [
+        "beast"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 180,
+        "maxMp": 99,
+        "attack": 28,
+        "defense": 3,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "BatLifesteal",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 3006,
+      "name": "portrait_guardian",
+      "displayName": "画像守卫",
+      "magicName": "画中袭击",
+      "skillDescription": "满MP控制目标。",
+      "rarity": 1,
+      "bonds": [
+        "building"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 300,
+        "maxMp": 10,
+        "attack": 38,
+        "defense": 7,
+        "range": 3,
+        "shield": 15
+      },
+      "defaultSkills": [
+        {
+          "name": "PortraitStun",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 3007,
+      "name": "magic_broom",
+      "displayName": "魔法扫帚",
+      "magicName": "高速清扫",
+      "skillDescription": "每第3次攻击造成额外伤害。",
+      "rarity": 1,
+      "bonds": [
+        "building"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 210,
+        "maxMp": 99,
+        "attack": 30,
+        "defense": 5,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "BroomFlurry",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 3008,
+      "name": "biting_book",
+      "displayName": "会咬人的书",
+      "magicName": "禁忌翻页",
+      "skillDescription": "满MP强化下一次攻击。",
+      "rarity": 1,
+      "bonds": [
+        "mage"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 200,
+        "maxMp": 7,
+        "attack": 32,
+        "defense": 4,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "ForbiddenPage",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 3009,
+      "name": "pumpkin_bomber",
+      "displayName": "南瓜炸弹怪",
+      "magicName": "爆裂惊吓",
+      "skillDescription": "满MP范围爆炸。",
+      "rarity": 1,
+      "bonds": [
+        "beast"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 170,
+        "maxMp": 9,
+        "attack": 45,
+        "defense": 3,
+        "range": 2,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "PumpkinBomb",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 3010,
+      "name": "potion_slime",
+      "displayName": "魔药史莱姆",
+      "magicName": "随机药剂",
+      "skillDescription": "满MP随机治疗、加盾或加攻。",
+      "rarity": 1,
+      "bonds": [
+        "mage"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 280,
+        "maxMp": 10,
+        "attack": 24,
+        "defense": 7,
+        "range": 2,
+        "shield": 15
+      },
+      "defaultSkills": [
+        {
+          "name": "PotionSlime",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 3011,
+      "name": "cursed_doll",
+      "displayName": "诅咒人偶",
+      "magicName": "精神诅咒",
+      "skillDescription": "满MP降低目标攻击。",
+      "rarity": 1,
+      "bonds": [
+        "mage"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 220,
+        "maxMp": 10,
+        "attack": 28,
+        "defense": 5,
+        "range": 3,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "DollCurse",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 3012,
+      "name": "clockwork_knight",
+      "displayName": "发条骑士",
+      "magicName": "机械过载",
+      "skillDescription": "低血时攻击更强。",
+      "rarity": 1,
+      "bonds": [
+        "building"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 330,
+        "maxMp": 99,
+        "attack": 40,
+        "defense": 10,
+        "range": 1,
+        "shield": 25
+      },
+      "defaultSkills": [
+        {
+          "name": "ClockworkKnightOverload",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 3013,
+      "name": "crystal_eye",
+      "displayName": "水晶眼球",
+      "magicName": "魔法射线",
+      "skillDescription": "满MP高伤单体攻击。",
+      "rarity": 1,
+      "bonds": [
+        "mage"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 190,
+        "maxMp": 8,
+        "attack": 46,
+        "defense": 3,
+        "range": 4,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "CrystalBeam",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 3014,
+      "name": "flame_wyrmling",
+      "displayName": "火焰幼龙",
+      "magicName": "幼龙吐息",
+      "skillDescription": "满MP范围火焰攻击。",
+      "rarity": 1,
+      "bonds": [
+        "beast"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 240,
+        "maxMp": 9,
+        "attack": 42,
+        "defense": 7,
+        "range": 3,
+        "shield": 10
+      },
+      "defaultSkills": [
+        {
+          "name": "WyrmlingBreath",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 3015,
+      "name": "mimic_chest",
+      "displayName": "宝箱怪",
+      "magicName": "伪装宝箱",
+      "skillDescription": "受伤低血后强化自身。",
+      "rarity": 1,
+      "bonds": [
+        "beast"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 360,
+        "maxMp": 99,
+        "attack": 34,
+        "defense": 9,
+        "range": 1,
+        "shield": 25
+      },
+      "defaultSkills": [
+        {
+          "name": "MimicChestRage",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 3101,
+      "name": "black_iron_knight",
+      "displayName": "黑甲骑士",
+      "magicName": "黑铁守护",
+      "skillDescription": "受击后获得护盾。",
+      "rarity": 2,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 620,
+        "maxMp": 99,
+        "attack": 52,
+        "defense": 15,
+        "range": 1,
+        "shield": 90
+      },
+      "defaultSkills": [
+        {
+          "name": "BlackIronGuard",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 3102,
+      "name": "vampire_thrall",
+      "displayName": "吸血仆从",
+      "magicName": "血之收割",
+      "skillDescription": "攻击后恢复生命。",
+      "rarity": 2,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 430,
+        "maxMp": 99,
+        "attack": 50,
+        "defense": 10,
+        "range": 1,
+        "shield": 20
+      },
+      "defaultSkills": [
+        {
+          "name": "BloodHarvest",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 3103,
+      "name": "necromancer",
+      "displayName": "亡灵法师",
+      "magicName": "亡者复苏",
+      "skillDescription": "满MP召唤骷髅兵。",
+      "rarity": 2,
+      "bonds": [
+        "mage"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 360,
+        "maxMp": 12,
+        "attack": 42,
+        "defense": 7,
+        "range": 3,
+        "shield": 10
+      },
+      "defaultSkills": [
+        {
+          "name": "Necromancy",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 3104,
+      "name": "blood_moon_assassin",
+      "displayName": "血月刺客",
+      "magicName": "血月斩杀",
+      "skillDescription": "满MP斩杀低血目标，否则造成高伤。",
+      "rarity": 2,
+      "bonds": [
+        "assassin"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 320,
+        "maxMp": 10,
+        "attack": 58,
+        "defense": 6,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "BloodMoonExecute",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 3105,
+      "name": "runaway_golem",
+      "displayName": "失控魔像",
+      "magicName": "核心暴走",
+      "skillDescription": "受伤低血后强化自身。",
+      "rarity": 2,
+      "bonds": [
+        "building"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 760,
+        "maxMp": 99,
+        "attack": 44,
+        "defense": 18,
+        "range": 1,
+        "shield": 80
+      },
+      "defaultSkills": [
+        {
+          "name": "GolemCoreRage",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 3106,
+      "name": "dragonflame_priest",
+      "displayName": "龙焰祭司",
+      "magicName": "龙焰祝福",
+      "skillDescription": "满MP强化友方单位。",
+      "rarity": 2,
+      "bonds": [
+        "pastor"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 400,
+        "maxMp": 12,
+        "attack": 48,
+        "defense": 8,
+        "range": 3,
+        "shield": 20
+      },
+      "defaultSkills": [
+        {
+          "name": "DragonflameBlessing",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 3201,
+      "name": "ancient_red_dragon",
+      "displayName": "赤焰古龙",
+      "magicName": "龙息灭世 / 与我一战",
+      "skillDescription": "满MP造成大范围伤害；半血后斩杀一个低血敌人。",
+      "rarity": 3,
+      "bonds": [
+        "beast"
+      ],
+      "team": "enemy",
+      "baseStats": {
+        "maxHp": 980,
+        "maxMp": 16,
+        "attack": 64,
+        "defense": 16,
+        "range": 4,
+        "shield": 120
+      },
+      "defaultSkills": [
+        {
+          "name": "DragonApocalypse",
+          "is_buff": false
+        },
+        {
+          "name": "DuelMe",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 4001,
       "name": "chess_pawn",
+      "displayName": "棋子士兵",
+      "magicName": "兵卒推进",
+      "skillDescription": "满MP造成一次稳定伤害。",
+      "rarity": 2,
       "bonds": [
         "chess"
       ],
       "team": "enemy",
       "baseStats": {
-        "maxHp": 95,
+        "maxHp": 125,
         "maxMp": 3,
-        "attack": 9,
-        "defense": 4,
-        "shield": 8
+        "attack": 16,
+        "defense": 6,
+        "range": 1,
+        "shield": 12
       },
       "defaultSkills": [
         {
@@ -370,18 +1844,23 @@
       ]
     },
     {
-      "templateId": 1102,
+      "templateId": 4002,
       "name": "chess_rook",
+      "displayName": "棋子城堡",
+      "magicName": "城堡壁垒",
+      "skillDescription": "满MP获得护盾并攻击。",
+      "rarity": 2,
       "bonds": [
         "chess"
       ],
       "team": "enemy",
       "baseStats": {
-        "maxHp": 150,
+        "maxHp": 220,
         "maxMp": 4,
-        "attack": 13,
-        "defense": 9,
-        "shield": 18
+        "attack": 22,
+        "defense": 12,
+        "range": 1,
+        "shield": 30
       },
       "defaultSkills": [
         {
@@ -391,18 +1870,23 @@
       ]
     },
     {
-      "templateId": 1103,
+      "templateId": 4003,
       "name": "chess_knight",
+      "displayName": "棋子骑士",
+      "magicName": "骑士叉击",
+      "skillDescription": "满MP造成高额单体伤害。",
+      "rarity": 2,
       "bonds": [
         "chess"
       ],
       "team": "enemy",
       "baseStats": {
-        "maxHp": 115,
+        "maxHp": 175,
         "maxMp": 3,
-        "attack": 15,
-        "defense": 5,
-        "shield": 8
+        "attack": 28,
+        "defense": 8,
+        "range": 1,
+        "shield": 12
       },
       "defaultSkills": [
         {
@@ -412,18 +1896,23 @@
       ]
     },
     {
-      "templateId": 1104,
+      "templateId": 4004,
       "name": "chess_bishop",
+      "displayName": "棋子主教",
+      "magicName": "斜线惩戒",
+      "skillDescription": "满MP攻击并施加诅咒。",
+      "rarity": 2,
       "bonds": [
         "chess"
       ],
       "team": "enemy",
       "baseStats": {
-        "maxHp": 105,
+        "maxHp": 165,
         "maxMp": 3,
-        "attack": 12,
-        "defense": 4,
-        "shield": 6
+        "attack": 24,
+        "defense": 7,
+        "range": 3,
+        "shield": 10
       },
       "defaultSkills": [
         {
@@ -433,18 +1922,23 @@
       ]
     },
     {
-      "templateId": 1105,
+      "templateId": 4005,
       "name": "chess_queen",
+      "displayName": "棋子皇后",
+      "magicName": "王后横扫",
+      "skillDescription": "满MP造成强力攻击。",
+      "rarity": 3,
       "bonds": [
         "chess"
       ],
       "team": "enemy",
       "baseStats": {
-        "maxHp": 135,
+        "maxHp": 230,
         "maxMp": 5,
-        "attack": 17,
-        "defense": 6,
-        "shield": 10
+        "attack": 34,
+        "defense": 10,
+        "range": 3,
+        "shield": 20
       },
       "defaultSkills": [
         {
@@ -454,22 +1948,1069 @@
       ]
     },
     {
-      "templateId": 1106,
+      "templateId": 4006,
       "name": "chess_king",
+      "displayName": "棋子国王",
+      "magicName": "国王号令",
+      "skillDescription": "满MP治疗自身、获得护盾并攻击。",
+      "rarity": 3,
       "bonds": [
         "chess"
       ],
       "team": "enemy",
       "baseStats": {
-        "maxHp": 170,
+        "maxHp": 280,
         "maxMp": 5,
-        "attack": 12,
-        "defense": 8,
-        "shield": 20
+        "attack": 26,
+        "defense": 12,
+        "range": 1,
+        "shield": 45
       },
       "defaultSkills": [
         {
           "name": "KingCommand",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1212,
+      "name": "frieren",
+      "displayName": "芙莉莲",
+      "magicName": "解析魔法",
+      "skillDescription": "解析魔法：对单体造成180%攻的魔法伤害；若目标防<自身防则额外追加80%攻伤害",
+      "rarity": 3,
+      "bonds": [
+        "mage"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 80,
+        "maxMp": 5,
+        "attack": 45,
+        "defense": 10,
+        "range": 4,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "FrierenAnalysis",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1213,
+      "name": "fern",
+      "displayName": "费伦",
+      "magicName": "速射魔弹",
+      "skillDescription": "速射魔弹：连续2次攻击，每次造成90%攻伤害，第二次伤害降低至70%",
+      "rarity": 2,
+      "bonds": [
+        "mage"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 70,
+        "maxMp": 4,
+        "attack": 38,
+        "defense": 8,
+        "range": 4,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "FernRapidBolt",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1214,
+      "name": "stark",
+      "displayName": "修塔尔克",
+      "magicName": "巨斧重击",
+      "skillDescription": "巨斧重击：对前方1格造成160%攻伤害，并获得+15防持续3秒",
+      "rarity": 2,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 150,
+        "maxMp": 4,
+        "attack": 42,
+        "defense": 30,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "StarkAxeGuard",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1215,
+      "name": "himmel",
+      "displayName": "辛梅尔",
+      "magicName": "收割",
+      "skillDescription": "收割：跃击(传送到最近位置并攻击)最低血目标造成200%攻伤害，击杀回复50%MP",
+      "rarity": 3,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 180,
+        "maxMp": 6,
+        "attack": 50,
+        "defense": 24,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "HimmelHarvest",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1216,
+      "name": "aura",
+      "displayName": "阿乌拉",
+      "magicName": "支配天秤",
+      "skillDescription": "支配天秤：若敌防小于自身防，降低其80%攻持续4秒，否则造成200%攻伤害",
+      "rarity": 3,
+      "bonds": [
+        "mage"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 85,
+        "maxMp": 5,
+        "attack": 36,
+        "defense": 12,
+        "range": 3,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "AuraScale",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1217,
+      "name": "aqua",
+      "displayName": "阿库娅",
+      "magicName": "净化治疗",
+      "skillDescription": "净化治疗1：治疗最近的友军血量，为其恢复120%攻击力的血量。   净化治疗2：普通攻击寻找最近的友方，每次恢复10血",
+      "rarity": 1,
+      "bonds": [
+        "pastor"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 100,
+        "maxMp": 4,
+        "attack": 30,
+        "defense": 18,
+        "range": 3,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "AquaPurify",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1218,
+      "name": "megumin",
+      "displayName": "惠惠",
+      "magicName": "爆裂魔法",
+      "skillDescription": "爆裂魔法1：对5格范围造成500%攻伤害，释放后2秒无法行动   爆裂魔法2:不再进行普通攻击，改为每秒恢复一点mp",
+      "rarity": 3,
+      "bonds": [
+        "mage",
+        "assassin"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 75,
+        "maxMp": 15,
+        "attack": 200,
+        "defense": 0,
+        "range": 5,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "MeguminExplosion",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1219,
+      "name": "darkness",
+      "displayName": "达克妮斯",
+      "magicName": "嘲讽承伤",
+      "skillDescription": "嘲讽承伤：强制周围敌人攻击自己3秒，并获得+30防",
+      "rarity": 2,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 190,
+        "maxMp": 4,
+        "attack": 18,
+        "defense": 45,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "DarknessTaunt",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1220,
+      "name": "kazuma",
+      "displayName": "佐藤和真",
+      "magicName": "偷取攻击",
+      "skillDescription": "偷取攻击：攻击时偷取目标10%攻，持续4秒",
+      "rarity": 1,
+      "bonds": [
+        "assassin"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 70,
+        "maxMp": 3,
+        "attack": 28,
+        "defense": 14,
+        "range": 2,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "KazumaSteal",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 1221,
+      "name": "chris",
+      "displayName": "克里斯",
+      "magicName": "幸运背刺",
+      "skillDescription": "幸运背刺：瞬移背后造成170%攻伤害，若目标生命>自己生命则+40%",
+      "rarity": 2,
+      "bonds": [
+        "assassin"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 85,
+        "maxMp": 4,
+        "attack": 34,
+        "defense": 12,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "ChrisBackstab",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1222,
+      "name": "jotaro_kujo",
+      "displayName": "空条承太郎",
+      "magicName": "时间停顿",
+      "skillDescription": "时间停顿：冻结目标1.5秒并对单体造成220%攻伤害",
+      "rarity": 3,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 180,
+        "maxMp": 6,
+        "attack": 55,
+        "defense": 28,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "JotaroTimeStop",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1223,
+      "name": "dio",
+      "displayName": "迪奥",
+      "magicName": "世界",
+      "skillDescription": "世界：停止时间1.2秒并对最低血敌人造成250%攻伤害",
+      "rarity": 3,
+      "bonds": [
+        "assassin"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 160,
+        "maxMp": 6,
+        "attack": 48,
+        "defense": 18,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "DioTheWorld",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1224,
+      "name": "joseph_joestar",
+      "displayName": "乔瑟夫",
+      "magicName": "反击波纹",
+      "skillDescription": "反击波纹1：受击额外获得一点MP。    反击波纹2:满MP造成等同于自己已经损失血量的伤害",
+      "rarity": 2,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 140,
+        "maxMp": 8,
+        "attack": 32,
+        "defense": 18,
+        "range": 2,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "JosephRippleCounter",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 1225,
+      "name": "noriaki_kakyoin",
+      "displayName": "花京院典明",
+      "magicName": "绿宝石水花",
+      "skillDescription": "绿宝石水花：发射5枚弹幕，每次造成70%攻伤害",
+      "rarity": 2,
+      "bonds": [
+        "mage"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 80,
+        "maxMp": 4,
+        "attack": 36,
+        "defense": 10,
+        "range": 4,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "KakyoinEmeraldSplash",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1226,
+      "name": "bruno_bucciarati",
+      "displayName": "布加拉提",
+      "magicName": "拉链空间",
+      "skillDescription": "拉链空间：穿越敌人(传送到背后可用位置)，造成160%攻伤害，并眩晕目标2秒",
+      "rarity": 2,
+      "bonds": [
+        "assassin"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 130,
+        "maxMp": 4,
+        "attack": 40,
+        "defense": 18,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "BucciaratiZipper",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1227,
+      "name": "yoshikage_kira",
+      "displayName": "吉良吉影",
+      "magicName": "杀手皇后",
+      "skillDescription": "杀手皇后：标记敌人，3秒后爆炸造成350%攻击力的范围伤害",
+      "rarity": 3,
+      "bonds": [
+        "assassin"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 150,
+        "maxMp": 5,
+        "attack": 42,
+        "defense": 14,
+        "range": 2,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "KiraKillerQueen",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1228,
+      "name": "royal_guard",
+      "displayName": "皇家卫队",
+      "magicName": "稳健格挡",
+      "skillDescription": "稳健格挡：获得20防持续4秒，下一次伤害减少30%",
+      "rarity": 1,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 120,
+        "maxMp": 3,
+        "attack": 30,
+        "defense": 32,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "RoyalGuardBlock",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1229,
+      "name": "valkyrie",
+      "displayName": "女武神",
+      "magicName": "旋风斩",
+      "skillDescription": "旋风斩：对周围敌人造成140%攻伤害",
+      "rarity": 2,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 150,
+        "maxMp": 4,
+        "attack": 36,
+        "defense": 30,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "ValkyrieWhirlwind",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1230,
+      "name": "mini_pekka",
+      "displayName": "迷你皮卡",
+      "magicName": "重砍",
+      "skillDescription": "重砍：下一击造成250%攻伤害并降低攻速30%",
+      "rarity": 2,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 170,
+        "maxMp": 4,
+        "attack": 60,
+        "defense": 18,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "MiniPekkaHeavySlash",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1231,
+      "name": "skeleton_army",
+      "displayName": "骷髅军团",
+      "magicName": "召唤",
+      "skillDescription": "召唤：召唤3个骷髅（骷髅：1血，12攻，0防，无技能，攻击范围1）围攻目标",
+      "rarity": 1,
+      "bonds": [
+        "assassin"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 60,
+        "maxMp": 6,
+        "attack": 18,
+        "defense": 6,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "SkeletonArmySummon",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1232,
+      "name": "bomb_tower",
+      "displayName": "炸弹塔",
+      "magicName": "爆炸",
+      "skillDescription": "爆炸：攻击造成120%攻范围伤害，死亡爆炸180%",
+      "rarity": 2,
+      "bonds": [
+        "building"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 180,
+        "maxMp": 4,
+        "attack": 35,
+        "defense": 36,
+        "range": 3,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "BombTowerBlast",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 1233,
+      "name": "tombstone",
+      "displayName": "骷髅墓碑",
+      "magicName": "亡灵召唤",
+      "skillDescription": "亡灵召唤：每5秒产生一个骷髅",
+      "rarity": 3,
+      "bonds": [
+        "building"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 50,
+        "maxMp": 99,
+        "attack": 0,
+        "defense": 0,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "TombstoneSummon",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 1234,
+      "name": "tesla_tower",
+      "displayName": "特斯拉电塔",
+      "magicName": "电弧",
+      "skillDescription": "电弧：攻击时，额外对第二近的目标造成80%攻伤害",
+      "rarity": 2,
+      "bonds": [
+        "building"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 170,
+        "maxMp": 4,
+        "attack": 32,
+        "defense": 30,
+        "range": 3,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "TeslaArc",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 1235,
+      "name": "goblin_hut",
+      "displayName": "哥布林小屋",
+      "magicName": "产兵",
+      "skillDescription": "产兵：每8秒生成1野蛮哥布林（50血 20攻 10防 无技能 攻击范围1）",
+      "rarity": 2,
+      "bonds": [
+        "building"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 160,
+        "maxMp": 99,
+        "attack": 0,
+        "defense": 0,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "GoblinHutSpawn",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 1236,
+      "name": "elixir_collector",
+      "displayName": "圣水收集器",
+      "magicName": "赐福",
+      "skillDescription": "赐福：每5秒强化随机一名友军+15%攻、防",
+      "rarity": 3,
+      "bonds": [
+        "building"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 200,
+        "maxMp": 99,
+        "attack": 0,
+        "defense": 0,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "ElixirCollectorBlessing",
+          "is_buff": true
+        }
+      ]
+    },
+    {
+      "templateId": 1237,
+      "name": "spire_regent",
+      "displayName": "储君",
+      "magicName": "铸剑",
+      "skillDescription": "铸剑：为所有友方提升5点攻击，没有上限。",
+      "rarity": 1,
+      "bonds": [
+        "assassin"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 70,
+        "maxMp": 4,
+        "attack": 30,
+        "defense": 10,
+        "range": 2,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "RegentForgeBlade",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1238,
+      "name": "ironclad",
+      "displayName": "铁甲战士",
+      "magicName": "燃血",
+      "skillDescription": "燃血：攻击提升30%，击杀回复20防",
+      "rarity": 2,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 170,
+        "maxMp": 5,
+        "attack": 42,
+        "defense": 34,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "IroncladBloodBurn",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1239,
+      "name": "silent_hunter",
+      "displayName": "静默猎手",
+      "magicName": "飞刀",
+      "skillDescription": "飞刀：攻击3个目标，每个70%攻",
+      "rarity": 2,
+      "bonds": [
+        "assassin"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 90,
+        "maxMp": 4,
+        "attack": 34,
+        "defense": 12,
+        "range": 3,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "SilentHunterKnives",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1240,
+      "name": "defect_robot",
+      "displayName": "缺陷机器人",
+      "magicName": "我已启动",
+      "skillDescription": "我已启动：秒杀所有敌人，获得胜利(真的能攒到30点吗)",
+      "rarity": 1,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 110,
+        "maxMp": 30,
+        "attack": 5,
+        "defense": 22,
+        "range": 3,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "DefectRobotStartup",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1241,
+      "name": "watcher",
+      "displayName": "观者",
+      "magicName": "姿态切换",
+      "skillDescription": "姿态切换：攻击姿态 +70%攻-50%防，防御姿态： +70%防-50%攻。每次满mp切换，切换时回复30生命",
+      "rarity": 3,
+      "bonds": [
+        "mage",
+        "pastor"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 140,
+        "maxMp": 5,
+        "attack": 48,
+        "defense": 30,
+        "range": 2,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "WatcherStance",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1242,
+      "name": "amiya",
+      "displayName": "阿米娅",
+      "magicName": "爆发术",
+      "skillDescription": "爆发术：造成190%攻法伤，目标血越低伤害越高最高+50%",
+      "rarity": 3,
+      "bonds": [
+        "mage"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 80,
+        "maxMp": 5,
+        "attack": 42,
+        "defense": 10,
+        "range": 4,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "AmiyaBurst",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1243,
+      "name": "chen",
+      "displayName": "陈",
+      "magicName": "赤霄",
+      "skillDescription": "赤霄：斩击，单体造成100%攻伤害",
+      "rarity": 1,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 160,
+        "maxMp": 3,
+        "attack": 20,
+        "defense": 14,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "ChenChixiao",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1244,
+      "name": "exusiai",
+      "displayName": "能天使",
+      "magicName": "过载射击",
+      "skillDescription": "过载射击：连续4次攻击，每次80%攻",
+      "rarity": 3,
+      "bonds": [
+        "assassin"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 85,
+        "maxMp": 4,
+        "attack": 35,
+        "defense": 8,
+        "range": 4,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "ExusiaiOverload",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1245,
+      "name": "silverash",
+      "displayName": "银灰",
+      "magicName": "真银斩",
+      "skillDescription": "真银斩：范围3格内造成240%攻伤害",
+      "rarity": 3,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 170,
+        "maxMp": 6,
+        "attack": 52,
+        "defense": 26,
+        "range": 2,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "SilverashTruesilver",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1246,
+      "name": "saria",
+      "displayName": "塞雷娅",
+      "magicName": "治疗领域",
+      "skillDescription": "治疗领域：治疗150%攻并+20防持续3秒",
+      "rarity": 3,
+      "bonds": [
+        "pastor"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 200,
+        "maxMp": 5,
+        "attack": 24,
+        "defense": 42,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "SariaHealField",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1247,
+      "name": "nightingale",
+      "displayName": "夜莺",
+      "magicName": "圣域",
+      "skillDescription": "圣域：减少30%法伤并治疗120%攻",
+      "rarity": 3,
+      "bonds": [
+        "pastor"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 120,
+        "maxMp": 5,
+        "attack": 22,
+        "defense": 16,
+        "range": 4,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "NightingaleSanctuary",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1248,
+      "name": "melantha",
+      "displayName": "玫兰莎",
+      "magicName": "剑技强化",
+      "skillDescription": "剑技强化：攻击提升40%持续3秒",
+      "rarity": 1,
+      "bonds": [
+        "soldier"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 110,
+        "maxMp": 3,
+        "attack": 38,
+        "defense": 20,
+        "range": 1,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "MelanthaSwordBoost",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1249,
+      "name": "kroos",
+      "displayName": "克洛丝",
+      "magicName": "暴击",
+      "skillDescription": "暴击：下一击造成200%攻伤害",
+      "rarity": 1,
+      "bonds": [
+        "assassin"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 70,
+        "maxMp": 3,
+        "attack": 26,
+        "defense": 8,
+        "range": 4,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "KroosCrit",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1250,
+      "name": "ansel",
+      "displayName": "安赛尔",
+      "magicName": "治疗",
+      "skillDescription": "治疗：恢复120%攻生命",
+      "rarity": 1,
+      "bonds": [
+        "pastor"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 90,
+        "maxMp": 3,
+        "attack": 18,
+        "defense": 10,
+        "range": 4,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "AnselHeal",
+          "is_buff": false
+        }
+      ]
+    },
+    {
+      "templateId": 1251,
+      "name": "lava",
+      "displayName": "炎熔",
+      "magicName": "爆破",
+      "skillDescription": "爆破：对目标及周围造成140%攻伤害",
+      "rarity": 1,
+      "bonds": [
+        "mage"
+      ],
+      "team": "pc",
+      "baseStats": {
+        "maxHp": 95,
+        "maxMp": 4,
+        "attack": 32,
+        "defense": 8,
+        "range": 3,
+        "shield": 0
+      },
+      "defaultSkills": [
+        {
+          "name": "LavaBlast",
           "is_buff": false
         }
       ]

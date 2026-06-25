@@ -64,7 +64,8 @@ GameHud::GameHud(QWidget* parent)
     , timeLabel(new QLabel(this))
     , exitButton(makeHudButton(this, "bottom_exit.png", QSize(118, 58), QSize(112, 52)))
     , bagButton(makeHudButton(this, "bottom_bag.png", QSize(58, 58), QSize(48, 52)))
-    , shopButton(makeHudButton(this, "bottom_shop.png", QSize(58, 58), QSize(48, 52))) {
+    , shopButton(makeHudButton(this, "bottom_shop.png", QSize(58, 58), QSize(48, 52)))
+    , equipmentButton(makeHudButton(this, "top_equipment.png", QSize(58, 58), QSize(48, 52))) {
     setFixedHeight(72);
     setAttribute(Qt::WA_StyledBackground, true);
 
@@ -84,6 +85,7 @@ GameHud::GameHud(QWidget* parent)
     layout->addSpacing(20);
     layout->addWidget(coinIconLabel);
     layout->addWidget(goldLabel);
+    layout->addWidget(equipmentButton);
     layout->addSpacing(20);
     layout->addWidget(timeLabel);
     layout->addStretch();
@@ -96,6 +98,9 @@ GameHud::GameHud(QWidget* parent)
     });
     connect(shopButton, &QToolButton::clicked, this, [this]() {
         emit shopRequested();
+    });
+    connect(equipmentButton, &QToolButton::clicked, this, [this]() {
+        emit equipmentRequested();
     });
     connect(exitButton, &QToolButton::clicked, this, [this]() {
         emit returnToStartRequested();

@@ -21,6 +21,7 @@ signals:
     void saveRequested(int slot);
     void bagRequested();
     void shopRequested();
+    void equipmentRequested();
     void returnToStartRequested();
 
 private:
@@ -34,6 +35,7 @@ private:
     QToolButton* exitButton;
     QToolButton* bagButton;
     QToolButton* shopButton;
+    QToolButton* equipmentButton;
     int lastGold = -1;
 };
 

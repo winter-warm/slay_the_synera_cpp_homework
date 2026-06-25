@@ -8,6 +8,8 @@
 #include "hex.h"
 
 class QJsonArray;
+class QJsonObject;
+class QJsonValue;
 class Obstacle;
 class Unit;
 
@@ -18,7 +20,7 @@ public:
     Board();
     ~Board();
 
-    bool load(const std::string& path);
+    bool load(const std::string& path, const std::string& requestedId = "");
 
     const std::string& id() const { return boardId; }
     std::vector<Hex> cells() const;
@@ -31,6 +33,7 @@ public:
     bool posOf(Unit* unit, Hex* out) const;
 
     bool add(Unit* unit, const Hex& h);
+    bool addOwned(std::unique_ptr<Unit> unit, const Hex& h);
     bool move(Unit* unit, const Hex& h);
     void remove(Unit* unit);
     void clearUnits();
@@ -45,13 +48,16 @@ private:
         Unit* unit = nullptr; bool pass = true; Zone zone = Zone::None;
     };
 
-    bool build(const QJsonArray& rows, const QJsonArray& obstacleRows);
-    void addObstacle(const Hex& h, bool blockAttack, int image);
+    bool build(const QJsonArray& rows,
+               const QJsonValue& obstacleRows,
+               const std::unordered_map<int, std::string>& obstacleAssets);
+    void addObstacle(const Hex& h, bool blockAttack, int image, const std::string& imagePath = "");
 
     std::string boardId;
     std::unordered_map<Hex, Cell> cellMap;
     std::unordered_map<Unit*, Hex> unitPos;
     std::vector<std::unique_ptr<Obstacle>> obstacles;
+    std::vector<std::unique_ptr<Unit>> ownedUnits;
 };
 
 #endif // BOARD_H

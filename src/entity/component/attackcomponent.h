@@ -29,6 +29,7 @@ private:
     std::vector<Skill> skill;
     float cooldown = 0.0f;
     float attackInterval = 1.0f;
+    int actionLocks = 0;
 
 public:
     AttackComponent(Character* owner,Skill skill);
@@ -40,6 +41,8 @@ public:
     void addSkill(Skill addedSkill);
     void activateAndRemoveBuffSkills();
     void modifyAttackIntervalPercent(int percent);
+    void addActionLock(){++actionLocks;}
+    void removeActionLock(){if(actionLocks > 0){--actionLocks;}}
 };
 
 #endif // ATTACKCOMPONENT_H

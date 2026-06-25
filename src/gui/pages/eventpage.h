@@ -38,6 +38,7 @@ signals:
     void saveRequested(int slot);
     void bagRequested();
     void shopRequested();
+    void equipmentRequested();
     void returnToStartRequested();
 
 private:
@@ -59,9 +60,11 @@ private:
     QWidget* optionsWidget;
     QVBoxLayout* optionsLayout;
     QHBoxLayout* hexTechLayout;
+    QWidget* restOptionsWidget;
     QScrollArea* restScrollArea;
     QGridLayout* restLayout;
     QLabel* restDescriptionLabel;
+    QLabel* restEquipmentHintLabel;
     QPushButton* confirmHexTechButton;
     GameState currentState;
     QPixmap backgroundPixmap;

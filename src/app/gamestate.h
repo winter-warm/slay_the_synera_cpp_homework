@@ -46,6 +46,9 @@ struct GameState {
     std::vector<std::string> activeAuraIds;
     std::vector<HexTechDefinition> currentHexTechChoices;
     std::vector<OwnedCharacterCard> ownedCharacterCards;
+    std::vector<OwnedEquipment> ownedEquipment;
+    int nextOwnedCardUid = 1;
+    int nextEquipmentInstanceId = 1;
     ShopState shop;
 
     QJsonObject toJson() const;

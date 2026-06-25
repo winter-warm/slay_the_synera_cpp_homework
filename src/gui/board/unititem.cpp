@@ -67,7 +67,6 @@ UnitItem::UnitItem(Unit* unit, QGraphicsItem* parent)
     setAcceptedMouseButtons(Qt::LeftButton);
     if (Character* character = dynamic_cast<Character*>(unitPtr)) {
         hud = std::make_unique<CharacterHUD>(character->name());
-        character->getrender().bindHUD(hud.get());
     }
 }
 
@@ -80,13 +79,16 @@ QRectF UnitItem::boundingRect() const {
 }
 
 void UnitItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) {
-    if (hud) {
-        hud->paint(painter, QRectF(-42, -42, 84, 84));
-    }
-
     Character* character = dynamic_cast<Character*>(unitPtr);
     if (!character || !painter) {
         return;
+    }
+    if (!character->getrender().inVisible()) {
+        return;
+    }
+    if (hud) {
+        hud->setVisible(true);
+        hud->paint(painter, QRectF(-42, -42, 84, 84));
     }
 
     StatsComponent& stats = character->getstats();

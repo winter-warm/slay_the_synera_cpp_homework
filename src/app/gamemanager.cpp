@@ -1,5 +1,6 @@
 #include "gamemanager.h"
 #include "combat/battlerepository.h"
+#include "combat/equipment/equipmentrepository.h"
 #include "entity/character/characterfactory.h"
 #include "eventrules.h"
 #include "world/event/eventrepository.h"
@@ -148,7 +149,9 @@ void GameManager::newGame(int seed) {
     state.seed = seed;
     state.map = MapGenerator().generate(seed);
     state.currentLayerId = 1;
-    state.ownedCharacterCards = {{1209, 1}};
+    state.nextOwnedCardUid = 1;
+    state.nextEquipmentInstanceId = 1;
+    state.ownedCharacterCards = {{1209, 1, state.nextOwnedCardUid++}};
     state.shop = {};
     currentState = state;
     terminalRunFinished = false;
@@ -526,7 +529,7 @@ bool GameManager::executeEventAction(const EventAction& action, int optionIndex,
     }
     case EventActionType::GrantCard:
         if (action.templateId > 0) {
-            currentState.ownedCharacterCards.push_back({action.templateId, 1});
+            currentState.ownedCharacterCards.push_back(makeOwnedCharacterCard(action.templateId, 1));
             grantShopExperience(1);
         }
         return true;
@@ -536,7 +539,7 @@ bool GameManager::executeEventAction(const EventAction& action, int optionIndex,
             std::mt19937 rng = eventActionRng(currentState, optionIndex, actionIndex);
             std::uniform_int_distribution<int> pick(0, static_cast<int>(templates.size()) - 1);
             const auto& selected = templates[static_cast<size_t>(pick(rng))];
-            currentState.ownedCharacterCards.push_back({selected.templateId, 1});
+            currentState.ownedCharacterCards.push_back(makeOwnedCharacterCard(selected.templateId, 1));
             grantShopExperience(1);
         }
         return true;
@@ -657,6 +660,89 @@ void GameManager::grantBattleChestGold(int gold) {
     emit stateChanged(currentState);
 }
 
+void GameManager::grantBattleChestEquipment(EquipmentGroup group, int equipmentId) {
+    if (equipmentId <= 0) {
+        return;
+    }
+    currentState.ownedEquipment.push_back(makeOwnedEquipment(group, equipmentId));
+    emit stateChanged(currentState);
+}
+
+void GameManager::unequipAllEquipment() {
+    if (!isRestEventActive()) {
+        return;
+    }
+    for (OwnedEquipment& equipment : currentState.ownedEquipment) {
+        equipment.equippedCardUid = -1;
+    }
+    emit stateChanged(currentState);
+}
+
+void GameManager::composeEquipment(int firstInstanceId, int secondInstanceId) {
+    if (!isRestEventActive() || firstInstanceId == secondInstanceId) {
+        return;
+    }
+
+    OwnedEquipment* first = findOwnedEquipment(firstInstanceId);
+    OwnedEquipment* second = findOwnedEquipment(secondInstanceId);
+    if (!first || !second || first->equippedCardUid >= 0 || second->equippedCardUid >= 0) {
+        return;
+    }
+
+    EquipmentRepository repository;
+    const auto firstEquipment = first->group == EquipmentGroup::Advanced
+                                    ? repository.findAdvanced(first->equipmentId)
+                                    : repository.findBasic(first->group, first->equipmentId);
+    const auto secondEquipment = second->group == EquipmentGroup::Advanced
+                                     ? repository.findAdvanced(second->equipmentId)
+                                     : repository.findBasic(second->group, second->equipmentId);
+    if (!firstEquipment || !secondEquipment) {
+        return;
+    }
+
+    const auto result = repository.composeResult(*firstEquipment, *secondEquipment);
+    if (!result) {
+        return;
+    }
+
+    currentState.ownedEquipment.erase(
+        std::remove_if(currentState.ownedEquipment.begin(), currentState.ownedEquipment.end(),
+                       [firstInstanceId, secondInstanceId](const OwnedEquipment& equipment) {
+                           return equipment.instanceId == firstInstanceId ||
+                                  equipment.instanceId == secondInstanceId;
+                       }),
+        currentState.ownedEquipment.end());
+    currentState.ownedEquipment.push_back(makeOwnedEquipment(EquipmentGroup::Advanced, result->id()));
+    emit stateChanged(currentState);
+}
+
+void GameManager::equipEquipmentToCard(int equipmentInstanceId, int ownedCardUid) {
+    OwnedEquipment* equipment = findOwnedEquipment(equipmentInstanceId);
+    if (!equipment || equipment->equippedCardUid >= 0 || ownedCardUid <= 0) {
+        return;
+    }
+
+    const bool cardExists =
+        std::any_of(currentState.ownedCharacterCards.begin(), currentState.ownedCharacterCards.end(),
+                    [ownedCardUid](const OwnedCharacterCard& card) {
+                        return card.uid == ownedCardUid;
+                    });
+    if (!cardExists) {
+        return;
+    }
+    const bool cardAlreadyEquipped =
+        std::any_of(currentState.ownedEquipment.begin(), currentState.ownedEquipment.end(),
+                    [ownedCardUid](const OwnedEquipment& item) {
+                        return item.equippedCardUid == ownedCardUid;
+                    });
+    if (cardAlreadyEquipped) {
+        return;
+    }
+
+    equipment->equippedCardUid = ownedCardUid;
+    emit stateChanged(currentState);
+}
+
 void GameManager::buyShopOffer(int offerIndex) {
     ensureCardEconomyInitialized();
     if (offerIndex < 0 || offerIndex >= static_cast<int>(currentState.shop.offers.size())) {
@@ -680,7 +766,7 @@ void GameManager::buyShopOffer(int offerIndex) {
     }
 
     currentState.gold -= cost;
-    currentState.ownedCharacterCards.push_back({offer.templateId, 1});
+    currentState.ownedCharacterCards.push_back(makeOwnedCharacterCard(offer.templateId, 1));
     offer.sold = true;
     grantShopExperience(1);
     emit stateChanged(currentState);
@@ -706,10 +792,19 @@ void GameManager::mergeOwnedCharacterCards(int firstIndex, int secondIndex) {
         return;
     }
 
+    const int firstUid = first.uid;
+    const int secondUid = second.uid;
     currentState.ownedCharacterCards.erase(currentState.ownedCharacterCards.begin() + secondIndex);
     currentState.ownedCharacterCards.erase(currentState.ownedCharacterCards.begin() + firstIndex);
-    currentState.ownedCharacterCards.push_back({first.templateId, first.starLevel + 1});
+    OwnedCharacterCard merged = makeOwnedCharacterCard(first.templateId, first.starLevel + 1);
+    for (OwnedEquipment& equipment : currentState.ownedEquipment) {
+        if (equipment.equippedCardUid == firstUid || equipment.equippedCardUid == secondUid) {
+            equipment.equippedCardUid = -1;
+        }
+    }
+    currentState.ownedCharacterCards.push_back(merged);
     emit stateChanged(currentState);
+    emit centerToastRequested(QString::fromUtf8("合成成功，(如有)装备已自动脱下"));
 }
 
 void GameManager::pauseElapsedTimer() {
@@ -862,8 +957,68 @@ void GameManager::finishRestEvent() {
 }
 
 void GameManager::grantRandomEquipmentFromRest() {
+    EquipmentRepository repository;
+    struct EquipmentKey {
+        EquipmentGroup group = EquipmentGroup::Mold;
+        int id = 0;
+        std::string title;
+    };
+    std::vector<EquipmentKey> pool;
+    for (const Equipment& equipment : repository.allBasic()) {
+        pool.push_back({equipment.group(), equipment.id(), equipment.title()});
+    }
+    if (pool.empty()) {
+        return;
+    }
+
+    std::mt19937 rng(static_cast<unsigned int>(currentState.seed * 2654435761u +
+                                               currentState.currentNodeId * 1103515245u +
+                                               currentState.ownedEquipment.size() * 97u + 41u));
+    std::uniform_int_distribution<int> pick(0, static_cast<int>(pool.size()) - 1);
+    const EquipmentKey selected = pool[static_cast<size_t>(pick(rng))];
+    currentState.ownedEquipment.push_back(makeOwnedEquipment(selected.group, selected.id));
     emit messageRequested(QString::fromUtf8("锻造"),
-                          QString::fromUtf8("随机装备接口已调用，装备背包将在后续实现。"));
+                          QString::fromUtf8("获得装备：%1").arg(QString::fromStdString(selected.title)));
+}
+
+OwnedCharacterCard GameManager::makeOwnedCharacterCard(int templateId, int starLevel) {
+    OwnedCharacterCard card;
+    card.templateId = templateId;
+    card.starLevel = std::max(1, std::min(3, starLevel));
+    card.uid = currentState.nextOwnedCardUid++;
+    return card;
+}
+
+OwnedEquipment GameManager::makeOwnedEquipment(EquipmentGroup group, int equipmentId) {
+    OwnedEquipment equipment;
+    equipment.instanceId = currentState.nextEquipmentInstanceId++;
+    equipment.group = group;
+    equipment.equipmentId = equipmentId;
+    equipment.equippedCardUid = -1;
+    return equipment;
+}
+
+OwnedEquipment* GameManager::findOwnedEquipment(int instanceId) {
+    for (OwnedEquipment& equipment : currentState.ownedEquipment) {
+        if (equipment.instanceId == instanceId) {
+            return &equipment;
+        }
+    }
+    return nullptr;
+}
+
+const OwnedEquipment* GameManager::findOwnedEquipment(int instanceId) const {
+    for (const OwnedEquipment& equipment : currentState.ownedEquipment) {
+        if (equipment.instanceId == instanceId) {
+            return &equipment;
+        }
+    }
+    return nullptr;
+}
+
+bool GameManager::isRestEventActive() const {
+    return currentState.currentEvent.active &&
+           currentState.currentEvent.eventId == MapEventId::Rest;
 }
 
 void GameManager::startBattle(const BattleConfig& config) {
@@ -877,7 +1032,7 @@ void GameManager::startBattle(const BattleConfig& config) {
 
 void GameManager::ensureCardEconomyInitialized() {
     if (currentState.ownedCharacterCards.empty()) {
-        currentState.ownedCharacterCards.push_back({1209, 1});
+        currentState.ownedCharacterCards.push_back(makeOwnedCharacterCard(1209, 1));
     }
     if (currentState.shop.level < 1) {
         currentState.shop.level = 1;
