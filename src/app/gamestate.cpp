@@ -83,6 +83,12 @@ static QString actionTypeToString(EventActionType type) {
         return "grantRandomEquipment";
     case EventActionType::ChooseOwnedCard:
         return "chooseOwnedCard";
+    case EventActionType::ChooseRecruit:
+        return "chooseRecruit";
+    case EventActionType::ChooseBasicEquipment:
+        return "chooseBasicEquipment";
+    case EventActionType::ChooseAdvancedEquipment:
+        return "chooseAdvancedEquipment";
     case EventActionType::FinishNode:
         return "finish";
     }
@@ -141,6 +147,15 @@ static EventActionType actionTypeFromString(const QString& value) {
     if (value == "chooseOwnedCard") {
         return EventActionType::ChooseOwnedCard;
     }
+    if (value == "chooseRecruit") {
+        return EventActionType::ChooseRecruit;
+    }
+    if (value == "chooseBasicEquipment") {
+        return EventActionType::ChooseBasicEquipment;
+    }
+    if (value == "chooseAdvancedEquipment") {
+        return EventActionType::ChooseAdvancedEquipment;
+    }
     return EventActionType::FinishNode;
 }
 
@@ -160,7 +175,9 @@ static QJsonObject battleToJson(const BattleConfig& battle) {
     }
     object["enemies"] = enemies;
     object["statMultiplier"] = battle.statMultiplier;
+    object["poolLayerId"] = battle.poolLayerId;
     object["returnStepId"] = QString::fromStdString(battle.returnStepId);
+    object["defeatStepId"] = QString::fromStdString(battle.defeatStepId);
     return object;
 }
 
@@ -169,6 +186,7 @@ static BattleConfig battleFromJson(const QJsonObject& object) {
     battle.kind = battleKindFromString(object.value("kind").toString());
     battle.boardId = object.value("boardId").toString("default_board").toStdString();
     battle.statMultiplier = static_cast<float>(object.value("statMultiplier").toDouble(1.0));
+    battle.poolLayerId = object.value("poolLayerId").toInt();
     const QJsonArray enemies = object.value("enemies").toArray();
     for (const QJsonValue& value : enemies) {
         const QJsonObject enemyObject = value.toObject();
@@ -183,6 +201,7 @@ static BattleConfig battleFromJson(const QJsonObject& object) {
         }
     }
     battle.returnStepId = object.value("returnStepId").toString().toStdString();
+    battle.defeatStepId = object.value("defeatStepId").toString().toStdString();
     return battle;
 }
 
@@ -320,6 +339,11 @@ static QJsonObject currentEventToJson(const CurrentEventState& event) {
     object["restSelection"] = event.restSelection;
     object["restTrainingSelection"] = event.restTrainingSelection;
     object["ownedCardSelection"] = event.ownedCardSelection;
+    object["recruitSelection"] = event.recruitSelection;
+    object["equipmentSelection"] = event.equipmentSelection;
+    object["advancedEquipmentSelection"] = event.advancedEquipmentSelection;
+    object["recruitMinRarity"] = event.recruitMinRarity;
+    object["recruitMaxRarity"] = event.recruitMaxRarity;
     object["selectionPrompt"] = QString::fromStdString(event.selectionPrompt);
     object["selectionFilter"] = QString::fromStdString(event.selectionFilter);
     object["selectedOwnedCardIndex"] = event.selectedOwnedCardIndex;
@@ -348,6 +372,11 @@ static CurrentEventState currentEventFromJson(const QJsonObject& object) {
     event.restSelection = object.value("restSelection").toBool(false);
     event.restTrainingSelection = object.value("restTrainingSelection").toBool(false);
     event.ownedCardSelection = object.value("ownedCardSelection").toBool(false);
+    event.recruitSelection = object.value("recruitSelection").toBool(false);
+    event.equipmentSelection = object.value("equipmentSelection").toBool(false);
+    event.advancedEquipmentSelection = object.value("advancedEquipmentSelection").toBool(false);
+    event.recruitMinRarity = object.value("recruitMinRarity").toInt(1);
+    event.recruitMaxRarity = object.value("recruitMaxRarity").toInt(3);
     event.selectionPrompt = object.value("selectionPrompt").toString().toStdString();
     event.selectionFilter = object.value("selectionFilter").toString().toStdString();
     event.selectedOwnedCardIndex = object.value("selectedOwnedCardIndex").toInt(-1);
@@ -562,6 +591,7 @@ QJsonObject GameState::toJson() const {
     object["currentEvent"] = currentEventToJson(currentEvent);
     object["currentBattle"] = battleToJson(currentBattle);
     object["pendingEventStepAfterBattle"] = QString::fromStdString(pendingEventStepAfterBattle);
+    object["pendingEventDefeatStepAfterBattle"] = QString::fromStdString(pendingEventDefeatStepAfterBattle);
     QJsonArray selectedCards;
     for (const HexTechCardRecord& record : selectedHexTechCards) {
         selectedCards.append(hexTechCardRecordToJson(record));
@@ -605,6 +635,8 @@ GameState GameState::fromJson(const QJsonObject& object) {
     state.currentEvent = currentEventFromJson(object.value("currentEvent").toObject());
     state.currentBattle = battleFromJson(object.value("currentBattle").toObject());
     state.pendingEventStepAfterBattle = object.value("pendingEventStepAfterBattle").toString().toStdString();
+    state.pendingEventDefeatStepAfterBattle =
+        object.value("pendingEventDefeatStepAfterBattle").toString().toStdString();
     const QJsonArray selectedCards = object.value("selectedHexTechCards").toArray();
     for (const QJsonValue& value : selectedCards) {
         state.selectedHexTechCards.push_back(hexTechCardRecordFromJson(value.toObject()));

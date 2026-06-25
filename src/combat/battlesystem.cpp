@@ -12,6 +12,39 @@
 #include <algorithm>
 #include <cmath>
 
+static int percentDelta(int value, int percent)
+{
+    return static_cast<int>(std::lround(value * percent / 100.0));
+}
+
+static void modifyMaxHpPercent(Character* character, int percent)
+{
+    if (!character) {
+        return;
+    }
+    StatsComponent& stats = character->getstats();
+    stats.modifyMAXHP(percentDelta(stats.getMAXHP(), percent));
+    stats.setHP(stats.getMAXHP());
+}
+
+static void modifyAttackPercent(Character* character, int percent)
+{
+    if (!character) {
+        return;
+    }
+    StatsComponent& stats = character->getstats();
+    stats.modifyATTACL(percentDelta(stats.getATTACK(), percent));
+}
+
+static void modifyDefensePercent(Character* character, int percent)
+{
+    if (!character) {
+        return;
+    }
+    StatsComponent& stats = character->getstats();
+    stats.modifyDEFESE(percentDelta(stats.getDEFENSE(), percent));
+}
+
 battlesystem::battlesystem(QObject* parent)
     : QObject(parent) {}
 
@@ -77,6 +110,24 @@ void battlesystem::setActiveAuraIds(const std::vector<std::string>& auraIds) {
     }
 }
 
+std::unordered_map<Bond, int> battlesystem::count_bond(const std::vector<CharacterPlacement>& placements)
+{
+    std::unordered_map<Bond, int> counts;
+    for (const CharacterPlacement& placement : placements) {
+        Character* character = placement.source;
+        if (!character || character->getteam().getteam() == teams::enemy) {
+            continue;
+        }
+        for (int i = 0; i < character->getBondCount(); ++i) {
+            const Bond bond = character->getBond(i);
+            if (bond != Bond::none) {
+                ++counts[bond];
+            }
+        }
+    }
+    return counts;
+}
+
 bool battlesystem::startFromPreparedUnits(const std::vector<CharacterPlacement>& placements) {
     if (running) {
         return false;
@@ -113,6 +164,8 @@ bool battlesystem::startFromPreparedUnits(const std::vector<CharacterPlacement>&
         clear();
         return false;
     }
+
+    applyBondEffects(count_bond(placements));
 
     for (const auto& placement : placements) {
         if (placement.source) {
@@ -205,7 +258,7 @@ std::string battlesystem::boardPathForId(const std::string& boardId) const {
         return appPath.toStdString();
     }
 
-    const QString localPath = QDir("src/core/boards").filePath(fileName);
+    const QString localPath = QDir("src/core").filePath(fileName);
     if (QFile::exists(localPath)) {
         return localPath.toStdString();
     }
@@ -278,6 +331,66 @@ void battlesystem::addEquipmentBuffs(Character* character, EquipmentGroup group,
     }
     equipskill::addEquipmentStartBuffs(character, *equipment);
     equipskill::addEquipmentActiveSkills(character, *equipment);
+}
+
+void battlesystem::applyBondEffects(const std::unordered_map<Bond, int>& bondCounts)
+{
+    auto count = [&bondCounts](Bond bond) {
+        const auto it = bondCounts.find(bond);
+        return it == bondCounts.end() ? 0 : it->second;
+    };
+
+    std::vector<Character*> pcCharacters;
+    pcCharacters.reserve(pcTeamIds.size());
+    for (int id : pcTeamIds) {
+        const auto it = characters.find(id);
+        if (it != characters.end() && it->second.character) {
+            pcCharacters.push_back(it->second.character.get());
+        }
+    }
+
+    const int soldierCount = count(Bond::soldier);
+    const int mageCount = count(Bond::mage);
+    const int buildingCount = count(Bond::building);
+    const int witchCount = count(Bond::witch);
+    const int assassinCount = count(Bond::assassin);
+
+    for (Character* character : pcCharacters) {
+        if (soldierCount >= 3) {
+            modifyAttackPercent(character, 10);
+        }
+        if (soldierCount >= 5) {
+            modifyAttackPercent(character, 20);
+            modifyMaxHpPercent(character, 10);
+        }
+
+        if (mageCount >= 2) {
+            character->getstats().modifyMP(3);
+        }
+        if (mageCount >= 4) {
+            character->getstats().modifyMAXMP(-1);
+        }
+
+        if (buildingCount >= 1) {
+            modifyMaxHpPercent(character, 30);
+        }
+
+        if (witchCount >= 3) {
+            modifyMaxHpPercent(character, -30);
+            modifyAttackPercent(character, 50);
+        }
+        if (witchCount >= 5) {
+            modifyDefensePercent(character, 10);
+            modifyAttackPercent(character, 30);
+        }
+
+        if (assassinCount >= 3) {
+            character->getattack().modifyAttackIntervalPercent(50);
+        }
+        if (assassinCount >= 5 && character->hasBond(Bond::assassin)) {
+            modifyMaxHpPercent(character, 20);
+        }
+    }
 }
 
 void battlesystem::addRecordFromSource(Character* source, const Hex& hex, bool hasEquipment,

@@ -178,7 +178,13 @@ StartPage::StartPage(QWidget* parent)
         dialog.exec();
     });
     connect(settingsButton, &QToolButton::clicked, this, [this]() {
-        QMessageBox::information(this, "Settings", "Settings placeholder.");
+        QMessageBox::information(
+            this,
+            QString::fromUtf8("游戏说明"),
+            QString::fromUtf8("在路线地图选择节点推进。\n"
+                              "战斗前可购买角色、拖拽布阵、穿戴装备和合成装备。\n"
+                              "战斗会自动进行，胜利后打开宝箱领取奖励。\n"
+                              "顶部 HUD 可保存进度、查看背包、商店和装备。"));
     });
     connect(exitButton, &QToolButton::clicked, qApp, &QApplication::quit);
 }

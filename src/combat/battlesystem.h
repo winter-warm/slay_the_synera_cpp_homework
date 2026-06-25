@@ -14,6 +14,7 @@
 #include <vector>
 
 class Character;
+enum class Bond:int;
 
 struct CharacterPlacement {
     Character* source = nullptr;
@@ -39,6 +40,7 @@ public:
 
     bool loadBattle(const BattleConfig& config);
     void setActiveAuraIds(const std::vector<std::string>& auraIds);
+    static std::unordered_map<Bond, int> count_bond(const std::vector<CharacterPlacement>& placements);
     bool startFromPreparedUnits(const std::vector<CharacterPlacement>& placements);
     void update(float deltaTime);
     void clear();
@@ -60,6 +62,7 @@ private:
     void addAuraBuffs(Character* character);
     void addEquipmentBuffs(Character* character, const Character* source);
     void addEquipmentBuffs(Character* character, EquipmentGroup group, int equipmentId);
+    void applyBondEffects(const std::unordered_map<Bond, int>& bondCounts);
     void addRecordFromSource(Character* source, const Hex& hex, bool hasEquipment = false,
                              EquipmentGroup equipmentGroup = EquipmentGroup::Mold, int equipmentId = 0);
     void removeDeadCharacters();

@@ -1829,9 +1829,9 @@
       ],
       "team": "enemy",
       "baseStats": {
-        "maxHp": 125,
+        "maxHp": 25,
         "maxMp": 3,
-        "attack": 16,
+        "attack": 1,
         "defense": 6,
         "range": 1,
         "shield": 12
@@ -1855,9 +1855,9 @@
       ],
       "team": "enemy",
       "baseStats": {
-        "maxHp": 220,
+        "maxHp": 60,
         "maxMp": 4,
-        "attack": 22,
+        "attack": 5,
         "defense": 12,
         "range": 1,
         "shield": 30
@@ -1881,10 +1881,10 @@
       ],
       "team": "enemy",
       "baseStats": {
-        "maxHp": 175,
+        "maxHp": 50,
         "maxMp": 3,
-        "attack": 28,
-        "defense": 8,
+        "attack": 5,
+        "defense": 1,
         "range": 1,
         "shield": 12
       },
@@ -1907,9 +1907,9 @@
       ],
       "team": "enemy",
       "baseStats": {
-        "maxHp": 165,
-        "maxMp": 3,
-        "attack": 24,
+        "maxHp": 40,
+        "maxMp": 6,
+        "attack": 5,
         "defense": 7,
         "range": 3,
         "shield": 10
@@ -1933,10 +1933,10 @@
       ],
       "team": "enemy",
       "baseStats": {
-        "maxHp": 230,
-        "maxMp": 5,
-        "attack": 34,
-        "defense": 10,
+        "maxHp": 30,
+        "maxMp": 6,
+        "attack": 10,
+        "defense": 8,
         "range": 3,
         "shield": 20
       },
@@ -1959,10 +1959,10 @@
       ],
       "team": "enemy",
       "baseStats": {
-        "maxHp": 280,
-        "maxMp": 5,
-        "attack": 26,
-        "defense": 12,
+        "maxHp": 100,
+        "maxMp": 15,
+        "attack": 1,
+        "defense": 1,
         "range": 1,
         "shield": 45
       },
@@ -2705,7 +2705,7 @@
     {
       "templateId": 1240,
       "name": "defect_robot",
-      "displayName": "缺陷机器人",
+      "displayName": "故障机器人",
       "magicName": "我已启动",
       "skillDescription": "我已启动：秒杀所有敌人，获得胜利(真的能攒到30点吗)",
       "rarity": 1,

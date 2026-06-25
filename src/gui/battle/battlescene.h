@@ -18,6 +18,7 @@ class HexLayout;
 class Object;
 class Obstacle;
 class PropItem;
+class QGraphicsRectItem;
 class QGraphicsItem;
 class QGraphicsScene;
 class QGraphicsTextItem;
@@ -63,10 +64,12 @@ public:
 signals:
     void rewardChestOpened();
     void rewardEquipmentClaimed(EquipmentGroup group, int equipmentId);
+    void placementsChanged();
+    void rosterUnitRecycleRequested(int unitId);
 
 private:
     enum class BattlePhase { Prep, Battle };
-    enum class UnitArea { Hidden, Board, Bench };
+    enum class UnitArea { Hidden, Board, Bench, Trash };
 
     struct Placement {
         UnitArea area = UnitArea::Hidden;
@@ -98,6 +101,8 @@ private:
     BenchSlotItem* findBenchSlotItemAt(const QPointF& scenePos) const;
     UnitItem* findUnitItem(int unitId) const;
     void clearHighlights();
+    bool isTrashAt(const QPointF& scenePos) const;
+    void setTrashHover(bool hover, bool accepted);
     bool canApplyDrop(int unitId, const DropTarget& target) const;
     void applyDrop(int unitId, const DropTarget& target);
     int boardRosterCount() const;
@@ -132,6 +137,8 @@ private:
     QGraphicsScene* sceneObj;
     std::vector<GridItem*> gridItems;
     QGraphicsTextItem* deploymentTextItem;
+    QGraphicsRectItem* trashItem;
+    QGraphicsTextItem* trashTextItem;
     std::vector<BenchSlotItem*> benchItems;
     std::vector<UnitItem*> unitItems;
     std::vector<QGraphicsItem*> obstacleItems;

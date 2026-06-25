@@ -1,5 +1,6 @@
 #include "eventpage.h"
 #include "app/eventrules.h"
+#include "combat/equipment/equipmentrepository.h"
 #include "entity/character/characterfactory.h"
 #include "gui/widgets/gamehud.h"
 #include <QCoreApplication>
@@ -22,7 +23,9 @@
 #include <QSizePolicy>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <algorithm>
 #include <functional>
+#include <optional>
 
 class HexTechCardFrame : public QFrame {
 public:
@@ -112,60 +115,62 @@ public:
         , descriptionLabel(new QLabel(this))
         , optionsLayout(new QVBoxLayout()) {
         setAttribute(Qt::WA_TranslucentBackground);
-        auto* layout = new QVBoxLayout(this);
-        layout->setContentsMargins(0, 0, 0, 0);
-        layout->setSpacing(12);
-        layout->setAlignment(Qt::AlignRight | Qt::AlignTop);
+        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        auto* layout = new QHBoxLayout(this);
+        layout->setContentsMargins(48, 18, 82, 36);
+        layout->setSpacing(0);
+        layout->addStretch(1);
 
-        titleLabel->setFixedWidth(470);
-        titleLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        auto* panelLayout = new QVBoxLayout();
+        panelLayout->setContentsMargins(0, 0, 0, 0);
+        panelLayout->setSpacing(14);
+        panelLayout->setAlignment(Qt::AlignTop);
+        layout->addLayout(panelLayout);
+
+        titleLabel->setFixedWidth(560);
+        titleLabel->setAlignment(Qt::AlignCenter);
         titleLabel->setStyleSheet(R"(
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 900;
-            color: #fff5cf;
-            background-color: rgba(14, 15, 17, 185);
-            border: 2px solid rgba(239, 211, 128, 175);
-            border-radius: 8px;
-            padding: 12px 18px;
+            color: #d8b45b;
+            background: transparent;
+            padding: 0 8px;
         )");
-        layout->addWidget(titleLabel, 0, Qt::AlignRight);
+        panelLayout->addWidget(titleLabel, 0, Qt::AlignHCenter);
 
-        bodyLabel->setFixedWidth(470);
-        bodyLabel->setMinimumHeight(150);
+        bodyLabel->setFixedWidth(560);
+        bodyLabel->setMinimumHeight(170);
         bodyLabel->setWordWrap(true);
-        bodyLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+        bodyLabel->setAlignment(Qt::AlignCenter | Qt::AlignTop);
         bodyLabel->setStyleSheet(R"(
             font-size: 18px;
-            color: #fff9e6;
-            background-color: rgba(14, 15, 17, 185);
-            border: 2px solid rgba(239, 211, 128, 175);
-            border-radius: 8px;
-            padding: 18px;
+            line-height: 140%;
+            color: #f5efe7;
+            background: transparent;
+            padding: 10px 6px;
         )");
-        layout->addWidget(bodyLabel, 0, Qt::AlignRight);
+        panelLayout->addWidget(bodyLabel, 0, Qt::AlignHCenter);
 
         auto* optionsWidget = new QWidget(this);
         optionsWidget->setAttribute(Qt::WA_TranslucentBackground);
-        optionsWidget->setFixedWidth(470);
+        optionsWidget->setFixedWidth(560);
         optionsLayout->setContentsMargins(0, 0, 0, 0);
-        optionsLayout->setAlignment(Qt::AlignRight | Qt::AlignTop);
+        optionsLayout->setAlignment(Qt::AlignTop);
         optionsWidget->setLayout(optionsLayout);
-        layout->addWidget(optionsWidget, 0, Qt::AlignRight);
+        panelLayout->addWidget(optionsWidget, 0, Qt::AlignHCenter);
 
-        descriptionLabel->setFixedWidth(470);
+        descriptionLabel->setFixedWidth(560);
         descriptionLabel->setWordWrap(true);
         descriptionLabel->setMinimumHeight(44);
         descriptionLabel->setStyleSheet(R"(
-            font-size: 18px;
+            font-size: 15px;
             font-weight: 800;
-            color: #ffb946;
-            background-color: rgba(14, 15, 17, 150);
-            border: 1px solid rgba(239, 211, 128, 100);
-            border-radius: 8px;
-            padding: 8px 14px;
+            color: rgba(255, 219, 140, 190);
+            background: transparent;
+            padding: 2px 14px;
         )");
-        layout->addWidget(descriptionLabel, 0, Qt::AlignRight);
-        layout->addStretch();
+        panelLayout->addWidget(descriptionLabel, 0, Qt::AlignHCenter);
+        panelLayout->addStretch(1);
     }
 
     std::function<void(int)> onOptionSelected;
@@ -188,31 +193,37 @@ public:
         for (int i = 0; i < optionCount; ++i) {
             const EventOption& option = state.currentEvent.options[static_cast<size_t>(i)];
             auto* button = new NormalOptionButton(this);
-            button->setText(QString::fromStdString(option.label));
-            button->setMinimumSize(420, optionCount == 4 ? 54 : 64);
+            QString buttonText = QString::fromStdString(option.label);
+            if (!option.description.empty()) {
+                buttonText += "\n" + QString::fromStdString(option.description);
+            }
+            button->setText(buttonText);
+            button->setMinimumSize(520, optionCount == 4 ? 66 : 76);
             button->setCursor(Qt::PointingHandCursor);
             const std::string disabledReason = disabledReasonForEventOption(currentState, option);
             button->setToolTip(QString::fromStdString(disabledReason.empty() ? option.description : disabledReason));
             button->setProperty("blocked", !disabledReason.empty());
             button->setStyleSheet(R"(
                 QPushButton {
-                    background-color: rgba(25, 27, 30, 190);
-                    border: 2px solid rgba(239, 211, 128, 190);
-                    border-radius: 8px;
-                    color: #fff4cf;
-                    font-size: 20px;
+                    background-color: rgba(28, 77, 83, 210);
+                    border: 2px solid rgba(109, 171, 178, 210);
+                    border-radius: 3px;
+                    color: #f7eed0;
+                    font-size: 17px;
                     font-weight: 800;
                     text-align: left;
                     padding-left: 24px;
+                    padding-top: 6px;
+                    padding-bottom: 6px;
                 }
                 QPushButton:hover {
-                    background-color: rgba(55, 43, 24, 220);
-                    border: 3px solid #ffb946;
+                    background-color: rgba(43, 105, 112, 235);
+                    border: 2px solid #dfc06a;
                 }
                 QPushButton[blocked="true"] {
                     color: rgba(255, 244, 207, 95);
-                    background-color: rgba(20, 20, 20, 120);
-                    border: 2px solid rgba(130, 120, 100, 100);
+                    background-color: rgba(25, 50, 54, 130);
+                    border: 2px solid rgba(94, 112, 116, 130);
                 }
             )");
             button->onHovered = [this, option, disabledReason]() {
@@ -259,6 +270,25 @@ static QString assetPath(const std::string& relativePath) {
 static QString characterCardPath(const std::string& name) {
     const QString relative = QDir("assets/characters").filePath(QString::fromStdString(name) + "/card.png");
     return QDir(QCoreApplication::applicationDirPath()).filePath(relative);
+}
+
+static QString equipmentIconPath(const Equipment& equipment) {
+    const QString runtimePath = QDir(QCoreApplication::applicationDirPath())
+                                    .filePath(QString::fromStdString(equipment.iconPath()));
+    if (QFile::exists(runtimePath)) {
+        return runtimePath;
+    }
+    return QString::fromStdString(equipment.iconPath());
+}
+
+static QString equipmentGroupLabel(EquipmentGroup group) {
+    if (group == EquipmentGroup::Advanced) {
+        return QString::fromUtf8("高级");
+    }
+    if (group == EquipmentGroup::Element) {
+        return QString::fromUtf8("素材");
+    }
+    return QString::fromUtf8("胚子");
 }
 
 static QString restOptionLabel(RestOption option) {
@@ -602,32 +632,28 @@ void EventPage::rebuildOptions() {
 
     if (currentState.currentEvent.restTrainingSelection) {
         setSpecialEventLayoutVisible(true);
+        contentLayout->setContentsMargins(24, 8, 24, 18);
+        bodyLabel->setVisible(false);
         restDescriptionLabel->setVisible(true);
         restDescriptionLabel->setText(QString::fromUtf8("选择一张未到达三星的卡，升一星"));
-        restScrollArea->setVisible(true);
-        auto* button = new QPushButton(QString::fromUtf8("打开锻炼面板"), this);
-        button->setMinimumSize(280, 68);
-        button->setCursor(Qt::PointingHandCursor);
-        button->setStyleSheet(R"(
-            QPushButton {
-                background-color: rgba(255, 246, 182, 225);
-                border: 3px solid rgba(255, 226, 115, 225);
-                border-radius: 8px;
-                color: #5a310a;
-                font-size: 24px;
-                font-weight: 900;
-            }
-            QPushButton:hover {
-                background-color: rgba(255, 252, 213, 245);
-                border: 4px solid #ffb946;
-            }
+        restDescriptionLabel->setFixedHeight(72);
+        restDescriptionLabel->setStyleSheet(R"(
+            font-size: 26px;
+            font-weight: 900;
+            color: #ff9d2e;
+            background: transparent;
+            padding: 8px 0;
         )");
-        restLayout->addWidget(button, 0, 0, Qt::AlignTop | Qt::AlignHCenter);
-        connect(button, &QPushButton::clicked, this, [this]() {
-            QTimer::singleShot(0, this, [this]() {
-                emit trainingPanelRequested();
-            });
-        });
+        restScrollArea->setVisible(true);
+        restScrollArea->setMinimumSize(940, 390);
+        int column = 0;
+        for (int i = 0; i < static_cast<int>(currentState.ownedCharacterCards.size()); ++i) {
+            if (currentState.ownedCharacterCards[static_cast<size_t>(i)].starLevel >= 3) {
+                continue;
+            }
+            restLayout->addWidget(createRestTrainingCard(i), column / 4, column % 4, Qt::AlignTop);
+            ++column;
+        }
         return;
     }
 
@@ -642,6 +668,69 @@ void EventPage::rebuildOptions() {
         for (int ownedCardIndex : indexes) {
             restLayout->addWidget(createEventOwnedCard(ownedCardIndex), column / 4, column % 4, Qt::AlignTop);
             ++column;
+        }
+        return;
+    }
+
+    if (currentState.currentEvent.recruitSelection) {
+        setSpecialEventLayoutVisible(true);
+        restDescriptionLabel->setVisible(true);
+        restDescriptionLabel->setText(QString::fromStdString(currentState.currentEvent.selectionPrompt));
+        restScrollArea->setVisible(true);
+        restScrollArea->setMinimumSize(940, 390);
+
+        std::vector<characterfactory::CharacterTemplateInfo> candidates = characterfactory::playerTemplates();
+        candidates.erase(std::remove_if(candidates.begin(), candidates.end(), [this](const auto& info) {
+                             return info.rarity < currentState.currentEvent.recruitMinRarity ||
+                                    info.rarity > currentState.currentEvent.recruitMaxRarity;
+                         }),
+                         candidates.end());
+        std::sort(candidates.begin(), candidates.end(), [](const auto& left, const auto& right) {
+            if (left.rarity != right.rarity) {
+                return left.rarity < right.rarity;
+            }
+            const std::string leftBond = left.bonds.empty() ? "" : left.bonds.front();
+            const std::string rightBond = right.bonds.empty() ? "" : right.bonds.front();
+            if (leftBond != rightBond) {
+                return leftBond < rightBond;
+            }
+            return left.templateId < right.templateId;
+        });
+        for (int i = 0; i < static_cast<int>(candidates.size()); ++i) {
+            restLayout->addWidget(createRecruitChoiceCard(candidates[static_cast<size_t>(i)].templateId),
+                                  i / 4,
+                                  i % 4,
+                                  Qt::AlignTop);
+        }
+        return;
+    }
+
+    if (currentState.currentEvent.equipmentSelection) {
+        setSpecialEventLayoutVisible(true);
+        restDescriptionLabel->setVisible(true);
+        restDescriptionLabel->setText(QString::fromStdString(currentState.currentEvent.selectionPrompt));
+        restScrollArea->setVisible(true);
+        restScrollArea->setMinimumSize(980, 390);
+
+        EquipmentRepository repository;
+        std::vector<Equipment> choices = currentState.currentEvent.advancedEquipmentSelection
+                                             ? repository.allAdvanced()
+                                             : repository.allBasic();
+        std::sort(choices.begin(), choices.end(), [](const Equipment& left, const Equipment& right) {
+            if (left.group() != right.group()) {
+                return static_cast<int>(left.group()) < static_cast<int>(right.group());
+            }
+            if (left.id() != right.id()) {
+                return left.id() < right.id();
+            }
+            return left.title() < right.title();
+        });
+        for (int i = 0; i < static_cast<int>(choices.size()); ++i) {
+            const Equipment& equipment = choices[static_cast<size_t>(i)];
+            restLayout->addWidget(createEquipmentChoiceCard(equipment.group(), equipment.id()),
+                                  i / 4,
+                                  i % 4,
+                                  Qt::AlignTop);
         }
         return;
     }
@@ -902,6 +991,142 @@ QWidget* EventPage::createEventOwnedCard(int ownedCardIndex) {
     };
     frame->onClicked = [this, ownedCardIndex]() {
         emit eventOwnedCardSelected(ownedCardIndex);
+    };
+    return frame;
+}
+
+QWidget* EventPage::createRecruitChoiceCard(int templateId) {
+    const auto info = characterfactory::infoFor(templateId);
+
+    auto* frame = new RestCardFrame(this);
+    frame->setFixedSize(220, 336);
+    frame->setCursor(Qt::PointingHandCursor);
+    frame->setAttribute(Qt::WA_StyledBackground, true);
+    frame->setStyleSheet(R"(
+        QFrame {
+            background-color: rgba(255, 246, 182, 225);
+            border: 3px solid rgba(255, 226, 115, 225);
+            border-radius: 8px;
+        }
+        QFrame:hover {
+            background-color: rgba(255, 252, 213, 245);
+            border: 4px solid #ffb946;
+        }
+    )");
+
+    auto* layout = new QVBoxLayout(frame);
+    layout->setContentsMargins(10, 10, 10, 12);
+    layout->setSpacing(7);
+
+    auto* image = new QLabel(frame);
+    image->setFixedSize(196, 190);
+    image->setAlignment(Qt::AlignCenter);
+    image->setStyleSheet("background: #1b1813; border: 2px solid rgba(90, 49, 10, 180); border-radius: 6px;");
+    if (info) {
+        const QPixmap pixmap = loadScaledPixmap(characterCardPath(info->name), image->size());
+        if (!pixmap.isNull()) {
+            image->setPixmap(pixmap);
+        }
+    }
+    layout->addWidget(image, 0, Qt::AlignCenter);
+
+    auto* name = new QLabel(info ? QString::fromStdString(info->displayName) : QString::fromUtf8("未知角色"), frame);
+    name->setAlignment(Qt::AlignCenter);
+    name->setWordWrap(true);
+    name->setStyleSheet("font-size: 19px; font-weight: 900; color: #4d2908; background: transparent; border: none;");
+    layout->addWidget(name);
+
+    const QString firstBond = info && !info->bonds.empty()
+                                  ? QString::fromStdString(info->bonds.front())
+                                  : QString::fromUtf8("none");
+    auto* meta = new QLabel(info ? QString::fromUtf8("稀有度 %1  职业 %2").arg(info->rarity).arg(firstBond)
+                                 : QString::fromUtf8("未知"), frame);
+    meta->setAlignment(Qt::AlignCenter);
+    meta->setWordWrap(true);
+    meta->setStyleSheet("font-size: 14px; font-weight: 800; color: #7d4c12; background: transparent; border: none;");
+    layout->addWidget(meta);
+
+    auto* skill = new QLabel(info ? QString::fromStdString(info->magicName) : QString(), frame);
+    skill->setAlignment(Qt::AlignCenter);
+    skill->setWordWrap(true);
+    skill->setStyleSheet("font-size: 14px; font-weight: 800; color: #2f1a07; background: transparent; border: none;");
+    layout->addWidget(skill, 1);
+
+    frame->onHovered = [this, name]() {
+        restDescriptionLabel->setText(QString::fromUtf8("选择 %1 加入队伍").arg(name->text()));
+    };
+    frame->onLeft = [this]() {
+        restDescriptionLabel->setText(QString::fromStdString(currentState.currentEvent.selectionPrompt));
+    };
+    frame->onClicked = [this, templateId]() {
+        emit recruitTemplateSelected(templateId);
+    };
+    return frame;
+}
+
+QWidget* EventPage::createEquipmentChoiceCard(EquipmentGroup group, int equipmentId) {
+    EquipmentRepository repository;
+    const std::optional<Equipment> equipment = group == EquipmentGroup::Advanced
+                                                   ? repository.findAdvanced(equipmentId)
+                                                   : repository.findBasic(group, equipmentId);
+
+    auto* frame = new RestCardFrame(this);
+    frame->setFixedSize(228, 280);
+    frame->setCursor(Qt::PointingHandCursor);
+    frame->setAttribute(Qt::WA_StyledBackground, true);
+    frame->setStyleSheet(R"(
+        QFrame {
+            background-color: rgba(255, 246, 182, 225);
+            border: 3px solid rgba(255, 226, 115, 225);
+            border-radius: 8px;
+        }
+        QFrame:hover {
+            background-color: rgba(255, 252, 213, 245);
+            border: 4px solid #ffb946;
+        }
+    )");
+
+    auto* layout = new QVBoxLayout(frame);
+    layout->setContentsMargins(12, 12, 12, 12);
+    layout->setSpacing(8);
+
+    auto* image = new QLabel(frame);
+    image->setFixedSize(76, 76);
+    image->setAlignment(Qt::AlignCenter);
+    image->setStyleSheet("background: rgba(35, 25, 14, 190); border: 2px solid rgba(90, 49, 10, 180); border-radius: 8px;");
+    if (equipment) {
+        QPixmap pixmap(equipmentIconPath(*equipment));
+        if (!pixmap.isNull()) {
+            image->setPixmap(pixmap.scaled(image->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        }
+    }
+    layout->addWidget(image, 0, Qt::AlignCenter);
+
+    auto* name = new QLabel(equipment ? QString::fromStdString(equipment->title()) : QString::fromUtf8("未知装备"), frame);
+    name->setAlignment(Qt::AlignCenter);
+    name->setWordWrap(true);
+    name->setStyleSheet("font-size: 18px; font-weight: 900; color: #4d2908; background: transparent; border: none;");
+    layout->addWidget(name);
+
+    auto* meta = new QLabel(equipmentGroupLabel(group), frame);
+    meta->setAlignment(Qt::AlignCenter);
+    meta->setStyleSheet("font-size: 14px; font-weight: 900; color: #9a5a0a; background: transparent; border: none;");
+    layout->addWidget(meta);
+
+    auto* effect = new QLabel(equipment ? QString::fromStdString(equipment->effectText()) : QString(), frame);
+    effect->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    effect->setWordWrap(true);
+    effect->setStyleSheet("font-size: 13px; font-weight: 700; color: #2f1a07; background: transparent; border: none;");
+    layout->addWidget(effect, 1);
+
+    frame->onHovered = [this, name]() {
+        restDescriptionLabel->setText(QString::fromUtf8("选择 %1").arg(name->text()));
+    };
+    frame->onLeft = [this]() {
+        restDescriptionLabel->setText(QString::fromStdString(currentState.currentEvent.selectionPrompt));
+    };
+    frame->onClicked = [this, group, equipmentId]() {
+        emit eventEquipmentSelected(group, equipmentId);
     };
     return frame;
 }

@@ -44,9 +44,6 @@ add_custom_command(TARGET Synera_Starter POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/default_board.json"
         "$<TARGET_FILE_DIR:Synera_Starter>/boards/default_board.json"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/core/boards"
-        "$<TARGET_FILE_DIR:Synera_Starter>/boards"
     COMMAND ${CMAKE_COMMAND} -E make_directory
         "$<TARGET_FILE_DIR:Synera_Starter>/events"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -83,9 +80,6 @@ add_custom_target(copy_runtime_assets ALL
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/default_board.json"
         "$<TARGET_FILE_DIR:Synera_Starter>/boards/default_board.json"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/core/boards"
-        "$<TARGET_FILE_DIR:Synera_Starter>/boards"
     COMMAND ${CMAKE_COMMAND} -E make_directory
         "$<TARGET_FILE_DIR:Synera_Starter>/events"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different

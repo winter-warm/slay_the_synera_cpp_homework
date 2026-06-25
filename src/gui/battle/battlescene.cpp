@@ -1,4 +1,4 @@
-#include "gui/battle/battlescene.h"
+﻿#include "gui/battle/battlescene.h"
 #include "entity/character/character.h"
 #include "entity/object/object.h"
 #include "entity/obstacle/obstacle.h"
@@ -24,6 +24,7 @@
 #include <QParallelAnimationGroup>
 #include <QPainter>
 #include <QPointer>
+#include <QPen>
 #include <QPropertyAnimation>
 #include <QSequentialAnimationGroup>
 #include <QTimer>
@@ -33,10 +34,10 @@
 #include <functional>
 #include <random>
 
-
 static constexpr qreal zGrid = 0.0, zUnit = 1.0;
-static constexpr qreal zBench = 4.0, zBenchUnit = 5.0, zDraggingUnit = 6.0, zVisualEffect = 7.0;
+static constexpr qreal zBench = 20.0, zBenchUnit = 21.0, zTrash = 22.0, zDraggingUnit = 30.0, zVisualEffect = 40.0;
 static constexpr qreal sceneW = 1280.0, sceneH = 720.0, scenePad = 40.0;
+static constexpr qreal hexRadius = 42.0, hexRowGap = 63.0;
 static constexpr qreal pi = 3.14159265358979323846;
 
 class SquareParticle : public QGraphicsObject {
@@ -124,6 +125,8 @@ BattleScene::BattleScene(QObject* parent)
     , layout(std::make_unique<HexLayout>())
     , sceneObj(new QGraphicsScene(this))
     , deploymentTextItem(nullptr)
+    , trashItem(nullptr)
+    , trashTextItem(nullptr)
     , rewardChestItem(nullptr)
     , dragActive(false)
     , activeUnitId(-1)
@@ -173,6 +176,7 @@ void BattleScene::resetPreparation() {
     }
     hideBench(false);
     syncFromState();
+    emit placementsChanged();
 }
 
 void BattleScene::clearRoster() {
@@ -189,6 +193,7 @@ void BattleScene::clearRoster() {
     units.clear();
     places.clear();
     syncFromState();
+    emit placementsChanged();
 }
 
 void BattleScene::setDeploymentLimit(int limit) {
@@ -505,6 +510,8 @@ void BattleScene::handleDragMoved(int unitId, const QPointF& scenePos) {
             targetItem->setHoverActive(true);
             targetItem->setDropActive(canApplyDrop(unitId, target));
         }
+    } else if (target.area == UnitArea::Trash) {
+        setTrashHover(true, canApplyDrop(unitId, target));
     }
 }
 
@@ -634,6 +641,12 @@ void BattleScene::hideBench(bool hidden) {
             item->setVisible(!hidden);
         }
     }
+    if (trashItem) {
+        trashItem->setVisible(!hidden);
+    }
+    if (trashTextItem) {
+        trashTextItem->setVisible(!hidden);
+    }
 }
 
 Board* BattleScene::activeBoard() const {
@@ -670,6 +683,26 @@ void BattleScene::clearHighlights() {
             item->setDropActive(false);
         }
     }
+    setTrashHover(false, false);
+}
+
+bool BattleScene::isTrashAt(const QPointF& scenePos) const {
+    if (!trashItem || !trashItem->isVisible()) {
+        return false;
+    }
+    return trashItem->boundingRect().contains(trashItem->mapFromScene(scenePos));
+}
+
+void BattleScene::setTrashHover(bool hover, bool accepted) {
+    if (!trashItem) {
+        return;
+    }
+    const QColor baseFill(72, 54, 44, 220);
+    const QColor hoverFill = accepted ? QColor(128, 54, 44, 235) : QColor(70, 70, 70, 180);
+    const QColor basePen(210, 160, 100);
+    const QColor hoverPen = accepted ? QColor(255, 196, 112) : QColor(130, 130, 130);
+    trashItem->setBrush(QBrush(hover ? hoverFill : baseFill));
+    trashItem->setPen(QPen(hover ? hoverPen : basePen, 3.0));
 }
 
 bool BattleScene::canApplyDrop(int unitId, const DropTarget& target) const {
@@ -685,6 +718,10 @@ bool BattleScene::canApplyDrop(int unitId, const DropTarget& target) const {
     }
 
     const Placement& source = placementIt->second;
+
+    if (target.area == UnitArea::Trash) {
+        return source.area == UnitArea::Board || source.area == UnitArea::Bench;
+    }
 
     if (target.area == UnitArea::Board) {
         const Board::Zone z = target.hasHex ? board->zone(target.hex) : Board::Zone::None;
@@ -726,6 +763,13 @@ void BattleScene::applyDrop(int unitId, const DropTarget& target) {
         return;
     }
 
+    if (target.area == UnitArea::Trash) {
+        QTimer::singleShot(0, this, [this, unitId]() {
+            emit rosterUnitRecycleRequested(unitId);
+        });
+        return;
+    }
+
     const auto placementIt = places.find(unitId);
     if (placementIt != places.end() && placementIt->second.area == UnitArea::Board) {
         board->remove(unit);
@@ -749,6 +793,7 @@ void BattleScene::applyDrop(int unitId, const DropTarget& target) {
     place.slot = target.slot;
     places[unitId] = place;
     updateDeploymentText();
+    emit placementsChanged();
 }
 
 int BattleScene::boardRosterCount() const {
@@ -1095,6 +1140,8 @@ void BattleScene::buildScene() {
     sceneObj->clear();
     gridItems.clear();
     deploymentTextItem = nullptr;
+    trashItem = nullptr;
+    trashTextItem = nullptr;
     rewardChestItem = nullptr;
     benchItems.clear();
     unitItems.clear();
@@ -1103,24 +1150,20 @@ void BattleScene::buildScene() {
     Board* board = activeBoard();
     layout->setCells(board ? board->cells() : std::vector<Hex>{});
     layout->setOrigin(QPointF(0.0, 0.0));
-    layout->setSize(46.0, 69.0);
+    layout->setSize(hexRadius, hexRowGap);
 
     const qreal benchW = benchCols * benchSize + (benchCols - 1) * benchGap;
     const qreal benchH = benchRows * benchSize + (benchRows - 1) * benchGap;
-    benchOrigin = QPointF((sceneW - benchW) * 0.5, sceneH - scenePad - benchH);
+    const qreal bottomControlReserve = 120.0;
 
     QRectF rawBounds = rawBoardBounds();
     const qreal topW = sceneW - scenePad * 2.0;
-    const qreal topH = benchOrigin.y() - scenePad * 2.0;
-    if (!rawBounds.isEmpty()) {
-        const qreal scale = std::min<qreal>(1.0, std::min(topW / rawBounds.width(), topH / rawBounds.height()));
-        layout->setSize(46.0 * scale, 69.0 * scale);
-        rawBounds = rawBoardBounds();
-    }
-
     const qreal boardX = scenePad + qMax<qreal>(0.0, (topW - rawBounds.width()) * 0.5) - rawBounds.left();
-    const qreal boardY = scenePad + qMax<qreal>(0.0, (topH - rawBounds.height()) * 0.5) - rawBounds.top();
+    const qreal boardY = scenePad - rawBounds.top();
     layout->setOrigin(QPointF(boardX, boardY));
+    rawBounds = rawBoardBounds();
+    benchOrigin = QPointF((sceneW - benchW) * 0.5,
+                          qMax(sceneH - scenePad - bottomControlReserve - benchH, rawBounds.bottom() + scenePad));
 
     if (!board) {
         sceneObj->setSceneRect(QRectF(0.0, 0.0, sceneW, sceneH));
@@ -1155,6 +1198,22 @@ void BattleScene::buildScene() {
         }
     }
 
+    trashItem = sceneObj->addRect(QRectF(0.0, 0.0, benchSize, benchSize),
+                                  QPen(QColor(210, 160, 100), 3.0),
+                                  QBrush(QColor(72, 54, 44, 220)));
+    trashItem->setZValue(zTrash);
+    trashItem->setPos(benchOrigin.x() - benchGap - benchSize, benchOrigin.y());
+    trashItem->setAcceptedMouseButtons(Qt::NoButton);
+
+    trashTextItem = sceneObj->addText(QString::fromUtf8("鍥炴敹\n鍨冨溇妗?), QFont("Arial", 13, QFont::Black));
+    trashTextItem->setDefaultTextColor(QColor(255, 238, 198));
+    trashTextItem->setZValue(zTrash + 0.5);
+    trashTextItem->setAcceptedMouseButtons(Qt::NoButton);
+    const QRectF trashTextBounds = trashTextItem->boundingRect();
+    trashTextItem->setPos(trashItem->pos() +
+                          QPointF((benchSize - trashTextBounds.width()) * 0.5,
+                                  (benchSize - trashTextBounds.height()) * 0.5));
+
     for (Unit* unit : units) {
         createUnitItem(unit);
     }
@@ -1173,7 +1232,11 @@ void BattleScene::buildScene() {
         }
     }
 
-    sceneObj->setSceneRect(QRectF(0.0, 0.0, sceneW, sceneH));
+    QRectF sceneRect(0.0, 0.0, sceneW, sceneH);
+    sceneRect = sceneRect.united(rawBoardBounds());
+    sceneRect = sceneRect.united(QRectF(benchOrigin.x(), benchOrigin.y(), benchW, benchH));
+    sceneRect = sceneRect.united(QRectF(trashItem->pos(), QSizeF(benchSize, benchSize)));
+    sceneObj->setSceneRect(sceneRect.adjusted(-scenePad, -scenePad, scenePad, scenePad));
     hideBench(!isPreparationPhase());
 }
 
@@ -1299,6 +1362,13 @@ QPoint BattleScene::firstFreeBenchSlot() const {
 }
 
 BattleScene::DropTarget BattleScene::dropTargetAt(const QPointF& scenePos) const {
+    if (isTrashAt(scenePos)) {
+        DropTarget target;
+        target.area = UnitArea::Trash;
+        target.valid = true;
+        return target;
+    }
+
     if (BenchSlotItem* benchSlot = findBenchSlotItemAt(scenePos)) {
         DropTarget target;
         target.area = UnitArea::Bench;
@@ -1335,6 +1405,3 @@ QPointF BattleScene::benchSlotCenter(const QPoint& slotPos) const {
     return benchSlotTopLeft(slotPos.y(), slotPos.x()) +
            QPointF(benchSize * 0.5, benchSize * 0.5);
 }
-
-
-

@@ -10,6 +10,17 @@ static constexpr double usableWidthRatio = 0.75;
 static constexpr double topY = 70.0;
 static constexpr double bottomY = mapHeight - 70.0;
 static constexpr int slotCount = 6;
+static constexpr int lotteryEventId = 400;
+static constexpr int recruitEventId = 401;
+static constexpr int horseMarketEventId = 402;
+static constexpr int chessElderEventId = 403;
+
+struct NodeWeights {
+    int normalBattle = 0;
+    int eliteBattle = 0;
+    int event = 0;
+    int rest = 0;
+};
 
 static int randomInt(std::mt19937& rng, int minValue, int maxValue) {
     std::uniform_int_distribution<int> dist(minValue, maxValue);
@@ -34,15 +45,46 @@ static MapNodeType typeForEventId(int eventId) {
     return MapNodeType::NormalBattle;
 }
 
+static int randomFromPool(std::mt19937& rng, const std::vector<int>& pool) {
+    return pool[static_cast<size_t>(randomInt(rng, 0, static_cast<int>(pool.size()) - 1))];
+}
+
+static int randomLayerEventId(std::mt19937& rng, int layerId) {
+    static const std::vector<int> layer1Events = {101, 102, 103, 104, 105, 106,
+                                                  107, 108, 109, 110, 111, 112};
+    static const std::vector<int> layer2Events = {201, 202, 203, 204, 205, 206, 207, 208, 209, 210};
+    static const std::vector<int> layer3Events = {301, 302, 303, 304, 305, 306, 307, 308};
+
+    if (layerId == 1) {
+        return randomFromPool(rng, layer1Events);
+    }
+    if (layerId == 2) {
+        return randomFromPool(rng, layer2Events);
+    }
+    return randomFromPool(rng, layer3Events);
+}
+
+static NodeWeights weightsForLayer(int layerId) {
+    if (layerId == 2) {
+        return {6, 2, 4, 3};
+    }
+    if (layerId == 3) {
+        return {6, 5, 2, 2};
+    }
+    return {25, 8, 42, 25};
+}
+
 static int randomEventId(std::mt19937& rng, int layerId) {
-    const int roll = randomInt(rng, 1, 100);
-    if (roll <= 14) {
+    const NodeWeights weights = weightsForLayer(layerId);
+    const int total = weights.normalBattle + weights.eliteBattle + weights.event + weights.rest;
+    const int roll = randomInt(rng, 1, total);
+    if (roll <= weights.rest) {
         return MapEventId::Rest;
     }
-    if (roll <= 32) {
-        return layerId * 100 + randomInt(rng, 0, 99);
+    if (roll <= weights.rest + weights.event) {
+        return randomLayerEventId(rng, layerId);
     }
-    if (roll <= 84) {
+    if (roll <= weights.rest + weights.event + weights.normalBattle) {
         return MapEventId::NormalBattle;
     }
     return MapEventId::EliteBattle;
@@ -108,7 +150,7 @@ static std::pair<double, double> positionForNode(std::mt19937& rng, int row, int
 }
 
 static MapNode makeNode(int id, int layerId, int row, int lane, int eventId,
-                        MapNodeRole role, std::pair<double, double> position) {
+                        MapNodeRole role, std::pair<double, double> position, bool fixed = false) {
     MapNode node;
     node.id = id;
     node.event_id = eventId;
@@ -118,8 +160,69 @@ static MapNode makeNode(int id, int layerId, int row, int lane, int eventId,
     node.position = position;
     node.type = typeForEventId(eventId);
     node.role = role;
-    node.fixed = role != MapNodeRole::Normal;
+    node.fixed = fixed || role != MapNodeRole::Normal;
     return node;
+}
+
+static int fixedEventIdForRow(int layerId, int row, int totalRows) {
+    const int lastPlayableRow = totalRows - 2;
+    if (layerId == 1) {
+        if (row == 1 || row == lastPlayableRow) {
+            return MapEventId::Rest;
+        }
+        if (row == 6) {
+            return lotteryEventId;
+        }
+        if (row == 8) {
+            return chessElderEventId;
+        }
+        if (row == lastPlayableRow - 2) {
+            return recruitEventId;
+        }
+        if (row == lastPlayableRow - 1) {
+            return horseMarketEventId;
+        }
+        return -1;
+    }
+
+    if (row == 1 || row == lastPlayableRow) {
+        return MapEventId::Rest;
+    }
+    return -1;
+}
+
+static int fixedRowNodeCount(int row, int totalRows, int previousRowCount) {
+    const int lastPlayableRow = totalRows - 2;
+    if (row == 1) {
+        return 3;
+    }
+    if (row == lastPlayableRow) {
+        return 1;
+    }
+    return previousRowCount;
+}
+
+static void addPlayableRows(MapLayer& layer, std::mt19937& rng, int layerId, int middleRows,
+                            int totalRows, const std::vector<int>& rowCounts, int& nextId) {
+    for (int i = 0; i < middleRows; ++i) {
+        const int row = i + 1;
+        const int fixedEventId = fixedEventIdForRow(layerId, row, totalRows);
+        const bool fixedRow = fixedEventId >= 0;
+        const int previousRowCount = static_cast<int>(layer.rows[static_cast<size_t>(row - 1)].size());
+        const int nodeCount = fixedRow ? fixedRowNodeCount(row, totalRows, previousRowCount)
+                                       : rowCounts[static_cast<size_t>(i)];
+        const bool centeredFixedRest = fixedRow && row == totalRows - 2;
+        const std::vector<int> chosenSlots = centeredFixedRest ? std::vector<int>{2} : chooseSlots(rng, nodeCount);
+        for (int laneIndex = 0; laneIndex < static_cast<int>(chosenSlots.size()); ++laneIndex) {
+            const int slot = chosenSlots[static_cast<size_t>(laneIndex)];
+            layer.rows[static_cast<size_t>(row)].push_back(
+                makeNode(nextId++, layerId, row, slot,
+                         fixedRow ? fixedEventId : randomEventId(rng, layerId),
+                         MapNodeRole::Normal,
+                         positionForNode(rng, row, totalRows, slot, centeredFixedRest),
+                         fixedRow));
+        }
+    }
 }
 
 static int connectionCount(std::mt19937& rng, int maxCount) {
@@ -260,16 +363,7 @@ MapGraph MapGenerator::generate(int seed) const {
         layer1.startNodeId = nextId;
         layer1.rows[0].push_back(makeNode(nextId++, 1, 0, 2, MapEventId::Start,
                                           MapNodeRole::Start, positionForNode(rng1, 0, totalRows, 2, true)));
-        for (int i = 0; i < middleRows; ++i) {
-            const int row = i + 1;
-            const std::vector<int> chosenSlots = chooseSlots(rng1, rowCounts[static_cast<size_t>(i)]);
-            for (int laneIndex = 0; laneIndex < static_cast<int>(chosenSlots.size()); ++laneIndex) {
-                const int slot = chosenSlots[static_cast<size_t>(laneIndex)];
-                layer1.rows[static_cast<size_t>(row)].push_back(
-                    makeNode(nextId++, 1, row, slot, randomEventId(rng1, 1), MapNodeRole::Normal,
-                             positionForNode(rng1, row, totalRows, slot, false)));
-            }
-        }
+        addPlayableRows(layer1, rng1, 1, middleRows, totalRows, rowCounts, nextId);
         layer1.endNodeId = nextId;
         layer1.rows[static_cast<size_t>(totalRows - 1)].push_back(
             makeNode(nextId++, 1, totalRows - 1, 2, MapEventId::Boss,
@@ -290,16 +384,7 @@ MapGraph MapGenerator::generate(int seed) const {
         layer2.startNodeId = nextId;
         layer2.rows[0].push_back(makeNode(nextId++, 2, 0, 2, MapEventId::Start,
                                           MapNodeRole::Start, positionForNode(rng2, 0, totalRows, 2, true)));
-        for (int i = 0; i < middleRows; ++i) {
-            const int row = i + 1;
-            const std::vector<int> chosenSlots = chooseSlots(rng2, rowCounts[static_cast<size_t>(i)]);
-            for (int laneIndex = 0; laneIndex < static_cast<int>(chosenSlots.size()); ++laneIndex) {
-                const int slot = chosenSlots[static_cast<size_t>(laneIndex)];
-                layer2.rows[static_cast<size_t>(row)].push_back(
-                    makeNode(nextId++, 2, row, slot, randomEventId(rng2, 2), MapNodeRole::Normal,
-                             positionForNode(rng2, row, totalRows, slot, false)));
-            }
-        }
+        addPlayableRows(layer2, rng2, 2, middleRows, totalRows, rowCounts, nextId);
         layer2.endNodeId = nextId;
         layer2.rows[static_cast<size_t>(totalRows - 1)].push_back(
             makeNode(nextId++, 2, totalRows - 1, 2, MapEventId::Boss,
@@ -320,16 +405,7 @@ MapGraph MapGenerator::generate(int seed) const {
         layer3.startNodeId = nextId;
         layer3.rows[0].push_back(makeNode(nextId++, 3, 0, 2, MapEventId::Start,
                                           MapNodeRole::Start, positionForNode(rng3, 0, totalRows, 2, true)));
-        for (int i = 0; i < middleRows; ++i) {
-            const int row = i + 1;
-            const std::vector<int> chosenSlots = chooseSlots(rng3, rowCounts[static_cast<size_t>(i)]);
-            for (int laneIndex = 0; laneIndex < static_cast<int>(chosenSlots.size()); ++laneIndex) {
-                const int slot = chosenSlots[static_cast<size_t>(laneIndex)];
-                layer3.rows[static_cast<size_t>(row)].push_back(
-                    makeNode(nextId++, 3, row, slot, randomEventId(rng3, 3), MapNodeRole::Normal,
-                             positionForNode(rng3, row, totalRows, slot, false)));
-            }
-        }
+        addPlayableRows(layer3, rng3, 3, middleRows, totalRows, rowCounts, nextId);
         layer3.endNodeId = nextId;
         layer3.rows[static_cast<size_t>(totalRows - 1)].push_back(
             makeNode(nextId++, 3, totalRows - 1, 2, MapEventId::Boss,

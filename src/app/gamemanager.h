@@ -38,12 +38,15 @@ public slots:
     void chooseRestOption(RestOption option);
     void chooseRestTrainingCard(int ownedCardIndex);
     void chooseEventOwnedCard(int ownedCardIndex);
+    void chooseEventRecruit(int templateId);
+    void chooseEventEquipment(EquipmentGroup group, int equipmentId);
     void finishEvent(const EventResult& result = {});
     void finishBattle(const BattleResult& result = {});
     void startPreparedBattle(const std::vector<CharacterPlacement>& placements);
     void grantBattleChestGold(int gold);
     void grantBattleChestEquipment(EquipmentGroup group, int equipmentId);
     void buyShopOffer(int offerIndex);
+    void recycleOwnedCharacterCard(int ownedCardUid);
     void mergeOwnedCharacterCards(int firstIndex, int secondIndex);
     void unequipAllEquipment();
     void composeEquipment(int firstInstanceId, int secondInstanceId);
@@ -82,6 +85,7 @@ private:
     void startBattle(const BattleConfig& config);
     void ensureCardEconomyInitialized();
     void refreshShopOffers();
+    int maxOwnedCharacterCards() const;
     void grantShopExperience(int amount);
     void startElapsedTimer();
     void stopElapsedTimer();

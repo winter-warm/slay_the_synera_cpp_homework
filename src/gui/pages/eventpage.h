@@ -2,6 +2,7 @@
 #define GUI_PAGES_EVENTPAGE_H
 
 #include "app/gamemanager.h"
+#include "combat/equipment/equipment.h"
 #include <QPixmap>
 #include <QString>
 #include <QWidget>
@@ -34,7 +35,8 @@ signals:
     void restOptionSelected(RestOption option);
     void restTrainingCardSelected(int ownedCardIndex);
     void eventOwnedCardSelected(int ownedCardIndex);
-    void trainingPanelRequested();
+    void recruitTemplateSelected(int templateId);
+    void eventEquipmentSelected(EquipmentGroup group, int equipmentId);
     void saveRequested(int slot);
     void bagRequested();
     void shopRequested();
@@ -48,6 +50,8 @@ private:
     QWidget* createRestOptionCard(RestOption option);
     QWidget* createRestTrainingCard(int ownedCardIndex);
     QWidget* createEventOwnedCard(int ownedCardIndex);
+    QWidget* createRecruitChoiceCard(int templateId);
+    QWidget* createEquipmentChoiceCard(EquipmentGroup group, int equipmentId);
     void setSpecialEventLayoutVisible(bool visible);
     bool hasTrainableCards() const;
     void updateBackground();

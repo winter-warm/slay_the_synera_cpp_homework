@@ -114,6 +114,1309 @@
         }
       }
     },
+    "101": {
+      "title": "训练场赌约",
+      "backgroundPath": "assets/events/l1_training_wager.png",
+      "steps": {
+        "start": {
+          "text": "训练场上，木人被打得咚咚作响。教头把一枚铜币弹到指节上：“押一点？你的人要是撑过三轮，我就教他一招。”",
+          "options": [
+            {
+              "label": "押五枚金币",
+              "description": "失去5金币，随机一张未到三星的卡升一星",
+              "requiresGold": 5,
+              "requirements": [{ "type": "hasTrainableCard" }],
+              "actions": [
+                { "type": "loseGold", "amount": 5 },
+                { "type": "upgradeRandomOwnedCard" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "陪练一轮",
+              "description": "失去6点生命，获得4-7金币",
+              "requiresHpAbove": 6,
+              "actions": [
+                { "type": "loseHp", "amount": 6 },
+                { "type": "grantRandomGold", "min": 4, "max": 7 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "只看热闹",
+              "description": "恢复3点生命",
+              "actions": [
+                { "type": "heal", "amount": 3 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不参与赌约，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "102": {
+      "title": "巷口小贩",
+      "backgroundPath": "assets/events/l1_alley_vendor.png",
+      "steps": {
+        "start": {
+          "text": "巷口的小贩把摊布一掀，瓶瓶罐罐滚出一片叮当声。“都是真货，至少昨天还是真的。”",
+          "options": [
+            {
+              "label": "买密封包",
+              "description": "失去4金币，获得一件随机装备",
+              "requiresGold": 4,
+              "actions": [
+                { "type": "loseGold", "amount": 4 },
+                { "type": "grantRandomEquipment" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "讨价还价",
+              "description": "获得1-4金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 1, "max": 4 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不冒险，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "103": {
+      "title": "箭塔试射",
+      "backgroundPath": "assets/events/l1_arrow_tower_trial.png",
+      "steps": {
+        "start": {
+          "text": "城墙边的箭塔正在校准弩弦。守卫看见你，笑得过分真诚：“帮忙举一下靶子？很安全，大概。”",
+          "options": [
+            {
+              "label": "举靶",
+              "description": "失去5点生命，获得6-9金币",
+              "requiresHpAbove": 5,
+              "actions": [
+                { "type": "loseHp", "amount": 5 },
+                { "type": "grantRandomGold", "min": 6, "max": 9 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "校准弩机",
+              "description": "失去3金币，获得一张随机卡牌",
+              "requiresGold": 3,
+              "actions": [
+                { "type": "loseGold", "amount": 3 },
+                { "type": "grantRandomCard" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "帮忙捡箭",
+              "description": "获得1-3金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 1, "max": 3 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不靠近箭塔，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "104": {
+      "title": "酒馆传闻",
+      "backgroundPath": "assets/events/l1_tavern_rumor.png",
+      "steps": {
+        "start": {
+          "text": "酒馆角落里，吟游诗人的嗓音比酒还浑。每个传闻都像真的，只是价格不太像。",
+          "options": [
+            {
+              "label": "请他一杯",
+              "description": "失去4金币，获得5-10金币",
+              "requiresGold": 4,
+              "actions": [
+                { "type": "loseGold", "amount": 4 },
+                { "type": "grantRandomGold", "min": 5, "max": 10 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "赌一段传闻",
+              "description": "失去6金币，获得一张随机卡牌",
+              "requiresGold": 6,
+              "actions": [
+                { "type": "loseGold", "amount": 6 },
+                { "type": "grantRandomCard" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "蹭听墙角",
+              "description": "恢复2点生命",
+              "actions": [
+                { "type": "heal", "amount": 2 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不听传闻，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "105": {
+      "title": "破箱子",
+      "backgroundPath": "assets/events/l1_cracked_crate.png",
+      "steps": {
+        "start": {
+          "text": "一只破箱子倒在路边，木板缝里漏出一点亮光。它看上去很穷，但穷得很有希望。",
+          "options": [
+            {
+              "label": "撬开它",
+              "description": "失去4点生命，获得5-8金币",
+              "requiresHpAbove": 4,
+              "actions": [
+                { "type": "loseHp", "amount": 4 },
+                { "type": "grantRandomGold", "min": 5, "max": 8 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "仔细翻找",
+              "description": "获得1-4金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 1, "max": 4 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "106": {
+      "title": "机械师摊位",
+      "backgroundPath": "assets/events/l1_mechanic_stall.png",
+      "steps": {
+        "start": {
+          "text": "机械师的摊位上堆满齿轮和弹簧。她递给你一把扳手：“拧错了会炸，拧对了也可能会炸。”",
+          "options": [
+            {
+              "label": "帮她修核心",
+              "description": "失去5点生命，获得一件随机装备",
+              "requiresHpAbove": 5,
+              "actions": [
+                { "type": "loseHp", "amount": 5 },
+                { "type": "grantRandomEquipment" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "买个零件包",
+              "description": "失去5金币，获得一件随机装备",
+              "requiresGold": 5,
+              "actions": [
+                { "type": "loseGold", "amount": 5 },
+                { "type": "grantRandomEquipment" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "卖废铁",
+              "description": "获得2-4金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 2, "max": 4 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不碰机械，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "107": {
+      "title": "城门募捐",
+      "backgroundPath": "assets/events/l1_gate_donation.png",
+      "steps": {
+        "start": {
+          "text": "城门口摆着募捐箱，牌子上写着：为了更坚固的城墙，也为了更体面的收据。",
+          "options": [
+            {
+              "label": "慷慨捐赠",
+              "description": "失去8金币，最大生命提升3",
+              "requiresGold": 8,
+              "actions": [
+                { "type": "loseGold", "amount": 8 },
+                { "type": "changeMaxHp", "amount": 3 },
+                { "type": "heal", "amount": 3 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "帮忙搬砖",
+              "description": "失去4点生命，获得5-7金币",
+              "requiresHpAbove": 4,
+              "actions": [
+                { "type": "loseHp", "amount": 4 },
+                { "type": "grantRandomGold", "min": 5, "max": 7 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "投一枚零钱",
+              "description": "失去1金币，恢复4点生命",
+              "requiresGold": 1,
+              "actions": [
+                { "type": "loseGold", "amount": 1 },
+                { "type": "heal", "amount": 4 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不参与募捐，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "108": {
+      "title": "路边药锅",
+      "backgroundPath": "assets/events/l1_herbal_cauldron.png",
+      "steps": {
+        "start": {
+          "text": "路边药锅咕嘟咕嘟冒着泡，旁边的牌子写着：一碗提神，两碗见神。",
+          "options": [
+            {
+              "label": "喝一小碗",
+              "description": "恢复7点生命",
+              "actions": [
+                { "type": "heal", "amount": 7 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "喝一大碗",
+              "description": "最大生命降低2，恢复16点生命",
+              "actions": [
+                { "type": "changeMaxHp", "amount": -2 },
+                { "type": "heal", "amount": 16 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "卖给路人",
+              "description": "获得2-5金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 2, "max": 5 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不喝可疑药汤，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "109": {
+      "title": "抛硬币的孩子",
+      "backgroundPath": "assets/events/l1_coin_child.png",
+      "steps": {
+        "start": {
+          "text": "一个孩子把硬币抛得很高，落下时稳稳按在手背上。“猜正反，叔叔。输了别哭。”",
+          "options": [
+            {
+              "label": "猜正面",
+              "description": "失去2金币，获得1-6金币",
+              "requiresGold": 2,
+              "actions": [
+                { "type": "loseGold", "amount": 2 },
+                { "type": "grantRandomGold", "min": 1, "max": 6 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "猜反面",
+              "description": "失去3金币，获得2-8金币",
+              "requiresGold": 3,
+              "actions": [
+                { "type": "loseGold", "amount": 3 },
+                { "type": "grantRandomGold", "min": 2, "max": 8 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "送他一枚",
+              "description": "失去1金币，恢复3点生命",
+              "requiresGold": 1,
+              "actions": [
+                { "type": "loseGold", "amount": 1 },
+                { "type": "heal", "amount": 3 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不猜硬币，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "110": {
+      "title": "旧靶场",
+      "backgroundPath": "assets/events/l1_old_range.png",
+      "steps": {
+        "start": {
+          "text": "旧靶场里还立着几只歪斜的靶子。箭孔密得像账本，旁边压着一张未写完的训练表。",
+          "options": [
+            {
+              "label": "做满训练",
+              "description": "失去7点生命，随机一张未到三星的卡升一星",
+              "requiresHpAbove": 7,
+              "requirements": [{ "type": "hasTrainableCard" }],
+              "actions": [
+                { "type": "loseHp", "amount": 7 },
+                { "type": "upgradeRandomOwnedCard" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "拆下箭头",
+              "description": "获得3-6金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 3, "max": 6 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "靠着休息",
+              "description": "恢复4点生命",
+              "actions": [
+                { "type": "heal", "amount": 4 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不进靶场，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "111": {
+      "title": "契约板",
+      "backgroundPath": "assets/events/l1_contract_board.png",
+      "steps": {
+        "start": {
+          "text": "公告栏上钉满了委托，有的字迹端正，有的像是在逃命时写的。报酬越高，墨迹越乱。",
+          "options": [
+            {
+              "label": "接短工",
+              "description": "失去3点生命，获得5-8金币",
+              "requiresHpAbove": 3,
+              "actions": [
+                { "type": "loseHp", "amount": 3 },
+                { "type": "grantRandomGold", "min": 5, "max": 8 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "买推荐信",
+              "description": "失去6金币，获得一张随机卡牌",
+              "requiresGold": 6,
+              "actions": [
+                { "type": "loseGold", "amount": 6 },
+                { "type": "grantRandomCard" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "撕下悬赏角",
+              "description": "获得1-3金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 1, "max": 3 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不接委托，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "112": {
+      "title": "赊账商人",
+      "backgroundPath": "assets/events/l1_credit_merchant.png",
+      "steps": {
+        "start": {
+          "text": "商人把箱子锁得很紧，笑容却开得很大。“先拿货，后付款。信任，是最昂贵的货币。”",
+          "options": [
+            {
+              "label": "赊一件装备",
+              "description": "获得随机装备，失去8金币",
+              "requiresGold": 8,
+              "actions": [
+                { "type": "grantRandomEquipment" },
+                { "type": "loseGold", "amount": 8 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "抵押体力",
+              "description": "失去6点生命，获得随机装备",
+              "requiresHpAbove": 6,
+              "actions": [
+                { "type": "loseHp", "amount": 6 },
+                { "type": "grantRandomEquipment" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "帮他看摊",
+              "description": "获得2-5金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 2, "max": 5 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不赊账，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "201": {
+      "title": "树根神龛",
+      "backgroundPath": "assets/events/l2_root_shrine.png",
+      "steps": {
+        "start": {
+          "text": "古树的根须缠成一座小神龛，露水顺着树皮滴落，像某种缓慢的倒计时。",
+          "options": [
+            {
+              "label": "献上一滴血",
+              "description": "失去7点生命，最大生命提升4",
+              "requiresHpAbove": 7,
+              "actions": [
+                { "type": "loseHp", "amount": 7 },
+                { "type": "changeMaxHp", "amount": 4 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "清理落叶",
+              "description": "获得4-8金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 4, "max": 8 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "靠树休息",
+              "description": "恢复6点生命",
+              "actions": [
+                { "type": "heal", "amount": 6 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不打扰神龛，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "202": {
+      "title": "蘑菇圈",
+      "backgroundPath": "assets/events/l2_mushroom_ring.png",
+      "steps": {
+        "start": {
+          "text": "一圈发光蘑菇围出完美的圆。越完美的东西，越像陷阱，也越像晚餐。",
+          "options": [
+            {
+              "label": "摘亮的吃",
+              "description": "恢复14点生命，最大生命降低2",
+              "actions": [
+                { "type": "heal", "amount": 14 },
+                { "type": "changeMaxHp", "amount": -2 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "摘暗的卖",
+              "description": "失去4点生命，获得7-11金币",
+              "requiresHpAbove": 4,
+              "actions": [
+                { "type": "loseHp", "amount": 4 },
+                { "type": "grantRandomGold", "min": 7, "max": 11 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "203": {
+      "title": "狼群脚印",
+      "backgroundPath": "assets/events/l2_wolf_tracks.png",
+      "steps": {
+        "start": {
+          "text": "湿泥里留着一串新鲜脚印，旁边还有半块被咬碎的护符。狼群刚走，或者正在等你这么想。",
+          "options": [
+            {
+              "label": "追踪脚印",
+              "description": "失去8点生命，获得10-15金币",
+              "requiresHpAbove": 8,
+              "actions": [
+                { "type": "loseHp", "amount": 8 },
+                { "type": "grantRandomGold", "min": 10, "max": 15 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "捡起护符",
+              "description": "失去3点生命，获得一张随机卡牌",
+              "requiresHpAbove": 3,
+              "actions": [
+                { "type": "loseHp", "amount": 3 },
+                { "type": "grantRandomCard" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "掩盖气味",
+              "description": "失去2金币，恢复6点生命",
+              "requiresGold": 2,
+              "actions": [
+                { "type": "loseGold", "amount": 2 },
+                { "type": "heal", "amount": 6 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不追踪狼群，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "204": {
+      "title": "营火余烬",
+      "backgroundPath": "assets/events/l2_campfire_embers.png",
+      "steps": {
+        "start": {
+          "text": "一堆营火还剩暗红的余烬。灰里有脚印、骨头，还有一只没烧完的钱袋角。",
+          "options": [
+            {
+              "label": "翻找灰烬",
+              "description": "失去4点生命，获得6-12金币",
+              "requiresHpAbove": 4,
+              "actions": [
+                { "type": "loseHp", "amount": 4 },
+                { "type": "grantRandomGold", "min": 6, "max": 12 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "重新点火",
+              "description": "恢复10点生命，失去2金币",
+              "requiresGold": 2,
+              "actions": [
+                { "type": "loseGold", "amount": 2 },
+                { "type": "heal", "amount": 10 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "带走木炭",
+              "description": "获得3-5金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 3, "max": 5 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不碰余烬，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "205": {
+      "title": "藤蔓宝箱",
+      "backgroundPath": "assets/events/l2_vine_chest.png",
+      "steps": {
+        "start": {
+          "text": "一只宝箱被藤蔓缠得严严实实。藤蔓像睡着了，宝箱像装着让它醒来的理由。",
+          "options": [
+            {
+              "label": "强行劈开",
+              "description": "失去9点生命，获得一件随机装备",
+              "requiresHpAbove": 9,
+              "actions": [
+                { "type": "loseHp", "amount": 9 },
+                { "type": "grantRandomEquipment" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "喂它金币",
+              "description": "失去7金币，获得一件随机装备",
+              "requiresGold": 7,
+              "actions": [
+                { "type": "loseGold", "amount": 7 },
+                { "type": "grantRandomEquipment" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "摘几片叶子",
+              "description": "恢复5点生命",
+              "actions": [
+                { "type": "heal", "amount": 5 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不碰藤蔓，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "206": {
+      "title": "迷路旅人",
+      "backgroundPath": "assets/events/l2_lost_traveler.png",
+      "steps": {
+        "start": {
+          "text": "一个旅人抱着地图在原地转圈。地图画得很精美，问题是他拿反了。",
+          "options": [
+            {
+              "label": "护送一段",
+              "description": "失去5点生命，获得8-13金币",
+              "requiresHpAbove": 5,
+              "actions": [
+                { "type": "loseHp", "amount": 5 },
+                { "type": "grantRandomGold", "min": 8, "max": 13 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "买下地图",
+              "description": "失去5金币，获得一张随机卡牌",
+              "requiresGold": 5,
+              "actions": [
+                { "type": "loseGold", "amount": 5 },
+                { "type": "grantRandomCard" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "指个方向",
+              "description": "获得2-4金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 2, "max": 4 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不管旅人，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "207": {
+      "title": "鹿影泉水",
+      "backgroundPath": "assets/events/l2_deer_spring.png",
+      "steps": {
+        "start": {
+          "text": "泉水清得能照见月光，一只鹿影站在水边，低头时角尖像碰到了星星。",
+          "options": [
+            {
+              "label": "饮一捧泉水",
+              "description": "恢复12点生命",
+              "actions": [
+                { "type": "heal", "amount": 12 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "追逐鹿影",
+              "description": "失去8点生命，最大生命提升5",
+              "requiresHpAbove": 8,
+              "actions": [
+                { "type": "loseHp", "amount": 8 },
+                { "type": "changeMaxHp", "amount": 5 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "收集泉砂",
+              "description": "获得6-9金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 6, "max": 9 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不靠近泉水，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "208": {
+      "title": "倒下的古树",
+      "backgroundPath": "assets/events/l2_fallen_tree.png",
+      "steps": {
+        "start": {
+          "text": "一棵古树横在路上，树洞里塞着破布和旧铜片。想过去，总得付点力气。",
+          "options": [
+            {
+              "label": "搬开树干",
+              "description": "失去7点生命，获得一件随机装备",
+              "requiresHpAbove": 7,
+              "actions": [
+                { "type": "loseHp", "amount": 7 },
+                { "type": "grantRandomEquipment" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "钻进树洞",
+              "description": "失去4点生命，获得8-12金币",
+              "requiresHpAbove": 4,
+              "actions": [
+                { "type": "loseHp", "amount": 4 },
+                { "type": "grantRandomGold", "min": 8, "max": 12 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "绕路离开，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "209": {
+      "title": "花妖花圃",
+      "backgroundPath": "assets/events/l2_fae_flowerbed.png",
+      "steps": {
+        "start": {
+          "text": "一片花圃在林中亮着微光，花茎轻轻摇晃，像有人躲在叶子后面偷笑。",
+          "options": [
+            {
+              "label": "摘最亮的花",
+              "description": "失去5点生命，获得一张随机卡牌",
+              "requiresHpAbove": 5,
+              "actions": [
+                { "type": "loseHp", "amount": 5 },
+                { "type": "grantRandomCard" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "温和交涉",
+              "description": "获得4-7金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 4, "max": 7 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "闻一闻花香",
+              "description": "恢复8点生命，失去2金币",
+              "requiresGold": 2,
+              "actions": [
+                { "type": "loseGold", "amount": 2 },
+                { "type": "heal", "amount": 8 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不摘花，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "210": {
+      "title": "猎人陷阱",
+      "backgroundPath": "assets/events/l2_hunter_trap.png",
+      "steps": {
+        "start": {
+          "text": "落叶下露出一截细绳，旁边还有半个脚印。陷阱很老练，老练到有点看不起你。",
+          "options": [
+            {
+              "label": "拆掉机关",
+              "description": "失去5点生命，获得9-14金币",
+              "requiresHpAbove": 5,
+              "actions": [
+                { "type": "loseHp", "amount": 5 },
+                { "type": "grantRandomGold", "min": 9, "max": 14 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "回收零件",
+              "description": "失去3点生命，获得一件随机装备",
+              "requiresHpAbove": 3,
+              "actions": [
+                { "type": "loseHp", "amount": 3 },
+                { "type": "grantRandomEquipment" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "插个警示牌",
+              "description": "获得3-5金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 3, "max": 5 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不碰陷阱，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "301": {
+      "title": "破碎镜廊",
+      "backgroundPath": "assets/events/l3_shattered_mirror_hall.png",
+      "steps": {
+        "start": {
+          "text": "镜廊碎了一地，每块镜片里都站着一个慢半拍的你。有一个倒影已经先笑了。",
+          "options": [
+            {
+              "label": "凝视倒影",
+              "description": "失去10点生命，随机一张未到三星的卡升一星",
+              "requiresHpAbove": 10,
+              "requirements": [{ "type": "hasTrainableCard" }],
+              "actions": [
+                { "type": "loseHp", "amount": 10 },
+                { "type": "upgradeRandomOwnedCard" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "收集镜片",
+              "description": "失去5点生命，获得12-18金币",
+              "requiresHpAbove": 5,
+              "actions": [
+                { "type": "loseHp", "amount": 5 },
+                { "type": "grantRandomGold", "min": 12, "max": 18 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不看镜片，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "302": {
+      "title": "炼金罐",
+      "backgroundPath": "assets/events/l3_alchemy_tank.png",
+      "steps": {
+        "start": {
+          "text": "巨大的炼金罐还在运转，绿色液体一下下撞击玻璃。旁边贴着纸条：请勿饮用。纸条很旧。",
+          "options": [
+            {
+              "label": "饮用原液",
+              "description": "失去12点生命，最大生命提升7",
+              "requiresHpAbove": 12,
+              "actions": [
+                { "type": "loseHp", "amount": 12 },
+                { "type": "changeMaxHp", "amount": 7 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "稀释一杯",
+              "description": "最大生命降低2，恢复20点生命",
+              "actions": [
+                { "type": "changeMaxHp", "amount": -2 },
+                { "type": "heal", "amount": 20 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "卖掉样本",
+              "description": "获得10-16金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 10, "max": 16 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不碰炼金罐，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "303": {
+      "title": "龙焰余烬",
+      "backgroundPath": "assets/events/l3_dragonflame_embers.png",
+      "steps": {
+        "start": {
+          "text": "石桥上残留着龙焰，火光没有风也在摇。靠近时，你听见金币一样清脆的裂响。",
+          "options": [
+            {
+              "label": "徒手取炭",
+              "description": "失去12点生命，获得一件随机装备",
+              "requiresHpAbove": 12,
+              "actions": [
+                { "type": "loseHp", "amount": 12 },
+                { "type": "grantRandomEquipment" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "收集余火",
+              "description": "失去7点生命，获得14-22金币",
+              "requiresHpAbove": 7,
+              "actions": [
+                { "type": "loseHp", "amount": 7 },
+                { "type": "grantRandomGold", "min": 14, "max": 22 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "远远烤手",
+              "description": "恢复7点生命",
+              "actions": [
+                { "type": "heal", "amount": 7 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "远离龙焰，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "304": {
+      "title": "机械门锁",
+      "backgroundPath": "assets/events/l3_mechanical_lock.png",
+      "steps": {
+        "start": {
+          "text": "一扇机关门卡在半开处，锁芯里的齿轮还在转。它不像门，倒像一只等你伸手的嘴。",
+          "options": [
+            {
+              "label": "投币开锁",
+              "description": "失去9金币，获得一件随机装备",
+              "requiresGold": 9,
+              "actions": [
+                { "type": "loseGold", "amount": 9 },
+                { "type": "grantRandomEquipment" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "强拆锁芯",
+              "description": "失去9点生命，获得13-20金币",
+              "requiresHpAbove": 9,
+              "actions": [
+                { "type": "loseHp", "amount": 9 },
+                { "type": "grantRandomGold", "min": 13, "max": 20 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "抄下结构",
+              "description": "获得5-8金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 5, "max": 8 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不碰门锁，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "305": {
+      "title": "王座残影",
+      "backgroundPath": "assets/events/l3_throne_echo.png",
+      "steps": {
+        "start": {
+          "text": "废弃王座上浮着一层淡金色残影。它没有看你，却让你觉得自己已经被审判过一次。",
+          "options": [
+            {
+              "label": "献上贡金",
+              "description": "失去12金币，最大生命提升6",
+              "requiresGold": 12,
+              "actions": [
+                { "type": "loseGold", "amount": 12 },
+                { "type": "changeMaxHp", "amount": 6 },
+                { "type": "heal", "amount": 6 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "接受册封",
+              "description": "失去8点生命，获得一张随机卡牌",
+              "requiresHpAbove": 8,
+              "actions": [
+                { "type": "loseHp", "amount": 8 },
+                { "type": "grantRandomCard" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不接受王座审视，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "306": {
+      "title": "书架低语",
+      "backgroundPath": "assets/events/l3_whispering_bookshelf.png",
+      "steps": {
+        "start": {
+          "text": "城堡书架自己翻着页，纸张沙沙作响。每一行字都在努力说服你：只看一眼，不会有事。",
+          "options": [
+            {
+              "label": "读完禁页",
+              "description": "失去9点生命，随机一张未到三星的卡升一星",
+              "requiresHpAbove": 9,
+              "requirements": [{ "type": "hasTrainableCard" }],
+              "actions": [
+                { "type": "loseHp", "amount": 9 },
+                { "type": "upgradeRandomOwnedCard" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "抄下残章",
+              "description": "失去5金币，获得一张随机卡牌",
+              "requiresGold": 5,
+              "actions": [
+                { "type": "loseGold", "amount": 5 },
+                { "type": "grantRandomCard" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "卖掉书签",
+              "description": "获得7-12金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 7, "max": 12 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不读禁书，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "307": {
+      "title": "核心水晶",
+      "backgroundPath": "assets/events/l3_core_crystal.png",
+      "steps": {
+        "start": {
+          "text": "大厅中央的水晶缓慢旋转，光芒照在皮肤上，像有一只看不见的手在估价。",
+          "options": [
+            {
+              "label": "割让生命上限",
+              "description": "最大生命降低5，获得一件随机装备",
+              "actions": [
+                { "type": "changeMaxHp", "amount": -5 },
+                { "type": "grantRandomEquipment" },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "抽取晶尘",
+              "description": "失去10点生命，获得16-24金币",
+              "requiresHpAbove": 10,
+              "actions": [
+                { "type": "loseHp", "amount": 10 },
+                { "type": "grantRandomGold", "min": 16, "max": 24 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "借光疗伤",
+              "description": "恢复10点生命",
+              "actions": [
+                { "type": "heal", "amount": 10 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不碰水晶，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "308": {
+      "title": "断桥守卫",
+      "backgroundPath": "assets/events/l3_broken_bridge_guard.png",
+      "steps": {
+        "start": {
+          "text": "断桥前站着一副空盔甲，长戟横在路中央。桥下没有水，只有一片深得不讲道理的黑。",
+          "options": [
+            {
+              "label": "交过桥费",
+              "description": "失去8金币，获得12-18金币",
+              "requiresGold": 8,
+              "actions": [
+                { "type": "loseGold", "amount": 8 },
+                { "type": "grantRandomGold", "min": 12, "max": 18 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "强闯断桥",
+              "description": "进入战斗，胜利后领取桥后的战利品",
+              "actions": [
+                {
+                  "type": "startBattle",
+                  "returnStepId": "afterBattle",
+                  "defeatStepId": "afterDefeat",
+                  "battle": { "kind": "normal" }
+                }
+              ]
+            },
+            {
+              "label": "绕下桥洞",
+              "description": "失去6点生命，继续赶路",
+              "requiresHpAbove": 6,
+              "actions": [
+                { "type": "loseHp", "amount": 6 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "直接离开",
+              "description": "不靠近断桥，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        },
+        "afterBattle": {
+          "text": "空盔甲散成一地铁片，桥后的阴影里露出一只保存完好的补给箱。",
+          "options": [
+            {
+              "label": "打开补给箱",
+              "description": "获得一件随机装备和8-14金币",
+              "actions": [
+                { "type": "grantRandomEquipment" },
+                { "type": "grantRandomGold", "min": 8, "max": 14 },
+                { "type": "finish" }
+              ]
+            },
+            {
+              "label": "只拿金币",
+              "description": "获得14-22金币",
+              "actions": [
+                { "type": "grantRandomGold", "min": 14, "max": 22 },
+                { "type": "finish" }
+              ]
+            }
+          ]
+        },
+        "afterDefeat": {
+          "text": "空盔甲没有追击，只把长戟重新横在桥前。你听见它的甲片里传来一声很轻的叹息。",
+          "options": [
+            {
+              "label": "离开",
+              "description": "继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
     "400": {
       "title": "彩票店",
       "backgroundPath": "assets/events/lottery_shop.png",
@@ -218,6 +1521,120 @@
               "label": "离开",
               "description": "继续赶路",
               "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "401": {
+      "title": "招兵",
+      "backgroundPath": "assets/events/recruit_camp.png",
+      "steps": {
+        "start": {
+          "text": "大战之前必有补给。临时营地里灯火通明，佣兵、术士、猎手与医者都在等待一份可靠的契约。你可以任选一个稀有度1-3的角色加入队伍。",
+          "options": [
+            {
+              "label": "选择一个角色加入",
+              "description": "打开招募名册，任选一个稀有度1-3的角色",
+              "actions": [
+                {
+                  "type": "chooseRecruit",
+                  "min": 1,
+                  "max": 3,
+                  "prompt": "选择一个稀有度1-3的角色加入队伍。"
+                }
+              ]
+            },
+            {
+              "label": "离开",
+              "description": "不招募任何人，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "402": {
+      "title": "买马",
+      "backgroundPath": "assets/events/horse_market.png",
+      "steps": {
+        "start": {
+          "text": "东市买骏马，西市买鞍鞯，南市买辔头，北市买长鞭。行军之前，你总得挑一件称手的初级装备。",
+          "options": [
+            {
+              "label": "选择一个初级装备",
+              "description": "打开装备摊位，任选一个初级装备",
+              "actions": [
+                {
+                  "type": "chooseBasicEquipment",
+                  "prompt": "选择一件初级装备。"
+                }
+              ]
+            },
+            {
+              "label": "离开",
+              "description": "不购买装备，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        }
+      }
+    },
+    "403": {
+      "title": "象棋老人",
+      "backgroundPath": "assets/events/chess_elder.png",
+      "steps": {
+        "start": {
+          "text": "你看到了一个在下国际象棋的老人。他抬头看了你一眼，把棋钟轻轻按下。\n\n“下一局？”",
+          "options": [
+            {
+              "label": "与我一战",
+              "description": "进入战斗",
+              "actions": [
+                {
+                  "type": "startBattle",
+                  "returnStepId": "victory",
+                  "defeatStepId": "defeat",
+                  "battle": {
+                    "kind": "normal",
+                    "layer": 4
+                  }
+                }
+              ]
+            },
+            {
+              "label": "转身离开",
+              "description": "不打扰棋局，继续赶路",
+              "actions": [{ "type": "finish" }]
+            }
+          ]
+        },
+        "victory": {
+          "text": "哈哈哈，好棋好棋。",
+          "options": [
+            {
+              "label": "领取奖励离开",
+              "description": "获得10金币，然后选择一件初级装备",
+              "actions": [
+                { "type": "grantGold", "amount": 10 },
+                {
+                  "type": "chooseBasicEquipment",
+                  "prompt": "选择一件初级装备作为胜利奖励。"
+                }
+              ]
+            }
+          ]
+        },
+        "defeat": {
+          "text": "小伙子练练再来。",
+          "options": [
+            {
+              "label": "离开",
+              "description": "获得3金币，继续赶路",
+              "actions": [
+                { "type": "grantGold", "amount": 3 },
+                { "type": "finish" }
+              ]
             }
           ]
         }

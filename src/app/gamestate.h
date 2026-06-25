@@ -21,6 +21,11 @@ struct CurrentEventState {
     bool restSelection = false;
     bool restTrainingSelection = false;
     bool ownedCardSelection = false;
+    bool recruitSelection = false;
+    bool equipmentSelection = false;
+    bool advancedEquipmentSelection = false;
+    int recruitMinRarity = 1;
+    int recruitMaxRarity = 3;
     std::string selectionPrompt;
     std::string selectionFilter;
     std::vector<EventAction> selectionActions;
@@ -42,6 +47,7 @@ struct GameState {
     CurrentEventState currentEvent;
     BattleConfig currentBattle;
     std::string pendingEventStepAfterBattle;
+    std::string pendingEventDefeatStepAfterBattle;
     std::vector<HexTechCardRecord> selectedHexTechCards;
     std::vector<std::string> activeAuraIds;
     std::vector<HexTechDefinition> currentHexTechChoices;

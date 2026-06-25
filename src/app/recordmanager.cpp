@@ -51,8 +51,7 @@ static RunRecord recordFromJson(const QJsonObject& object)
 
 std::string RecordManager::recordPath() const
 {
-    const QString dirPath = QCoreApplication::applicationDirPath() + "/saves";
-    return QDir(dirPath).filePath("history.json").toStdString();
+    return QDir(QCoreApplication::applicationDirPath()).filePath("history.json").toStdString();
 }
 
 std::vector<RunRecord> RecordManager::loadRecords(std::string* error) const
@@ -94,14 +93,6 @@ bool RecordManager::appendRecord(const RunRecord& record, std::string* error) co
         saved.finishedAt = QDateTime::currentDateTime().toString(Qt::ISODate).toStdString();
     }
     records.insert(records.begin(), std::move(saved));
-
-    QDir dir(QCoreApplication::applicationDirPath());
-    if (!dir.exists("saves") && !dir.mkdir("saves")) {
-        if (error) {
-            *error = "Failed to create saves directory.";
-        }
-        return false;
-    }
 
     QJsonArray array;
     for (const RunRecord& existing : records) {

@@ -6,22 +6,13 @@
 
 std::string SaveManager::savePath(int slot) const {
     (void)slot;
-    const QString dirPath = QCoreApplication::applicationDirPath() + "/saves";
-    return QDir(dirPath).filePath("save.json").toStdString();
+    return QDir(QCoreApplication::applicationDirPath()).filePath("save.json").toStdString();
 }
 
 bool SaveManager::saveGame(const GameState& state, int slot, std::string* error) const {
     if (slot != 1) {
         if (error) {
             *error = "Only one save file is supported.";
-        }
-        return false;
-    }
-
-    QDir dir(QCoreApplication::applicationDirPath());
-    if (!dir.exists("saves") && !dir.mkdir("saves")) {
-        if (error) {
-            *error = "Failed to create saves directory.";
         }
         return false;
     }

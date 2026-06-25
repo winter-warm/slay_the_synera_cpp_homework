@@ -21,7 +21,7 @@ enum class MapNodeRole {
 
 // event_id meanings:
 // 0 = start, 1 = boss, 2 = rest, 3 = normal battle,
-// 4 = elite battle, 100-399 = other events.
+// 4 = elite battle, 100+ = other events.
 namespace MapEventId {
 static constexpr int Start = 0;
 static constexpr int Boss = 1;

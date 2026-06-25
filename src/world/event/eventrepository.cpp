@@ -45,6 +45,8 @@ static BattleConfig battleFromJson(const QJsonObject& object) {
     config.kind = battleKindFromString(object.value("kind").toString());
     config.boardId = object.value("boardId").toString("default_board").toStdString();
     config.returnStepId = object.value("returnStepId").toString().toStdString();
+    config.defeatStepId = object.value("defeatStepId").toString().toStdString();
+    config.poolLayerId = object.value("layer").toInt(object.value("poolLayerId").toInt());
     config.statMultiplier = static_cast<float>(object.value("statMultiplier").toDouble(1.0));
     const QJsonArray enemies = object.value("enemies").toArray();
     for (const QJsonValue& value : enemies) {
@@ -68,7 +70,12 @@ static EventAction actionFromJson(const QJsonObject& object) {
     if (type == "startBattle") {
         action.type = EventActionType::StartBattle;
         action.battle = battleFromJson(object.value("battle").toObject());
-        action.battle.returnStepId = object.value("returnStepId").toString().toStdString();
+        action.battle.returnStepId = object.value("returnStepId")
+                                         .toString(QString::fromStdString(action.battle.returnStepId))
+                                         .toStdString();
+        action.battle.defeatStepId = object.value("defeatStepId")
+                                         .toString(QString::fromStdString(action.battle.defeatStepId))
+                                         .toStdString();
     } else if (type == "goToStep") {
         action.type = EventActionType::GoToStep;
         action.nextStepId = object.value("stepId").toString(object.value("nextStepId").toString("start")).toStdString();
@@ -100,6 +107,12 @@ static EventAction actionFromJson(const QJsonObject& object) {
         action.type = EventActionType::GrantRandomEquipment;
     } else if (type == "chooseOwnedCard") {
         action.type = EventActionType::ChooseOwnedCard;
+    } else if (type == "chooseRecruit") {
+        action.type = EventActionType::ChooseRecruit;
+    } else if (type == "chooseBasicEquipment") {
+        action.type = EventActionType::ChooseBasicEquipment;
+    } else if (type == "chooseAdvancedEquipment") {
+        action.type = EventActionType::ChooseAdvancedEquipment;
     } else if (type == "upgradeSelectedOwnedCard") {
         action.type = EventActionType::UpgradeSelectedOwnedCard;
     } else {
@@ -212,9 +225,9 @@ static void validateEventTable(const QJsonObject& root) {
         for (auto stepIt = steps.begin(); stepIt != steps.end(); ++stepIt) {
             const QJsonObject step = stepIt.value().toObject();
             const QJsonArray options = step.value("options").toArray();
-            if (eventId != "2" && options.size() > 0 && (options.size() < 2 || options.size() > 4)) {
+            if (eventId != "2" && options.size() > 0 && options.size() > 4) {
                 qWarning() << "Event" << eventId << "step" << stepIt.key()
-                           << "should have 2-4 options for the normal event template.";
+                           << "should have 1-4 options for the normal event template.";
             }
             std::vector<QString> referencedSteps;
             for (const QJsonValue& optionValue : options) {

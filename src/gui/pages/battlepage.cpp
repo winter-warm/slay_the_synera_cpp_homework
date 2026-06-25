@@ -1,6 +1,7 @@
 #include "battlepage.h"
 #include "gui/battle/battlescene.h"
 #include "combat/equipment/equipmentrepository.h"
+#include "entity/character/character.h"
 #include "entity/character/characterfactory.h"
 #include "entity/unit.h"
 #include "gui/widgets/gamehud.h"
@@ -20,6 +21,7 @@
 #include <QPropertyAnimation>
 #include <QPushButton>
 #include <QSize>
+#include <QStringList>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <algorithm>
@@ -27,6 +29,131 @@
 #include <random>
 
 static const char* equipmentMimeType = "application/x-synera-equipment-instance";
+static const char* reachedBondColor = "#8a6500";
+static const char* unreachedBondColor = "#8f8f8f";
+static const char* normalBondColor = "#16120f";
+
+static QString bondDisplayName(Bond bond)
+{
+    switch (bond) {
+    case Bond::soldier:
+        return QString::fromUtf8("战士");
+    case Bond::mage:
+        return QString::fromUtf8("法师");
+    case Bond::animal:
+        return QString::fromUtf8("动物");
+    case Bond::building:
+        return QString::fromUtf8("建筑");
+    case Bond::pastor:
+        return QString::fromUtf8("牧师");
+    case Bond::witch:
+        return QString::fromUtf8("魔女");
+    case Bond::beast:
+        return QString::fromUtf8("野兽");
+    case Bond::chess:
+        return QString::fromUtf8("棋子");
+    case Bond::assassin:
+        return QString::fromUtf8("刺客");
+    case Bond::none:
+        return QString();
+    }
+    return QString();
+}
+
+struct BondEffectText {
+    int threshold = 0;
+    const char* description = "";
+};
+
+static std::vector<BondEffectText> bondEffectTexts(Bond bond)
+{
+    switch (bond) {
+    case Bond::soldier:
+        return {{3, "全体攻击+10%"}, {5, "全体攻击+20%，生命+10%"}};
+    case Bond::witch:
+        return {{3, "全体生命-30%，攻击+50%"}, {5, "全体防御+10%，攻击+30%"}};
+    case Bond::assassin:
+        return {{3, "全体攻速+50%"}, {5, "刺客生命+20%"}};
+    case Bond::mage:
+        return {{2, "全体初始MP+3"}, {4, "全体最大MP-1"}};
+    case Bond::building:
+        return {{1, "全体生命+30%"}};
+    default:
+        return {};
+    }
+}
+
+static QString coloredBondNumber(int value, bool reached)
+{
+    return QString("<span style=\"color:%1; font-weight:900; min-width:18px;\">%2</span>")
+        .arg(reached ? reachedBondColor : unreachedBondColor)
+        .arg(value);
+}
+
+class ZoneLegendWidget : public QWidget {
+public:
+    explicit ZoneLegendWidget(QWidget* parent = nullptr)
+        : QWidget(parent) {
+        setFixedSize(190, 184);
+        setAttribute(Qt::WA_TransparentForMouseEvents);
+    }
+
+protected:
+    void paintEvent(QPaintEvent*) override {
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::Antialiasing, true);
+
+        painter.setPen(QPen(QColor(32, 28, 24, 210), 2));
+        painter.setBrush(QColor(248, 241, 225, 232));
+        painter.drawRoundedRect(rect().adjusted(1, 1, -1, -1), 8, 8);
+
+        QFont titleFont = painter.font();
+        titleFont.setPointSize(13);
+        titleFont.setBold(true);
+        painter.setFont(titleFont);
+        painter.setPen(QColor(36, 30, 24));
+        painter.drawText(QRectF(18, 10, width() - 36, 24), Qt::AlignLeft | Qt::AlignVCenter,
+                         QString::fromUtf8("格子说明"));
+
+        struct Entry {
+            QColor color;
+            const char* label;
+        };
+        const Entry entries[] = {
+            {QColor(60, 60, 80), "我方布阵"},
+            {QColor(80, 60, 60), "敌方区域"},
+            {QColor(180, 160, 105), "战斗区域"},
+            {QColor(70, 125, 75), "阻挡障碍"},
+            {QColor(130, 105, 40), "低矮障碍"}
+        };
+
+        QFont labelFont = painter.font();
+        labelFont.setPointSize(11);
+        labelFont.setBold(true);
+        painter.setFont(labelFont);
+
+        for (int row = 0; row < 5; ++row) {
+            const qreal centerX = 28.0;
+            const qreal centerY = 54.0 + row * 25.0;
+            QPolygonF hex;
+            hex.reserve(6);
+            for (int i = 0; i < 6; ++i) {
+                const qreal angle = (60.0 * i - 90.0) * 3.14159265358979323846 / 180.0;
+                hex.append(QPointF(centerX + std::cos(angle) * 11.0,
+                                   centerY + std::sin(angle) * 11.0));
+            }
+
+            painter.setPen(QPen(QColor(36, 36, 36), 1.5));
+            painter.setBrush(entries[row].color);
+            painter.drawPolygon(hex);
+
+            painter.setPen(QColor(36, 30, 24));
+            painter.drawText(QRectF(50, centerY - 11.0, 120, 22),
+                             Qt::AlignLeft | Qt::AlignVCenter,
+                             QString::fromUtf8(entries[row].label));
+        }
+    }
+};
 
 BattlePage::BattlePage(QWidget* parent)
     : QWidget(parent)
@@ -35,6 +162,8 @@ BattlePage::BattlePage(QWidget* parent)
     , startButton(new QPushButton(this))
     , settlementButton(new QPushButton(view))
     , equipmentWarningLabel(new QLabel(view))
+    , zoneLegend(new ZoneLegendWidget(view))
+    , bondSummaryLabel(nullptr)
     , game(new BattleScene(this))
     , battleSystem(nullptr)
     , battleTimer(new QTimer(this))
@@ -73,6 +202,8 @@ BattlePage::BattlePage(QWidget* parent)
     equipmentWarningLabel->setFixedSize(430, 86);
     equipmentWarningLabel->hide();
     equipmentWarningLabel->raise();
+    zoneLegend->show();
+    zoneLegend->raise();
     view->installEventFilter(this);
     view->viewport()->installEventFilter(this);
     view->viewport()->setAcceptDrops(true);
@@ -96,6 +227,13 @@ BattlePage::BattlePage(QWidget* parent)
         emit startBattleRequested();
     });
     connect(settlementButton, &QPushButton::clicked, this, &BattlePage::completeSettlement);
+    connect(game, &BattleScene::placementsChanged, this, &BattlePage::updateBondSummary);
+    connect(game, &BattleScene::rosterUnitRecycleRequested, this, [this](int unitId) {
+        const auto uidIt = unitIdToOwnedCardUid.find(unitId);
+        if (uidIt != unitIdToOwnedCardUid.end()) {
+            emit recycleOwnedCardRequested(uidIt->second);
+        }
+    });
     connect(game, &BattleScene::rewardChestOpened, this, &BattlePage::completeVictoryChest);
     connect(game, &BattleScene::rewardEquipmentClaimed, this, [this](EquipmentGroup group, int equipmentId) {
         auto it = std::find_if(pendingRewardEquipmentDrops.begin(), pendingRewardEquipmentDrops.end(),
@@ -145,6 +283,7 @@ void BattlePage::setBattleSystem(battlesystem* system) {
             game, &BattleScene::removeCharacterItem);
     connect(battleSystem, &battlesystem::battleStarted, this, [this]() {
         startButton->hide();
+        clearBondSummary();
         emit battlePreparationModeChanged(false);
         syncFromBattleSystem();
         battleTimer->start();
@@ -185,6 +324,7 @@ void BattlePage::setState(const GameState& state) {
         game->setDeploymentLimit(deploymentLimitForCurrentLayer());
     }
     syncRosterFromState();
+    updateBondSummary();
 }
 
 void BattlePage::setElapsedSeconds(int seconds) {
@@ -202,6 +342,8 @@ void BattlePage::startNodeBattle(int) {
         syncFromBattleSystem();
     }
     startButton->show();
+    ensureBondSummary();
+    updateBondSummary();
     emit battlePreparationModeChanged(true);
     QTimer::singleShot(0, this, &BattlePage::fitSceneInView);
 }
@@ -281,12 +423,12 @@ void BattlePage::applyStarScaling(Character* character, int starLevel) {
 
 int BattlePage::deploymentLimitForCurrentLayer() const {
     if (currentState.currentLayerId <= 1) {
-        return 4;
+        return 6;
     }
     if (currentState.currentLayerId == 2) {
-        return 5;
+        return 7;
     }
-    return 6;
+    return 8;
 }
 
 void BattlePage::syncFromBattleSystem() {
@@ -295,9 +437,101 @@ void BattlePage::syncFromBattleSystem() {
     }
 }
 
+void BattlePage::ensureBondSummary() {
+    if (bondSummaryLabel || !view) {
+        return;
+    }
+    bondSummaryLabel = new QLabel(view);
+    bondSummaryLabel->setTextFormat(Qt::RichText);
+    bondSummaryLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    bondSummaryLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
+    bondSummaryLabel->setStyleSheet("background: rgba(248, 241, 225, 232); border: 2px solid rgba(32, 28, 24, 210); border-radius: 8px; padding: 10px 12px;");
+    bondSummaryLabel->setMinimumWidth(190);
+    bondSummaryLabel->raise();
+}
+
+void BattlePage::clearBondSummary() {
+    if (!bondSummaryLabel) {
+        return;
+    }
+    bondSummaryLabel->hide();
+    bondSummaryLabel->deleteLater();
+    bondSummaryLabel = nullptr;
+}
+
+void BattlePage::updateBondSummary() {
+    if (!game || (battleSystem && battleSystem->isRunning()) || settlementActive) {
+        clearBondSummary();
+        return;
+    }
+
+    const std::unordered_map<Bond, int> counts = battlesystem::count_bond(game->preparedPlacements());
+    if (counts.empty()) {
+        if (bondSummaryLabel) {
+            bondSummaryLabel->hide();
+        }
+        return;
+    }
+
+    ensureBondSummary();
+    if (!bondSummaryLabel) {
+        return;
+    }
+
+    const std::vector<Bond> displayOrder = {
+        Bond::soldier,
+        Bond::mage,
+        Bond::building,
+        Bond::witch,
+        Bond::assassin,
+        Bond::pastor,
+        Bond::animal,
+        Bond::beast,
+        Bond::chess
+    };
+
+    QStringList rows;
+    for (Bond bond : displayOrder) {
+        const auto it = counts.find(bond);
+        if (it == counts.end() || it->second <= 0) {
+            continue;
+        }
+
+        QString row = QString("<div style=\"color:%1; font-weight:800; font-size:15px; margin-top:5px;\">%2 "
+                              "<span style=\"font-weight:900;\">%3</span></div>")
+                          .arg(normalBondColor, bondDisplayName(bond))
+                          .arg(it->second);
+        const std::vector<BondEffectText> effects = bondEffectTexts(bond);
+        if (effects.empty()) {
+            row += QString("<div style=\"color:%1; font-size:13px; margin-left:10px;\">暂无羁绊效果</div>")
+                       .arg(normalBondColor);
+        } else {
+            for (const BondEffectText& effect : effects) {
+                row += QString("<div style=\"color:%1; font-size:13px; margin-left:10px;\">%2 "
+                               "<span style=\"color:%1;\">%3</span></div>")
+                           .arg(normalBondColor,
+                                coloredBondNumber(effect.threshold, it->second >= effect.threshold),
+                                QString::fromUtf8(effect.description));
+            }
+        }
+        rows.push_back(row);
+    }
+
+    if (rows.empty()) {
+        bondSummaryLabel->hide();
+        return;
+    }
+
+    bondSummaryLabel->setText(rows.join(""));
+    bondSummaryLabel->adjustSize();
+    bondSummaryLabel->show();
+    bondSummaryLabel->raise();
+    positionSettlementButton();
+}
+
 bool BattlePage::eventFilter(QObject* watched, QEvent* event) {
     if (watched == view && event->type() == QEvent::Resize) {
-        positionSettlementButton();
+        fitSceneInView();
     }
     if (watched == view->viewport()) {
         if (event->type() == QEvent::DragEnter || event->type() == QEvent::DragMove) {
@@ -349,6 +583,19 @@ void BattlePage::positionSettlementButton() {
     if (equipmentWarningLabel) {
         equipmentWarningLabel->move((view->viewport()->width() - equipmentWarningLabel->width()) / 2,
                                     (view->viewport()->height() - equipmentWarningLabel->height()) / 2);
+    }
+    if (zoneLegend) {
+        const int legendX = view->viewport()->width() - zoneLegend->width() - 34;
+        const int legendY = std::clamp(static_cast<int>(view->viewport()->height() * 0.52),
+                                       96,
+                                       std::max(96, view->viewport()->height() - zoneLegend->height() - 170));
+        zoneLegend->move(qMax(0, legendX), legendY);
+        zoneLegend->raise();
+    }
+    if (bondSummaryLabel && bondSummaryLabel->isVisible()) {
+        const int bondX = view->viewport()->width() - bondSummaryLabel->width() - 34;
+        bondSummaryLabel->move(qMax(0, bondX), 34);
+        bondSummaryLabel->raise();
     }
 }
 
@@ -536,5 +783,4 @@ int BattlePage::extraChestGoldFromHexTech() const {
     }
     return extra;
 }
-
 

@@ -45,8 +45,20 @@ AppWindow::AppWindow(QWidget* parent)
     stack->addWidget(eventPage);
     stack->setCurrentWidget(startPage);
 
-    connect(startPage, &StartPage::newGameRequested,
-            manager, &GameManager::newGame);
+    connect(startPage, &StartPage::newGameRequested, this, [this](int seed) {
+        if (!manager->existingSaveSlots().empty()) {
+            const QMessageBox::StandardButton answer =
+                QMessageBox::question(this,
+                                      QString::fromUtf8("覆盖存档"),
+                                      QString::fromUtf8("将会覆盖现有存档，确定吗？"),
+                                      QMessageBox::Yes | QMessageBox::No,
+                                      QMessageBox::No);
+            if (answer != QMessageBox::Yes) {
+                return;
+            }
+        }
+        manager->newGame(seed);
+    });
     connect(startPage, &StartPage::loadGameRequested,
             manager, &GameManager::loadFromSlot);
 
@@ -82,10 +94,10 @@ AppWindow::AppWindow(QWidget* parent)
             manager, &GameManager::chooseRestTrainingCard);
     connect(eventPage, &EventPage::eventOwnedCardSelected,
             manager, &GameManager::chooseEventOwnedCard);
-    connect(eventPage, &EventPage::trainingPanelRequested, this, [this]() {
-        cardPanel->showTraining();
-        cardPanel->raise();
-    });
+    connect(eventPage, &EventPage::recruitTemplateSelected,
+            manager, &GameManager::chooseEventRecruit);
+    connect(eventPage, &EventPage::eventEquipmentSelected,
+            manager, &GameManager::chooseEventEquipment);
     connect(eventPage, &EventPage::saveRequested,
             manager, &GameManager::saveToSlot);
     connect(eventPage, &EventPage::bagRequested, this, [this]() {
@@ -139,9 +151,7 @@ AppWindow::AppWindow(QWidget* parent)
     connect(manager, &GameManager::showEventRequested, this, [this](int nodeId) {
         stack->setCurrentWidget(eventPage);
         eventPage->showEvent(nodeId);
-        if (manager->state().currentEvent.restTrainingSelection) {
-            cardPanel->showTraining();
-        } else if (cardPanel->mode() == CardPanel::Mode::Training) {
+        if (cardPanel->mode() == CardPanel::Mode::Training) {
             cardPanel->closePanel();
         }
         cardPanel->raise();
@@ -203,6 +213,8 @@ BattlePage* AppWindow::ensureBattlePage() {
     });
     connect(battlePage, &BattlePage::equipEquipmentRequested,
             manager, &GameManager::equipEquipmentToCard);
+    connect(battlePage, &BattlePage::recycleOwnedCardRequested,
+            manager, &GameManager::recycleOwnedCharacterCard);
     connect(battlePage, &BattlePage::battlePreparationModeChanged,
             equipmentPanel, &EquipmentPanel::setBattlePreparationMode);
     connect(battlePage, &BattlePage::panelsShouldClose, cardPanel, &CardPanel::closePanel);

@@ -1,7 +1,14 @@
-/PA说明文档.pdf
 /Synera_starter.zip
-/过程文件
+/过程文件/
+/过程素材/
 /.qtcreator/
 /build/
 /build-codex/
 /out/
+*.user
+*.o
+*.obj
+*.exe
+*.dll
+*.pdb
+*.ilk

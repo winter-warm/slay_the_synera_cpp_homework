@@ -17,6 +17,7 @@ class QGraphicsView;
 class QLabel;
 class QPushButton;
 class QTimer;
+class QWidget;
 
 class BattlePage : public QWidget {
     Q_OBJECT
@@ -43,6 +44,7 @@ signals:
     void shopRequested();
     void equipmentRequested();
     void equipEquipmentRequested(int equipmentInstanceId, int ownedCardUid);
+    void recycleOwnedCardRequested(int ownedCardUid);
     void battlePreparationModeChanged(bool active);
     void panelsShouldClose();
     void returnToStartRequested();
@@ -57,6 +59,9 @@ private:
     void applyStarScaling(Character* character, int starLevel);
     int deploymentLimitForCurrentLayer() const;
     void syncFromBattleSystem();
+    void ensureBondSummary();
+    void clearBondSummary();
+    void updateBondSummary();
     void positionSettlementButton();
     void beginSettlement(bool victory);
     void completeSettlement();
@@ -74,6 +79,8 @@ private:
     QPushButton* startButton;
     QPushButton* settlementButton;
     QLabel* equipmentWarningLabel;
+    QWidget* zoneLegend;
+    QLabel* bondSummaryLabel;
     BattleScene* game;
     battlesystem* battleSystem;
     QTimer* battleTimer;

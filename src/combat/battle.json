@@ -1,12 +1,1153 @@
-{
-  "battles": [
-    {
-      "layer": 4,
-      "elite": false,
-      "map_id": "default_board",
-      "enemy": [
-        { "position": { "x": 4, "y": -5 }, "enemy": 4006 }
-      ]
-    }
-  ]
+﻿{
+    "battles":  [
+                    {
+                        "layer":  1,
+                        "elite":  false,
+                        "map_id":  "town_training_square",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  1307
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  1301
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  1304
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  1,
+                        "elite":  false,
+                        "map_id":  "town_market_streets",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  1302
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  1303
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  1306
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  1301
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  1,
+                        "elite":  false,
+                        "map_id":  "town_arrow_tower_alley",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  1308
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  1304
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  1303
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  1,
+                        "elite":  false,
+                        "map_id":  "town_mechanical_workshop",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  1309
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  1310
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  1306
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  1301
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  1,
+                        "elite":  true,
+                        "map_id":  "town_market_streets",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  1401
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  1302
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  1303
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  1306
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  1,
+                        "elite":  true,
+                        "map_id":  "town_mechanical_workshop",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  1403
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  1309
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  1309
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  1310
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  1,
+                        "elite":  true,
+                        "map_id":  "town_arrow_tower_alley",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  1404
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  1308
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  1302
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  10,
+                        "elite":  true,
+                        "map_id":  "town_training_square",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  1501
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  1502
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  1503
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  2,
+                        "elite":  false,
+                        "map_id":  "forest_trail",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2002
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  2001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  2001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2004
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  2,
+                        "elite":  false,
+                        "map_id":  "forest_goblin_camp",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2006
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  2006
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  2007
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2008
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  9,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  2009
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  2,
+                        "elite":  false,
+                        "map_id":  "forest_mushroom_wetland",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2005
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  2005
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  2010
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2003
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  9,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  2012
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  2,
+                        "elite":  false,
+                        "map_id":  "forest_tree_hollow_loop",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2011
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  2003
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  2004
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2005
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  2,
+                        "elite":  false,
+                        "map_id":  "forest_moonlit_clearing",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2002
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  2001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  2001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2010
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  2,
+                        "elite":  true,
+                        "map_id":  "forest_goblin_camp",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2101
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  2006
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  2007
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2009
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  9,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  2008
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  2,
+                        "elite":  true,
+                        "map_id":  "forest_trail",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2103
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  2001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  2001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2002
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  2,
+                        "elite":  true,
+                        "map_id":  "forest_tree_hollow_loop",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2104
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  2003
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  2010
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2005
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  2,
+                        "elite":  true,
+                        "map_id":  "forest_mushroom_wetland",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2105
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  2003
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  2010
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2012
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  20,
+                        "elite":  true,
+                        "map_id":  "forest_moonlit_clearing",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2201
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  2010
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  2005
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  2001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  9,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  2001
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  3,
+                        "elite":  false,
+                        "map_id":  "castle_library_corridors",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3006
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  3008
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  3008
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3002
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  3,
+                        "elite":  false,
+                        "map_id":  "castle_alchemy_lab",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3010
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  3009
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  3011
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3013
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  3,
+                        "elite":  false,
+                        "map_id":  "castle_great_hall",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3004
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  3012
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  3001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  9,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  3002
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  3,
+                        "elite":  false,
+                        "map_id":  "castle_mirror_corridor",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3003
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  3003
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  3006
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3011
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  9,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  3005
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  3,
+                        "elite":  false,
+                        "map_id":  "castle_dragonflame_bridge",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3014
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  3009
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  3012
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3005
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  3,
+                        "elite":  true,
+                        "map_id":  "castle_great_hall",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3101
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  3001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  3001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3002
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  3,
+                        "elite":  true,
+                        "map_id":  "castle_library_corridors",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3103
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  3001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  3001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3002
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  3,
+                        "elite":  true,
+                        "map_id":  "castle_mechanism_hall",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3105
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  3012
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  3004
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3007
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  3,
+                        "elite":  true,
+                        "map_id":  "castle_mirror_corridor",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3104
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  3003
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  3005
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3011
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  3,
+                        "elite":  true,
+                        "map_id":  "castle_dragonflame_bridge",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3106
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  3014
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  3014
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3009
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  30,
+                        "elite":  true,
+                        "map_id":  "castle_dragon_core",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3201
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  3106
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  3014
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  3014
+                                      }
+                                  ]
+                    },
+                    {
+                        "layer":  4,
+                        "elite":  false,
+                        "map_id":  "chess_board",
+                        "enemy":  [
+                                      {
+                                          "position":  {
+                                                           "x":  4,
+                                                           "y":  -6
+                                                       },
+                                          "enemy":  4002
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  5,
+                                                           "y":  -7
+                                                       },
+                                          "enemy":  4003
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -8
+                                                       },
+                                          "enemy":  4004
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  4005
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -10
+                                                       },
+                                          "enemy":  4006
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  9,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  4004
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -12
+                                                       },
+                                          "enemy":  4003
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  11,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  4002
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  4,
+                                                           "y":  -7
+                                                       },
+                                          "enemy":  4001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  5,
+                                                           "y":  -8
+                                                       },
+                                          "enemy":  4001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  6,
+                                                           "y":  -9
+                                                       },
+                                          "enemy":  4001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  7,
+                                                           "y":  -10
+                                                       },
+                                          "enemy":  4001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  8,
+                                                           "y":  -11
+                                                       },
+                                          "enemy":  4001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  9,
+                                                           "y":  -12
+                                                       },
+                                          "enemy":  4001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  10,
+                                                           "y":  -13
+                                                       },
+                                          "enemy":  4001
+                                      },
+                                      {
+                                          "position":  {
+                                                           "x":  11,
+                                                           "y":  -14
+                                                       },
+                                          "enemy":  4001
+                                      }
+                                  ]
+                    }
+                ]
 }
+

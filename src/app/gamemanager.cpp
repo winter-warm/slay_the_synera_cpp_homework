@@ -15,6 +15,8 @@ static bool containsInt(const std::vector<int>& values, int value) {
     return std::find(values.begin(), values.end(), value) != values.end();
 }
 
+static constexpr int kShopOfferCount = 5;
+
 static int shopExpThresholdForLevel(int level) {
     if (level == 1) {
         return 10;
@@ -148,6 +150,7 @@ void GameManager::newGame(int seed) {
     GameState state;
     state.seed = seed;
     state.map = MapGenerator().generate(seed);
+    state.gold = 5;
     state.currentLayerId = 1;
     state.nextOwnedCardUid = 1;
     state.nextEquipmentInstanceId = 1;
@@ -163,6 +166,12 @@ void GameManager::newGame(int seed) {
     startElapsedTimer();
     emit stateChanged(currentState);
     emit showMapRequested();
+}
+
+static constexpr int kMaxOwnedCharacterCards = 24;
+
+static int maxOwnedCharacterCards() {
+    return kMaxOwnedCharacterCards;
 }
 
 void GameManager::loadFromSlot(int slot) {
@@ -206,6 +215,7 @@ void GameManager::enterMapNode(int nodeId) {
     currentState.currentEvent = {};
     currentState.currentHexTechChoices.clear();
     currentState.pendingEventStepAfterBattle.clear();
+    currentState.pendingEventDefeatStepAfterBattle.clear();
 
     EventContext context;
     context.layerId = currentState.currentLayerId;
@@ -249,6 +259,7 @@ void GameManager::enterMapNode(int nodeId) {
     }
 
     loadEventStep(node->event_id, "start");
+    emit stateChanged(currentState);
     emit showEventRequested(nodeId);
 }
 
@@ -275,10 +286,16 @@ void GameManager::chooseHexTechCard(int choiceIndex) {
     bool addedLongTerm = false;
     int goldGained = 0;
     bool deferredInterface = false;
+    bool chooseBasicEquipment = false;
+    bool chooseAdvancedEquipment = false;
     for (const HexTechEffect& effect : definition.effects) {
         if (effect.type == "grant_gold") {
             currentState.gold += effect.value;
             goldGained += effect.value;
+        } else if (effect.type == "choose_basic_equipment") {
+            chooseBasicEquipment = true;
+        } else if (effect.type == "choose_advanced_equipment") {
+            chooseAdvancedEquipment = true;
         } else if (isLongTermHexTechEffect(effect)) {
             addedLongTerm = true;
         } else {
@@ -293,9 +310,33 @@ void GameManager::chooseHexTechCard(int choiceIndex) {
         currentState.activeAuraIds.push_back(definition.id);
     }
 
+    if (chooseBasicEquipment || chooseAdvancedEquipment) {
+        currentState.currentHexTechChoices.clear();
+        currentState.pendingEventStepAfterBattle.clear();
+        currentState.pendingEventDefeatStepAfterBattle.clear();
+        currentState.currentEvent = {};
+        currentState.currentEvent.active = true;
+        currentState.currentEvent.eventId = MapEventId::Start;
+        currentState.currentEvent.stepId = "equipmentChoice";
+        currentState.currentEvent.title = definition.title;
+        currentState.currentEvent.backgroundPath =
+            "assets/events/hextech_start_layer" + std::to_string(currentState.currentLayerId) + ".png";
+        currentState.currentEvent.text = definition.description;
+        currentState.currentEvent.equipmentSelection = true;
+        currentState.currentEvent.advancedEquipmentSelection = chooseAdvancedEquipment;
+        currentState.currentEvent.selectionPrompt =
+            chooseAdvancedEquipment
+                ? QString::fromUtf8("选择一件高级装备。").toStdString()
+                : QString::fromUtf8("选择一件初级装备。").toStdString();
+        emit stateChanged(currentState);
+        emit showEventRequested(currentState.currentNodeId);
+        return;
+    }
+
     currentState.currentEvent = {};
     currentState.currentHexTechChoices.clear();
     currentState.pendingEventStepAfterBattle.clear();
+    currentState.pendingEventDefeatStepAfterBattle.clear();
     finishCurrentEventNode();
 
     if (goldGained > 0) {
@@ -408,6 +449,48 @@ void GameManager::chooseEventOwnedCard(int ownedCardIndex) {
     emit stateChanged(currentState);
 }
 
+void GameManager::chooseEventRecruit(int templateId) {
+    if (!currentState.currentEvent.active || !currentState.currentEvent.recruitSelection) {
+        return;
+    }
+    const auto info = characterfactory::infoFor(templateId);
+    if (!info || !info->playerCharacter ||
+        info->rarity < currentState.currentEvent.recruitMinRarity ||
+        info->rarity > currentState.currentEvent.recruitMaxRarity) {
+        return;
+    }
+
+    currentState.ownedCharacterCards.push_back(makeOwnedCharacterCard(templateId, 1));
+    grantShopExperience(1);
+    finishCurrentEventNode();
+}
+
+void GameManager::chooseEventEquipment(EquipmentGroup group, int equipmentId) {
+    if (!currentState.currentEvent.active || !currentState.currentEvent.equipmentSelection || equipmentId <= 0) {
+        return;
+    }
+
+    EquipmentRepository repository;
+    std::optional<Equipment> equipment;
+    if (currentState.currentEvent.advancedEquipmentSelection) {
+        if (group != EquipmentGroup::Advanced) {
+            return;
+        }
+        equipment = repository.findAdvanced(equipmentId);
+    } else {
+        if (group == EquipmentGroup::Advanced) {
+            return;
+        }
+        equipment = repository.findBasic(group, equipmentId);
+    }
+    if (!equipment) {
+        return;
+    }
+
+    currentState.ownedEquipment.push_back(makeOwnedEquipment(group, equipmentId));
+    finishCurrentEventNode();
+}
+
 void GameManager::executeEventActions(const std::vector<EventAction>& actions, int optionIndex) {
     for (int actionIndex = 0; actionIndex < static_cast<int>(actions.size()); ++actionIndex) {
         if (!executeEventAction(actions[static_cast<size_t>(actionIndex)], optionIndex, actionIndex)) {
@@ -428,6 +511,7 @@ bool GameManager::executeEventAction(const EventAction& action, int optionIndex,
         return false;
     case EventActionType::StartBattle:
         currentState.pendingEventStepAfterBattle = action.battle.returnStepId;
+        currentState.pendingEventDefeatStepAfterBattle = action.battle.defeatStepId;
         if (!action.battle.enemies.empty()) {
             startBattle(action.battle);
             return false;
@@ -436,9 +520,15 @@ bool GameManager::executeEventAction(const EventAction& action, int optionIndex,
             if (const MapNode* node = layer->nodeById(currentState.currentNodeId)) {
                 BattleRepository battleRepository;
                 BattleKind kind = action.battle.kind == BattleKind::None ? BattleKind::Normal : action.battle.kind;
-                if (const auto battle = battleRepository.battleFor(battleContextFor(currentState, *node, kind))) {
+                BattleNodeContext context = battleContextFor(currentState, *node, kind);
+                if (action.battle.poolLayerId > 0) {
+                    context.layerId = action.battle.poolLayerId;
+                }
+                if (const auto battle = battleRepository.battleFor(context)) {
                     BattleConfig config = *battle;
                     config.returnStepId = action.battle.returnStepId;
+                    config.defeatStepId = action.battle.defeatStepId;
+                    config.poolLayerId = action.battle.poolLayerId;
                     startBattle(config);
                 }
             }
@@ -587,6 +677,33 @@ bool GameManager::executeEventAction(const EventAction& action, int optionIndex,
         emit stateChanged(currentState);
         emit showEventRequested(currentState.currentNodeId);
         return false;
+    case EventActionType::ChooseRecruit:
+        currentState.currentEvent.recruitSelection = true;
+        currentState.currentEvent.recruitMinRarity = action.minAmount > 0 ? action.minAmount : 1;
+        currentState.currentEvent.recruitMaxRarity = action.maxAmount > 0 ? action.maxAmount : 3;
+        if (currentState.currentEvent.recruitMaxRarity < currentState.currentEvent.recruitMinRarity) {
+            std::swap(currentState.currentEvent.recruitMaxRarity, currentState.currentEvent.recruitMinRarity);
+        }
+        currentState.currentEvent.selectionPrompt = action.prompt.empty()
+                                                       ? QString::fromUtf8("选择一个角色加入。").toStdString()
+                                                       : action.prompt;
+        currentState.currentEvent.options.clear();
+        emit stateChanged(currentState);
+        emit showEventRequested(currentState.currentNodeId);
+        return false;
+    case EventActionType::ChooseBasicEquipment:
+    case EventActionType::ChooseAdvancedEquipment:
+        currentState.currentEvent.equipmentSelection = true;
+        currentState.currentEvent.advancedEquipmentSelection = action.type == EventActionType::ChooseAdvancedEquipment;
+        currentState.currentEvent.selectionPrompt = action.prompt.empty()
+                                                       ? (currentState.currentEvent.advancedEquipmentSelection
+                                                              ? QString::fromUtf8("选择一件高级装备。").toStdString()
+                                                              : QString::fromUtf8("选择一件初级装备。").toStdString())
+                                                       : action.prompt;
+        currentState.currentEvent.options.clear();
+        emit stateChanged(currentState);
+        emit showEventRequested(currentState.currentNodeId);
+        return false;
     }
     return true;
 }
@@ -605,7 +722,6 @@ void GameManager::finishBattle(const BattleResult& result) {
     battleSystem.clear();
     if (result.victory) {
         grantShopExperience(1);
-        refreshShopOffers();
     } else {
         currentState.playerHp = std::max(0,
                                          currentState.playerHp -
@@ -625,9 +741,14 @@ void GameManager::finishBattle(const BattleResult& result) {
             return;
         }
     }
-    if (!currentState.pendingEventStepAfterBattle.empty()) {
-        const std::string nextStep = currentState.pendingEventStepAfterBattle;
+    if (!currentState.pendingEventStepAfterBattle.empty() ||
+        !currentState.pendingEventDefeatStepAfterBattle.empty()) {
+        std::string nextStep = currentState.pendingEventStepAfterBattle;
+        if (!result.victory && !currentState.pendingEventDefeatStepAfterBattle.empty()) {
+            nextStep = currentState.pendingEventDefeatStepAfterBattle;
+        }
         currentState.pendingEventStepAfterBattle.clear();
+        currentState.pendingEventDefeatStepAfterBattle.clear();
         loadEventStep(currentState.currentEvent.eventId, nextStep);
         emit stateChanged(currentState);
         emit showEventRequested(currentState.currentNodeId);
@@ -749,6 +870,12 @@ void GameManager::buyShopOffer(int offerIndex) {
         return;
     }
 
+    if (static_cast<int>(currentState.ownedCharacterCards.size()) >= maxOwnedCharacterCards()) {
+        emit messageRequested(QString::fromUtf8("背包满了"),
+                              QString::fromUtf8("最多持有 %1 个角色。").arg(maxOwnedCharacterCards()));
+        return;
+    }
+
     ShopOffer& offer = currentState.shop.offers[static_cast<size_t>(offerIndex)];
     if (offer.sold || offer.templateId <= 0) {
         return;
@@ -770,6 +897,35 @@ void GameManager::buyShopOffer(int offerIndex) {
     offer.sold = true;
     grantShopExperience(1);
     emit stateChanged(currentState);
+}
+
+void GameManager::recycleOwnedCharacterCard(int ownedCardUid) {
+    auto it = std::find_if(currentState.ownedCharacterCards.begin(), currentState.ownedCharacterCards.end(),
+                           [ownedCardUid](const OwnedCharacterCard& card) {
+                               return card.uid == ownedCardUid;
+                           });
+    if (it == currentState.ownedCharacterCards.end()) {
+        return;
+    }
+    if (currentState.ownedCharacterCards.size() <= 1) {
+        emit messageRequested(QString::fromUtf8("无法回收"),
+                              QString::fromUtf8("至少保留一个角色。"));
+        return;
+    }
+
+    const auto info = characterfactory::infoFor(it->templateId);
+    const int cost = info ? shopCostForRarity(info->rarity) : 1;
+    const int refund = std::max(0, (it->starLevel - 1) * cost - 1);
+    const int uid = it->uid;
+    for (OwnedEquipment& equipment : currentState.ownedEquipment) {
+        if (equipment.equippedCardUid == uid) {
+            equipment.equippedCardUid = -1;
+        }
+    }
+    currentState.ownedCharacterCards.erase(it);
+    currentState.gold += refund;
+    emit stateChanged(currentState);
+    emit centerToastRequested(QString::fromUtf8("回收获得 %1 金币").arg(refund));
 }
 
 void GameManager::mergeOwnedCharacterCards(int firstIndex, int secondIndex) {
@@ -845,6 +1001,7 @@ void GameManager::finishCurrentEventNode() {
     currentState.currentEvent = {};
     currentState.currentHexTechChoices.clear();
     currentState.pendingEventStepAfterBattle.clear();
+    currentState.pendingEventDefeatStepAfterBattle.clear();
     completeCurrentNode();
     if (terminalRunFinished) {
         emit stateChanged(currentState);
@@ -888,11 +1045,13 @@ void GameManager::completeNode(int nodeId) {
             return;
         }
         unlockLayerStart(currentState.currentLayerId + 1);
+        refreshShopOffers();
         return;
     }
 
     currentState.availableNodeIds = node->nextNodeIds;
     currentState.currentNodeId = -1;
+    refreshShopOffers();
 }
 
 void GameManager::loadEventStep(int eventId, const std::string& stepId) {
@@ -920,6 +1079,11 @@ void GameManager::loadEventStep(int eventId, const std::string& stepId) {
     currentState.currentEvent.restSelection = false;
     currentState.currentEvent.restTrainingSelection = false;
     currentState.currentEvent.ownedCardSelection = false;
+    currentState.currentEvent.recruitSelection = false;
+    currentState.currentEvent.equipmentSelection = false;
+    currentState.currentEvent.advancedEquipmentSelection = false;
+    currentState.currentEvent.recruitMinRarity = 1;
+    currentState.currentEvent.recruitMaxRarity = 3;
     currentState.currentEvent.selectionPrompt.clear();
     currentState.currentEvent.selectionFilter.clear();
     currentState.currentEvent.selectionActions.clear();
@@ -1043,7 +1207,7 @@ void GameManager::ensureCardEconomyInitialized() {
     if (currentState.shop.exp < 0) {
         currentState.shop.exp = 0;
     }
-    if (currentState.shop.offers.size() != 4) {
+    if (currentState.shop.offers.size() != kShopOfferCount) {
         refreshShopOffers();
     }
 }
@@ -1058,7 +1222,7 @@ void GameManager::refreshShopOffers() {
     std::mt19937 rng(static_cast<unsigned int>(currentState.seed * 1103515245u +
                                                currentState.shop.rollCounter * 2654435761u +
                                                currentState.shop.level * 97u));
-    for (int slot = 0; slot < 4; ++slot) {
+    for (int slot = 0; slot < kShopOfferCount; ++slot) {
         const int rarity = rollRarityForShopLevel(currentState.shop.level, rng);
         std::vector<int> candidates;
         for (const auto& info : templates) {
@@ -1094,6 +1258,10 @@ void GameManager::grantShopExperience(int amount) {
         currentState.shop.level = 4;
         currentState.shop.exp = std::max(0, currentState.shop.exp);
     }
+}
+
+int GameManager::maxOwnedCharacterCards() const {
+    return ::maxOwnedCharacterCards();
 }
 
 void GameManager::startElapsedTimer() {

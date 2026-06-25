@@ -57,6 +57,10 @@ static int costForRarity(int rarity) {
     return 1;
 }
 
+static int maxOwnedCharacterCards() {
+    return 24;
+}
+
 static QString starsForLevel(int starLevel) {
     QString text;
     for (int i = 0; i < std::max(1, std::min(3, starLevel)); ++i) {
@@ -566,10 +570,19 @@ QWidget* CardPanel::createCharacterCard(int templateId, int starLevel, int cost,
         auto* button = new QPushButton(QString::number(cost), frame);
         button->setIcon(QIcon(uiAssetPath("ui_coin.png")));
         button->setIconSize(QSize(24, 24));
-        button->setEnabled(templateId > 0 && currentState.gold >= cost);
+        const bool rosterFull = static_cast<int>(currentState.ownedCharacterCards.size()) >=
+                                maxOwnedCharacterCards();
+        button->setEnabled(templateId > 0 && (currentState.gold >= cost || rosterFull));
+        if (rosterFull) {
+            button->setToolTip(QString::fromUtf8("背包满了"));
+        }
         button->setStyleSheet("QPushButton { padding: 6px; background: rgba(73,38,12,235); color: #fff5db; border-radius: 4px; font-weight: 900; font-size: 20px; } QPushButton:disabled { color: #79624a; background: rgba(91,55,22,90); }");
         layout->addWidget(button);
-        connect(button, &QPushButton::clicked, this, [this, frame, index]() {
+        connect(button, &QPushButton::clicked, this, [this, frame, index, rosterFull]() {
+            if (rosterFull) {
+                emit buyRequested(index);
+                return;
+            }
             playEnhancedCardFlyToBag(frame, index);
         });
     }

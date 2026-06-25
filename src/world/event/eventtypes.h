@@ -30,7 +30,10 @@ enum class EventActionType {
     UpgradeSelectedOwnedCard,
     GrantShopExp,
     GrantRandomEquipment,
-    ChooseOwnedCard
+    ChooseOwnedCard,
+    ChooseRecruit,
+    ChooseBasicEquipment,
+    ChooseAdvancedEquipment
 };
 
 enum class RestOption {
@@ -50,7 +53,9 @@ struct BattleConfig {
     std::string boardId = "default_board";
     std::vector<EnemyPlacement> enemies;
     float statMultiplier = 1.0f;
+    int poolLayerId = 0;
     std::string returnStepId;
+    std::string defeatStepId;
 };
 
 struct LotteryPayout {
