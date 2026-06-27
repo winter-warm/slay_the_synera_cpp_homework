@@ -16,7 +16,7 @@ enum class TargetSelectorKind {
 };
 
 enum class PathFinderKind {
-    Astar,
+    BFS,
     FlyToAttackPosition
 };
 
@@ -25,7 +25,7 @@ Character* highestAttackEnemy(Character* self, const Board& board);
 Character* lowestHpEnemy(Character* self, const Board& board);
 TargetSelector targetSelectorFromKind(TargetSelectorKind kind);
 PathFinder pathFinderFromKind(PathFinderKind kind);
-std::vector<Hex> Astar(Character* self, Character* target, const Board& board);
+std::vector<Hex> BFS(Character* self, Character* target, const Board& board);
 std::vector<Hex> flyToAttackPosition(Character* self, Character* target, const Board& board);
 
 class MoveComponent:public component {
@@ -42,7 +42,7 @@ private:
     void invalidateTargeting(){target = nullptr; path.clear();}
     void invalidatePath(){path.clear();}
 public:
-    MoveComponent(Character* owner, PathFinder pf = Astar, TargetSelector ts = nearestEnemy):component(owner), targetSelector(ts), pathFinder(pf){}
+    MoveComponent(Character* owner, PathFinder pf = BFS, TargetSelector ts = nearestEnemy):component(owner), targetSelector(ts), pathFinder(pf){}
     MoveComponent(const MoveComponent& other, Character* owner);
 
     bool update(Board& board);

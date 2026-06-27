@@ -182,15 +182,15 @@ TargetSelector targetSelectorFromKind(TargetSelectorKind kind) {
 
 PathFinder pathFinderFromKind(PathFinderKind kind) {
     switch(kind) {
-    case PathFinderKind::Astar:
-        return Astar;
+    case PathFinderKind::BFS:
+        return BFS;
     case PathFinderKind::FlyToAttackPosition:
         return flyToAttackPosition;
     }
-    return Astar;
+    return BFS;
 }
 
-std::vector<Hex> Astar(Character* self, Character* target, const Board& board) {
+std::vector<Hex> BFS(Character* self, Character* target, const Board& board) {
     Hex start;
     Hex targetHex;
     if(!self || !target || !board.posOf(self, &start) || !board.posOf(target, &targetHex)) {
